@@ -1,0 +1,37 @@
+
+{% extends 'home.html' %}
+{% block title %}Bookings - Water Tanker Service{% endblock %}
+<!-- Booking Form -->
+{% block Hero-bar %}
+    <div class="container my-4 booking-container">
+        <h2 class="text-center">Book a Water Tanker</h2>
+        <form class="p-4 border rounded">
+            <div class="mb-3 ">
+                <label for="tankSize" class="form-label fs-4 fw-bold">Tanker Size (in Liters)</label>
+                <input type="number" class="form-control" id="tankSize" placeholder="Enter Tanker Size" required>
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label fs-4 fw-bold">Name</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter Your Name" required>
+            </div>
+            <div class="mb-3">
+                <label for="mobile" class="form-label fs-4 fw-bold">Mobile Number</label>
+                <input type="tel" class="form-control" id="mobile" placeholder="Enter Mobile Number" required>
+            </div>
+            <div class="mb-3">
+                <label for="location" class="form-label fs-4 fw-bold">Location</label>
+                <input type="text" class="form-control" id="location" placeholder="Enter Delivery Location" required>
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label fs-4 fw-bold">Category</label>
+                <select class="form-select" id="category" required>
+                    <option value="">Select Category</option>
+                    <option value="drinking">Drinking</option>
+                    <option value="both">Both Drinking and Using</option>
+                    <option value="using">Only Using</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Book Now</button>
+        </form>
+    </div>
+{% endblock %}

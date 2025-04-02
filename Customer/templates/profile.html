@@ -1,0 +1,33 @@
+{% extends 'home.html' %}
+<!-- Customer Profile -->
+{%block title%}Customer Profile{%endblock%}
+{% block Hero-bar %}
+<!-- Customer Profile -->
+    <div class="container my-4 profile-container">
+        <h2>Customer Profile</h2>
+        <div class="p-4 border rounded">
+            <img src="customer-photo.jpg" alt="Customer Photo" class="rounded-circle mb-3 d-block mx-auto" width="100">
+            <h4 class="text-center">John Doe</h4>
+            <p class="text-center"><strong>Rating:</strong> ⭐⭐⭐⭐☆</p>
+            
+            <div class="mb-3">
+                <label class="form-label fs-4"><strong>Choose Language</strong></label>
+                <select class="form-select">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-success w-100 mb-2">
+                <i class="fa-solid fa-credit-card"></i> Payment Options
+            </button>
+            <button class="btn btn-warning w-100 mb-2">
+                <i class="fa-solid fa-bell"></i> Notifications
+            </button>
+            <button class="btn btn-danger w-100">
+                <i class="fa-solid fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+{%endblock%}

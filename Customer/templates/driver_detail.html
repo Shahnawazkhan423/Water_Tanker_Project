@@ -1,0 +1,16 @@
+ {% extends 'home.html'%}
+ <!-- Driver Details for Customer Panel -->
+{%block Hero-bar%}
+    <div class="container my-4 driver-container">
+        <h2 class="text-center">Driver Details</h2>
+        <div class="p-4 border rounded">
+            <p class="fs-4"><strong>Driver Name:</strong> <span id="displayDriverName">John Doe</span></p>
+            <p class="fs-4"><strong>Phone Number:</strong> <span id="displayDriverPhone">+1234567890</span></p>
+            <p class="fs-4"><strong>Delivery Date & Time:</strong> <span id="displayDeliveryDateTime">2025-04-05 10:00 AM</span></p>
+            <p class="fs-4"><strong>Status:</strong> <span id="displayStatus">Order On the Way</span></p>
+            <button class="btn btn-danger mt-2">
+                <i class="fa-solid fa-times-circle"></i> Cancel Order
+            </button>
+        </div>
+    </div>
+{% endblock %}
