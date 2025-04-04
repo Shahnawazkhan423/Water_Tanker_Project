@@ -1,0 +1,34 @@
+{% extends "Home.html" %}
+{%block title%}Driver Order{%endblock%}
+{%block sup-hero%}
+<div class="container mt-4">
+    <h5 class="text-center">Driver Order List</h5>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-3 p-3">
+                <h6><strong>Username:</strong> John Doe</h6>
+                <p><strong>Size Tanker:</strong> 5000L</p>
+                <p><strong>Mobile:</strong> 9876543210</p>
+                <p><strong>Location:</strong> Indore</p>
+                <p><strong>Categories:</strong> Drinking</p>
+                <div class="text-center">
+                    <button class="btn btn-danger">Cancel</button>
+                    <button class="btn btn-warning">On Way</button>
+                    <button class="btn btn-success">Order Complete</button>
+                </div>
+            </div>
+            <div class="card mb-3 p-3">
+                <h6><strong>Username:</strong> Jane Smith</h6>
+                <p><strong>Size Tanker:</strong> 10000L</p>
+                <p><strong>Mobile:</strong> 9123456789</p>
+                <p><strong>Location:</strong> Bhopal</p>
+                <p><strong>Categories:</strong> Usage</p>
+                <div class="text-center">
+                    <button class="btn btn-warning">On Way</button>
+                    <button class="btn btn-success">Order Complete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}

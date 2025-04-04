@@ -1,0 +1,44 @@
+{% extends "Home.html" %}
+{%block title%}Driver Earning{%endblock%}
+{%block sup-hero%}
+<div class="container mt-4">
+    <h2 class="text-center">Driver Earnings</h2>
+    
+    <div class="row text-center mt-3">
+        <div class="col-md-6">
+            <div class="card p-3 shadow">
+                <h5>Today Earning</h5>
+                <h3>₹ 3,000</h3>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3 shadow">
+                <h5>Complete Order</h5>
+                <h3>15 / 25</h3>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <h4 class="text-center">Daily Earnings (Last 7 Days)</h4>
+        <table class="table table-bordered text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Earnings (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>April 1</td><td>3,200</td></tr>
+                <tr><td>April 2</td><td>2,800</td></tr>
+                <tr><td>April 3</td><td>3,500</td></tr>
+                <tr><td>April 4</td><td>3,000</td></tr>
+                <tr><td>April 5</td><td>2,750</td></tr>
+                <tr><td>April 6</td><td>3,600</td></tr>
+                <tr><td>April 7</td><td>3,100</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{%endblock%}

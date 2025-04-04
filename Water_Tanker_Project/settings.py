@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 ]
 INTERNAL_APPS = [
     'Customer',
+    'Supplier',
 ]
 INSTALLED_APPS +=INTERNAL_APPS
 
@@ -81,7 +82,9 @@ WSGI_APPLICATION = 'Water_Tanker_Project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': BASE_DIR / 'db.mysql',
+        'NAME': 'ajay',
+        'USER':'root',
+        'PASSWORD':'mrkhan@123',
     }
 }
 

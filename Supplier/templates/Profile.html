@@ -1,0 +1,58 @@
+{% extends "Home.html" %}
+{%block title%}Driver Order{%endblock%}
+{%block sup-hero%}
+<div class="container mt-5">
+    <h4 class="text-center mb-4">🚚 Driver Profile</h4>
+    <div class="card shadow-lg rounded-4 p-4">
+        <div class="text-center mb-4">
+            <img src="https://via.placeholder.com/150" class="rounded-circle shadow-sm mb-3" alt="Driver Photo">
+            <h5 class="fw-bold mb-1">John Doe</h5>
+            <p class="mb-0"><strong>Rating:</strong> ⭐⭐⭐⭐☆ <span class="text-muted">(4.5)</span></p>
+        </div>
+
+        <hr>
+
+        <div class="row text-center mb-3">
+            <div class="col-md-6 mb-2">
+                <div class="bg-light rounded-3 p-3">
+                    <strong>Orders Completed:</strong>
+                    <div class="text-primary fs-5 fw-semibold">120</div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-2">
+                <div class="bg-light rounded-3 p-3">
+                    <strong>Year Joined:</strong>
+                    <div class="text-primary fs-5 fw-semibold">1</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center mb-3">
+            <div class="col-md-6 mb-2">
+                <div class="bg-light rounded-3 p-3">
+                    <strong>From Location:</strong>
+                    <div class="text-dark">Indore</div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-2">
+                <div class="bg-light rounded-3 p-3">
+                    <strong>Phone Number:</strong>
+                    <div class="text-dark">9876543210</div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <h6 class="fw-bold mb-3">🚛 Vehicle Information & Documents</h6>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Vehicle Type:</strong> Tanker 10000L</li>
+            <li class="list-group-item"><strong>Registration Number:</strong> MP09AB1234</li>
+            <li class="list-group-item"><strong>License Number:</strong> DL-12345-67890</li>
+            <li class="list-group-item"><strong>Insurance Validity:</strong> Till Dec 2025</li>
+            <li class="list-group-item"><strong>Pollution Certificate:</strong> Valid</li>
+        </ul>
+    </div>
+</div>
+
+{%endblock%}
