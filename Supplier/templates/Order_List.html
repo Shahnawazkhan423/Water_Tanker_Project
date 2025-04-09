@@ -6,24 +6,13 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card mb-3 p-3">
-                <h6><strong>Username:</strong> John Doe</h6>
-                <p><strong>Size Tanker:</strong> 5000L</p>
-                <p><strong>Mobile:</strong> 9876543210</p>
-                <p><strong>Location:</strong> Indore</p>
-                <p><strong>Categories:</strong> Drinking</p>
+                <h6><strong>Username:</strong> {{ user_name }}</h6>
+                <p><strong>Size Tanker:</strong> {{ size }}</p>
+                <p><strong>Mobile:</strong> {{ cust_number }}</p>
+                <p><strong>Location:</strong> {{ location }}</p>
+                <p><strong>Category:</strong> {{ cag }}</p>
                 <div class="text-center">
                     <button class="btn btn-danger">Cancel</button>
-                    <button class="btn btn-warning">On Way</button>
-                    <button class="btn btn-success">Order Complete</button>
-                </div>
-            </div>
-            <div class="card mb-3 p-3">
-                <h6><strong>Username:</strong> Jane Smith</h6>
-                <p><strong>Size Tanker:</strong> 10000L</p>
-                <p><strong>Mobile:</strong> 9123456789</p>
-                <p><strong>Location:</strong> Bhopal</p>
-                <p><strong>Categories:</strong> Usage</p>
-                <div class="text-center">
                     <button class="btn btn-warning">On Way</button>
                     <button class="btn btn-success">Order Complete</button>
                 </div>

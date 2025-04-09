@@ -1,37 +1,69 @@
-
 {% extends 'home.html' %}
 {% block title %}Bookings - Water Tanker Service{% endblock %}
-<!-- Booking Form -->
 {% block Hero-bar %}
-    <div class="container my-4 booking-container">
-        <h2 class="text-center">Book a Water Tanker</h2>
-        <form class="p-4 border rounded">
-            <div class="mb-3 ">
-                <label for="tankSize" class="form-label fs-4 fw-bold">Tanker Size (in Liters)</label>
-                <input type="number" class="form-control" id="tankSize" placeholder="Enter Tanker Size" required>
+<div class="container my-5">
+    <form method="post" class="p-4 border rounded shadow bg-light">
+        {% csrf_token %}
+
+        <!-- User Details Section -->
+        <h4 class="mb-3 text-primary">User Details</h4>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ user_form.first_name.label_tag }}
+                {{ user_form.first_name }}
             </div>
-            <div class="mb-3">
-                <label for="name" class="form-label fs-4 fw-bold">Name</label>
-                <input type="text" class="form-control" id="name" placeholder="Enter Your Name" required>
+            <div class="col-md-6 mb-3">
+                {{ user_form.last_name.label_tag }}
+                {{ user_form.last_name }}
             </div>
-            <div class="mb-3">
-                <label for="mobile" class="form-label fs-4 fw-bold">Mobile Number</label>
-                <input type="tel" class="form-control" id="mobile" placeholder="Enter Mobile Number" required>
+            <div class="col-md-6 mb-3">
+                {{ user_form.phone_number.label_tag }}
+                {{ user_form.phone_number }}
             </div>
-            <div class="mb-3">
-                <label for="location" class="form-label fs-4 fw-bold">Location</label>
-                <input type="text" class="form-control" id="location" placeholder="Enter Delivery Location" required>
+        </div>
+
+        <!-- Location Details Section -->
+        <h4 class="mb-3 text-primary">Location Details</h4>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ location_form.address_line.label_tag }}
+                {{ location_form.address_line }}
             </div>
-            <div class="mb-3">
-                <label for="category" class="form-label fs-4 fw-bold">Category</label>
-                <select class="form-select" id="category" required>
-                    <option value="">Select Category</option>
-                    <option value="drinking">Drinking</option>
-                    <option value="both">Both Drinking and Using</option>
-                    <option value="using">Only Using</option>
-                </select>
+            <div class="col-md-6 mb-3">
+                {{ location_form.street.label_tag }}
+                {{ location_form.street }}
             </div>
-            <button type="submit" class="btn btn-primary w-100">Book Now</button>
-        </form>
-    </div>
+            <div class="col-md-6 mb-3">
+                {{ location_form.landmark.label_tag }}
+                {{ location_form.landmark }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ location_form.city.label_tag }}
+                {{ location_form.city }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ location_form.state.label_tag }}
+                {{ location_form.state }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ location_form.country.label_tag }}
+                {{ location_form.country }}
+            </div>
+        </div>
+
+        <!-- Tanker Details Section -->
+        <h4 class="mb-3 text-primary">Tanker Details</h4>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ tanker_form.capacity.label_tag }}
+                {{ tanker_form.capacity }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ tanker_form.category.label_tag }}
+                {{ tanker_form.category }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3 w-100">Book Now</button>
+    </form>
+</div>
 {% endblock %}

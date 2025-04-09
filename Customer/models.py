@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-class LocationDetail(models.Model):
+class LocationDetail(models.Model): 
     address_line = models.CharField(max_length=255)
     street = models.CharField(max_length=255)
     landmark = models.CharField(max_length=255, blank=True, null=True)
@@ -17,12 +17,18 @@ class UserDetail(models.Model):
     passwords = models.CharField(max_length=255, unique=True)  # hash it later
     location = models.ForeignKey(LocationDetail, on_delete=models.SET_NULL, null=True)
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+
 class Feedback(models.Model):
     RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]
     rating_value = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
     feedback_date = models.DateTimeField(auto_now_add=True)
     feedback_comment = models.TextField(blank=True)
     user = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.feedback_comment
 
 class OrderDetail(models.Model):
     STATUS_CHOICES = [
@@ -37,9 +43,11 @@ class OrderDetail(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
     order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     delivery_date = models.DateTimeField(null=True, blank=True)
-    StartLocation = models.CharField(max_length=255)
-    rackingDetails = models.CharField(max_length=255, blank=True, null=True)
-    EndLocation = models.CharField(max_length=255)
+    Location = models.CharField(max_length=255)
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name} "
+
+    
 
 class Payment(models.Model):
     PAYMENT_METHODS = [
@@ -60,3 +68,4 @@ class Payment(models.Model):
     payment_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_date = models.DateTimeField(auto_now_add=True)
     transaction_id = models.CharField(max_length=255, blank=True, null=True)
+    
