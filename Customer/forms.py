@@ -10,7 +10,7 @@ class UserDetailForm(forms.ModelForm):
 class TankerDetailForm(forms.ModelForm):
     class Meta:
         model = TankerDetail
-        fields = ['capacity','category','driver']
+        fields = ['capacity','category']
 
 class LocationDetailForm(forms.ModelForm):
     class Meta:

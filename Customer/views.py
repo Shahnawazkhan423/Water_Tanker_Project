@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from Supplier.models import *
 from Customer.models import *
 from Customer.forms import UserDetailForm, TankerDetailForm,LocationDetailForm
@@ -16,40 +16,51 @@ def booking(request):
         tanker_form = TankerDetailForm(request.POST)
         location_form = LocationDetailForm(request.POST)
 
-        
         if user_form.is_valid() and tanker_form.is_valid() and location_form.is_valid():
-            location = location_form.save(commit=True)
-            user = user_form.save()
-            user.location = location
-          
-            print("user save data in in first save")
-
-            tanker = tanker_form.save(commit=False)
-            print('save for tanker')
-            tanker.user = user
-
-            default_driver = DriverDetail.objects.first()
-            print("default_driver is ", default_driver)
-            tanker.driver = default_driver
-            print('tanker driver is', tanker.driver)
-            tanker.save()
-            user.save()
-            location.save()
-            messages.success(request, "Form submitted successfully!")
-
+            try:
+                location = location_form.save()
+                
+                user = user_form.save(commit=False)
+                user.location = location
+                user.save()
+                
+                tanker = TankerDetail.objects.filter(available=True).first()
+                if not tanker:
+                    messages.error(request, "No available tankers at the moment.")
+                    return redirect('booking')
+                
+                # Update tanker details from form
+                tanker.capacity = tanker_form.cleaned_data['capacity']
+                tanker.category = tanker_form.cleaned_data['category']
+                tanker.save()
+                
+                # Create order
+                from Customer.models import OrderDetail
+                OrderDetail.objects.create(
+                    user=user,
+                    driver=tanker.driver,
+                    tanker=tanker,
+                    Location=location.address_line,
+                    order_status='Pending'
+                )
+                
+                messages.success(request, "Booking successful!")
+                return redirect('home')  
+                
+            except Exception as e:
+                messages.error(request, f"Error: {str(e)}")
         else:
-            messages.error(request, "Please correct the errors in the form.")
-
-        
+            messages.error(request, "Please correct the form errors.")
     else:
         user_form = UserDetailForm()
         tanker_form = TankerDetailForm()
         location_form = LocationDetailForm()
 
-
-    return render(request, 'booking.html', {'user_form': user_form, 'tanker_form': tanker_form,'location_form': location_form
-})
-
+    return render(request, 'booking.html', {
+        'user_form': user_form,
+        'tanker_form': tanker_form,
+        'location_form': location_form
+    })
 def driver_detail(request):
     if request.method=='GET':
         driver = DriverDetail.objects.select_related('user').first()

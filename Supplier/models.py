@@ -1,5 +1,6 @@
 from django.db import models
-from Customer.models import Feedback, UserDetail  
+from Customer.models import Feedback, UserDetail,OrderDetail  
+from django.utils import timezone
 
 class DriverAvailability(models.Model):
     STATUS_CHOICES = [
@@ -47,4 +48,16 @@ class TankerDetail(models.Model):
     category = models.CharField(max_length=50,choices=CATEGORY_CHOICES)
     available = models.BooleanField(default=True)
     def __str__(self):
-        return self.tanker_name
+        return self.tanker_name 
+
+class Earning(models.Model):
+    supplier = models.ForeignKey('DriverDetail', on_delete=models.CASCADE, related_name='earnings')
+    order = models.ForeignKey(OrderDetail, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    earning_date = models.DateField(default=timezone.now)
+    payment_status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('paid', 'Paid')], default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Earning #{self.id} - Supplier: {self.supplier} - ₹{self.amount}"
