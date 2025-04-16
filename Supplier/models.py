@@ -1,6 +1,5 @@
 from django.db import models
-from Customer.models import Feedback, UserDetail,OrderDetail  
-from django.utils import timezone
+from Customer.models import*
 
 class DriverAvailability(models.Model):
     STATUS_CHOICES = [
@@ -25,14 +24,16 @@ class DriverDetail(models.Model):
 
 class WaterTankerDocument(models.Model):
     water_tanker_name = models.CharField(max_length=255)
-    profile_photo = models.BinaryField()
-    driving_license = models.BinaryField()
-    aadhar_card = models.BinaryField()
-    pan_card = models.BinaryField()
-    registration_cert = models.BinaryField()
-    vechicle_insurance = models.BinaryField()
-    vechicle_permit = models.BinaryField()
+    profile_photo = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
+    driving_license = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
+    aadhar_card = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
+    pan_card = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
+    registration_cert = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
+    vechicle_insurance = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
+    vechicle_permit = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
     upload_date = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+       return self.water_tanker_name
 
 class TankerDetail(models.Model):
     driver = models.ForeignKey(DriverDetail, on_delete=models.CASCADE)
@@ -50,14 +51,3 @@ class TankerDetail(models.Model):
     def __str__(self):
         return self.tanker_name 
 
-class Earning(models.Model):
-    supplier = models.ForeignKey('DriverDetail', on_delete=models.CASCADE, related_name='earnings')
-    order = models.ForeignKey(OrderDetail, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    earning_date = models.DateField(default=timezone.now)
-    payment_status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('paid', 'Paid')], default='pending')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Earning #{self.id} - Supplier: {self.supplier} - ₹{self.amount}"

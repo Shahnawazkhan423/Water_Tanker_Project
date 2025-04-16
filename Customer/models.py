@@ -14,7 +14,7 @@ class UserDetail(models.Model):
     last_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15)
     email = models.EmailField()
-    passwords = models.CharField(max_length=255, unique=False) 
+    passwords = models.CharField(max_length=255, unique=True) 
     location = models.ForeignKey(LocationDetail, on_delete=models.CASCADE, null=True)
 
     def __str__(self):

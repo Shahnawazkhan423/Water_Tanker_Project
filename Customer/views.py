@@ -5,7 +5,6 @@ from Customer.forms import UserDetailForm, TankerDetailForm,LocationDetailForm
 from django.contrib import messages
 
 
-
 # Create your views here.
 def home(request):
     return render(request,'home.html')
