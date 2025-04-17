@@ -43,7 +43,7 @@ class OrderDetail(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
     order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     delivery_date = models.DateTimeField(null=True, blank=True)
-    Location = models.CharField(max_length=255)
+    Location = models.ForeignKey(LocationDetail, on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} "
 

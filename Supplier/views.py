@@ -1,17 +1,15 @@
 from django.shortcuts import render
 from Supplier.models import *
-from Customer.models import *
-
-
+from Customer.models import * 
 # Create your views here.
 def Supp_Home(request):
     return render(request,'Home.html')
 
 def earning(request):
+    
     return render(request,'Earning.html')
 
 def order(request):
-        
     return render(request,'Order.html')
 
 def order_list(request):

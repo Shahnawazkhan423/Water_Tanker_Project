@@ -1,5 +1,7 @@
 from django.db import models
 from Customer.models import*
+from django.utils import timezone
+
 
 class DriverAvailability(models.Model):
     STATUS_CHOICES = [
@@ -17,7 +19,7 @@ class DriverAvailability(models.Model):
     
 class DriverDetail(models.Model):
     user = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
-    availability = models.ForeignKey(DriverAvailability, on_delete=models.SET_NULL, null=True)
+    availability = models.ForeignKey(DriverAvailability, on_delete=models.SET_NULL, null=True,related_name='drivers')
     feedback = models.ForeignKey(Feedback, on_delete=models.SET_NULL, null=True)
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} "
