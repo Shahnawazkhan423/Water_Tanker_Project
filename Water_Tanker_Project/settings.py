@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 INTERNAL_APPS = [
     'Customer',
     'Supplier',
+    'django.contrib.humanize',
 ]
 INSTALLED_APPS +=INTERNAL_APPS
 

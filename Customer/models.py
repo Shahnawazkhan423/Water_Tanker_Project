@@ -69,3 +69,11 @@ class Payment(models.Model):
     payment_date = models.DateTimeField(auto_now_add=True)
     transaction_id = models.CharField(max_length=255, blank=True, null=True)
     
+class Notification(models.Model):
+    recipient = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Notification for {self.recipient.first_name} - {self.message}"

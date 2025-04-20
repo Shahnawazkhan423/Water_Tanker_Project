@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from Supplier.models import *
 from Customer.models import *
 from Customer.forms import UserDetailForm, TankerDetailForm,LocationDetailForm
@@ -87,3 +87,14 @@ def profile(request):
 def notification(request):
     return render(request,'notification.html')
 
+def consumer_cancel_order(request, order_id):
+    order = get_object_or_404(OrderDetail,id=order_id)
+    order.order_status = 'Canceled'
+    order.save()
+
+    supplier = order.driver.user
+    Notification.objects.create(
+        recipient=supplier,
+        message="Consumer has Cancelled the Order"
+    )
+    return redirect('consumer-dashboard')
