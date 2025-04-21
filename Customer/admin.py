@@ -7,7 +7,7 @@ class LocationDetailAdmin(admin.ModelAdmin):
 
 
 class UserDetailAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'phone_number', 'email', 'location')
+    list_display = ('first_name', 'last_name', 'phone_number', 'email', 'passwords','location')
     search_fields = ('first_name', 'last_name', 'email', 'phone_number')
     list_filter = ('location__city', 'location__state')
 

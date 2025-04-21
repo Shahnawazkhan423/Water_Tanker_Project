@@ -45,6 +45,7 @@ INTERNAL_APPS = [
     'django.contrib.humanize',
 ]
 INSTALLED_APPS +=INTERNAL_APPS
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

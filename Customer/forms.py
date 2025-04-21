@@ -5,7 +5,7 @@ from Supplier.models import TankerDetail
 class UserDetailForm(forms.ModelForm):
     class Meta:
         model = UserDetail
-        fields = ['first_name','last_name','phone_number'] 
+        fields = ['first_name','last_name','phone_number','email','passwords'] 
 
 class TankerDetailForm(forms.ModelForm):
     class Meta:

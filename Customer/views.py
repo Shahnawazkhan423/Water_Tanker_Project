@@ -3,9 +3,52 @@ from Supplier.models import *
 from Customer.models import *
 from Customer.forms import UserDetailForm, TankerDetailForm,LocationDetailForm
 from django.contrib import messages
+from django.contrib.auth import login,logout
+from django.contrib.auth.hashers import check_password
 
 
 # Create your views here.
+def register_view(request):
+    if request.method=="POST":
+        user_form = UserDetailForm(request.POST)
+        location_form = LocationDetailForm(request.POST)
+        if user_form.is_valid() and location_form.is_valid():
+            location = location_form.save()
+            user = user_form.save()
+            user.location = location
+            user.save()
+            messages.success(request, 'Registration successful.')
+            return redirect('login')
+    else:
+        user_form = UserDetailForm()
+        location_form = LocationDetailForm()
+
+    return render(request, 'register.html', {'user_form': user_form, 'location_form': location_form})
+
+def login_view(request):
+    if request.method == 'POST':
+        form = UserDetailForm(request.POST)
+        print("Welcome")
+        if form.is_valid():
+            try:
+                print("Hiiii")
+                user = UserDetail.objects.get(email=form.cleaned_data['email'])
+                if check_password(form.cleaned_data['passwords'], user.passwords):
+                    request.session['user_id'] = user.id
+                    messages.success(request, 'Login successful.')
+                    print("Hiiii")
+                    return redirect('home')
+                else:
+                    messages.error(request, 'Invalid password')
+            except UserDetail.DoesNotExist:
+                messages.error(request, 'User not found')
+    else:
+        print("Bye")
+        form = UserDetailForm()
+    return render(request, 'login.html', {'form': form})
+
+def logout(request):
+    pass
 def home(request):
     return render(request,'home.html')
 
@@ -72,7 +115,7 @@ def driver_detail(request):
             'order_status': status.order_status if status else 'N/A',
             
         } 
-    
+
     
     return render(request,'driver_detail.html',context)
 
@@ -87,14 +130,3 @@ def profile(request):
 def notification(request):
     return render(request,'notification.html')
 
-def consumer_cancel_order(request, order_id):
-    order = get_object_or_404(OrderDetail,id=order_id)
-    order.order_status = 'Canceled'
-    order.save()
-
-    supplier = order.driver.user
-    Notification.objects.create(
-        recipient=supplier,
-        message="Consumer has Cancelled the Order"
-    )
-    return redirect('consumer-dashboard')
