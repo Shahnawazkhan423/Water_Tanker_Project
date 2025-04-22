@@ -25,7 +25,6 @@ SECRET_KEY = 'django-insecure-&-!df1u3%1hltb53gnq3yx_s2@xxt*oyg(wm+i&6p(lmkp2l8z
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = ["*"]
 
 
@@ -45,8 +44,11 @@ INTERNAL_APPS = [
     'django.contrib.humanize',
 ]
 INSTALLED_APPS +=INTERNAL_APPS
+
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
+SESSION_COOKIE_SECURE = False
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -108,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+AUTH_USER_MODE = "Water_Tanker_Project.UserDetail"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -137,3 +139,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/login/'

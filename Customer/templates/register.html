@@ -95,7 +95,13 @@
           <div class="card-body bg-light p-4 p-lg-5">
             <form method="post" class="row g-3 needs-validation" novalidate action="{% url 'register' %}">
               {% csrf_token %}
-
+              {%if messages%}
+                <div class="alert alert-primary" role="alert">
+                  {%for message in messages%}
+                  {{message}}
+                  {%endfor%}
+                </div>
+              {%endif%}
               <!-- USER INFO -->
               <div class="col-12">
                 <h5 class="section-title"><i class="bi bi-person-circle me-2"></i>User Information</h5>
@@ -131,7 +137,7 @@
               
               <div class="col-12">
                 <div class="form-floating mb-3">
-                  <input type="password" class="form-control" id="id_passwords" name="passwords" placeholder="Password" required>
+                  <input type="password" class="form-control" id="id_passwords" name="id_passwords" placeholder="Password" required>
                   <label for="id_passwords">Password</label>
                 </div>
               </div>
