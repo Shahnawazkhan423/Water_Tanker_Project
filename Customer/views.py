@@ -5,19 +5,19 @@ from Customer.forms import UserDetailForm, TankerDetailForm,LocationDetailForm
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password,check_password
 
 
 # Create your views here.
 def register_view(request):
     if request.method=="POST":
-        print("Welcome")
         user_form = UserDetailForm(request.POST)
         location_form = LocationDetailForm(request.POST)
         if user_form.is_valid() and location_form.is_valid():
-            print("Welcome-Userdetail")
             location = location_form.save()
             user = user_form.save()
             user.location = location
+            user.passwords = make_password(user.passwords)
             user.save()
             messages.success(request, 'Registration successful.')
             return redirect('login')
@@ -31,24 +31,28 @@ def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('id_passwords')
-        print(email) 
+        print("Email OF the login : s",email) 
         print(password)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 
         if not UserDetail.objects.filter(email=email).exists():
             messages.error(request, "Email does not exist")
             return redirect("login")
         
-        user = authenticate(request, email=email, password=password)
-        print(user)
+        try:
+            user = UserDetail.objects.get(email=email)
+            if check_password(password,user.passwords):
+                request.session['user_id'] = user.id
+                messages.success(request, 'Login successful.')
+                return redirect('home')
+            else:
+                messages.error(request, 'Invalid password.')
+                return redirect('login')
+        except UserDetail.DoesNotExist:
+            messages.error(request, 'Invalid email.')
+            return redirect('login')
 
-        if user is not None:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-            login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, "Invalid password")
-            return redirect("login")
+    return render(request, 'login.html')
 
-    return render(request, "login.html")
 
 @login_required(login_url="login")
 def logout_view(request):
