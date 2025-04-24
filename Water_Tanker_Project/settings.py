@@ -16,7 +16,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR /'templates'
 
-
+AUTH_USER_MODEL = 'Customer.CustomUser'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'Water_Tanker_Project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ajay',
+        'NAME': 'Water_Tanker_Supply',
         'USER':'root',
         'PASSWORD':'mrkhan@123',
     }

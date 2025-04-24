@@ -1,11 +1,14 @@
 from django import forms
-from Customer.models import UserDetail,LocationDetail
+from Customer.models import CustomUser,LocationDetail
 from Supplier.models import TankerDetail
 
 class UserDetailForm(forms.ModelForm):
     class Meta:
-        model = UserDetail
-        fields = ['first_name','last_name','phone_number','email','passwords'] 
+        model = CustomUser
+        fields = ['first_name','last_name','phone_number','email','password','profile_image']
+        widgets = {
+            'password': forms.PasswordInput()
+        } 
 
 class TankerDetailForm(forms.ModelForm):
     class Meta:

@@ -1,4 +1,6 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 class LocationDetail(models.Model): 
@@ -9,13 +11,35 @@ class LocationDetail(models.Model):
     state = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
 
-class UserDetail(models.Model):
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("Email is required")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)  # uses Django's hashing
+        user.save()
+        return user
+
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self.create_user(email, password, **extra_fields)
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15)
     email = models.EmailField(unique=True)
-    passwords = models.CharField(max_length=255, unique=True) 
-    location = models.ForeignKey(LocationDetail, on_delete=models.CASCADE, null=True,blank=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
+    location = models.ForeignKey(LocationDetail, on_delete=models.CASCADE, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number']
+
+    objects = CustomUserManager()
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -26,7 +50,7 @@ class Feedback(models.Model):
     rating_value = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
     feedback_date = models.DateTimeField(auto_now_add=True)
     feedback_comment = models.TextField(blank=True)
-    user = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     def __str__(self):
         return self.feedback_comment
 
@@ -37,7 +61,7 @@ class OrderDetail(models.Model):
         ('Delivered', 'Delivered'),
         ('Canceled', 'Canceled')
     ]
-    user = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     driver = models.ForeignKey('Supplier.DriverDetail', on_delete=models.SET_NULL, null=True)
     tanker = models.ForeignKey('Supplier.TankerDetail', on_delete=models.SET_NULL, null=True)
     order_date = models.DateTimeField(auto_now_add=True)
@@ -70,7 +94,7 @@ class Payment(models.Model):
     transaction_id = models.CharField(max_length=255, blank=True, null=True)
     
 class Notification(models.Model):
-    recipient = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)

@@ -5,7 +5,7 @@ from Customer.forms import UserDetailForm, TankerDetailForm,LocationDetailForm
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password,check_password
+from django.contrib.auth.hashers import make_password
 
 
 # Create your views here.
@@ -17,7 +17,7 @@ def register_view(request):
             location = location_form.save()
             user = user_form.save()
             user.location = location
-            user.passwords = make_password(user.passwords)
+            user.password = make_password(user.password)
             user.save()
             messages.success(request, 'Registration successful.')
             return redirect('login')
@@ -31,24 +31,12 @@ def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('id_passwords')
-        print("Email OF the login : s",email) 
-        print(password)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-
-        if not UserDetail.objects.filter(email=email).exists():
-            messages.error(request, "Email does not exist")
-            return redirect("login")
-        
-        try:
-            user = UserDetail.objects.get(email=email)
-            if check_password(password,user.passwords):
-                request.session['user_id'] = user.id
-                messages.success(request, 'Login successful.')
-                return redirect('home')
-            else:
-                messages.error(request, 'Invalid password.')
-                return redirect('login')
-        except UserDetail.DoesNotExist:
-            messages.error(request, 'Invalid email.')
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, 'Invalid email or password.')
             return redirect('login')
 
     return render(request, 'login.html')
@@ -57,11 +45,15 @@ def login_view(request):
 @login_required(login_url="login")
 def logout_view(request):
     logout(request)
+    messages.success(request, "Logged out successfully.")
     return redirect('login')
 
 @login_required(login_url="login")
 def home(request):
-    return render(request,'home.html')
+    if request.user.is_authenticated:
+        return render(request,'home.html')
+    else:
+        return redirect('login')
 
 @login_required(login_url="login")
 def booking(request):
@@ -135,13 +127,11 @@ def driver_detail(request):
 
 @login_required(login_url="login")
 def profile(request):
-    if request.method =="GET":
-        customer = UserDetail.objects.select_related().first()
-        context = {
-            'user_name':f"{customer.first_name} {customer.last_name}" if customer else 'N/A',
-        }
-    return render(request,'profile.html',context)
-
+    if request.user.is_authenticated:
+        return render(request, 'profile.html', {'user': request.user})
+    else:
+        return redirect('login')
+    
 @login_required(login_url="login")
 def notification(request):
     return render(request,'notification.html')

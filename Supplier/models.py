@@ -18,7 +18,7 @@ class DriverAvailability(models.Model):
 
     
 class DriverDetail(models.Model):
-    user = models.ForeignKey(UserDetail, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     availability = models.ForeignKey(DriverAvailability, on_delete=models.SET_NULL, null=True,related_name='drivers')
     feedback = models.ForeignKey(Feedback, on_delete=models.SET_NULL, null=True)
     def __str__(self):
