@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Tanker Registration</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+        }
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Water Tanker Registration Form</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+              {%if messages%}
+                <div class="alert alert-primary" role="alert">
+                  {%for message in messages%}
+                  {{message}}
+                  {%endfor%}
+                </div>
+              {%endif%}
+            <!-- Tanker Name -->
+            <div class="form-group">
+                <label for="water_tanker_name">Tanker Name</label>
+                <input type="text" class="form-control" id="water_tanker_name" name="water_tanker_name" required>
+            </div>
+
+            <!-- Profile Photo -->
+            <div class="form-group">
+                <label for="profile_photo">Profile Photo</label>
+                <input type="file" class="form-control-file" id="profile_photo" name="profile_photo" required>
+            </div>
+
+            <!-- Driving License -->
+            <div class="form-group">
+                <label for="driving_license">Driving License</label>
+                <input type="file" class="form-control-file" id="driving_license" name="driving_license" required>
+            </div>
+
+            <!-- Aadhar Card -->
+            <div class="form-group">
+                <label for="aadhar_card">Aadhar Card</label>
+                <input type="file" class="form-control-file" id="aadhar_card" name="aadhar_card" required>
+            </div>
+
+            <!-- PAN Card -->
+            <div class="form-group">
+                <label for="pan_card">PAN Card</label>
+                <input type="file" class="form-control-file" id="pan_card" name="pan_card" required>
+            </div>
+
+            <!-- Registration Certificate -->
+            <div class="form-group">
+                <label for="registration_cert">Registration Certificate</label>
+                <input type="file" class="form-control-file" id="registration_cert" name="registration_cert" required>
+            </div>
+
+            <!-- Vehicle Insurance -->
+            <div class="form-group">
+                <label for="vehicle_insurance">Vehicle Insurance</label>
+                <input type="file" class="form-control-file" id="vehicle_insurance" name="vehicle_insurance" required>
+            </div>
+
+            <!-- Vehicle Permit -->
+            <div class="form-group">
+                <label for="vehicle_permit">Vehicle Permit</label>
+                <input type="file" class="form-control-file" id="vehicle_permit" name="vehicle_permit" required>
+            </div>
+
+            <!-- Capacity -->
+            <div class="form-group">
+                <label for="capacity">Capacity</label>
+                <input type="number" class="form-control" id="capacity" name="capacity" required>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select class="form-control" id="category" name="category" required>
+                    <option value="DRINKING">Drinking Water</option>
+                    <option value="NON_DRINKING">Non-Drinking Water</option>
+                    <option value="BOTH">Drinking & Usage Water</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

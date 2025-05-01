@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import LocationDetail, CustomUser, Feedback, OrderDetail, Payment
+from .models import LocationDetail, CustomUser,OrderDetail, Payment
 
 class LocationDetailAdmin(admin.ModelAdmin):
     list_display = ('address_line', 'city', 'state', 'country')
@@ -10,12 +10,6 @@ class UserDetailAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'phone_number', 'email', 'password','location')
     search_fields = ('first_name', 'last_name', 'email', 'phone_number')
     list_filter = ('location__city', 'location__state')
-
-
-class FeedbackAdmin(admin.ModelAdmin):
-    list_display = ('user', 'rating_value', 'feedback_date')
-    list_filter = ('rating_value', 'feedback_date')
-    search_fields = ('user__first_name', 'user__last_name')
 
 
 class OrderDetailAdmin(admin.ModelAdmin):
@@ -32,6 +26,5 @@ class PaymentAdmin(admin.ModelAdmin):
 
 admin.site.register(CustomUser,UserDetailAdmin)
 admin.site.register(LocationDetail,LocationDetailAdmin)
-admin.site.register(Feedback,FeedbackAdmin)
 admin.site.register(OrderDetail,OrderDetailAdmin)
 admin.site.register(Payment,PaymentAdmin)

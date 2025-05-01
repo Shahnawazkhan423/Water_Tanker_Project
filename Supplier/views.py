@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from Supplier.models import *
 from Customer.models import *
-from Customer.forms import UserDetailForm, TankerDetailForm,LocationDetailForm
+from Supplier.forms import*
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
@@ -10,45 +10,76 @@ from django.contrib.auth.hashers import make_password
 # Create your views here.
 def register_view(request):
     if request.method=="POST":
-        user_form = UserDetailForm(request.POST)
-        location_form = LocationDetailForm(request.POST)
+        user_form = SupplierDetailForm(request.POST)
+        location_form = SupplierLocationDetailForm(request.POST)
         if user_form.is_valid() and location_form.is_valid():
             location = location_form.save()
             user = user_form.save()
             user.location = location
             user.password = make_password(user.password)
             user.save()
-            messages.success(request, 'Registration successful.')
             return redirect('tanker_detail')
     else:
-        user_form = UserDetailForm()
-        location_form = LocationDetailForm()
+        user_form = SupplierDetailForm()
+        location_form = SupplierLocationDetailForm()
 
     return render(request, 'Register.html', {'user_form': user_form, 'location_form': location_form})
 
 
 def tanker_detail_view(request):
-    return render(request,"tanker_detail.html")
+    if request.method=="POST":
+        document = WaterTankerForm(request.POST,request.FILES)  
+        tanker_detail = SupplierTankerDetailForm(request.POST)
+        if document.is_valid and tanker_detail.is_valid():
+            tanker_instance  = document.save()
+            tanker_detail_instance = tanker_detail.save(commit=False)
+            tanker_detail_instance.tanker_instance = tanker_instance
+            tanker_detail_instance.save()
+            messages.success(request, 'Registration successful.')
+            return redirect('Login_page')
+    else:
+        document = WaterTankerForm()
+        tanker_detail = SupplierTankerDetailForm()
+
+    return render(request,"tanker_detail.html",{'document': document,
+        'tanker_detail': tanker_detail})
 
 def login_view(request):
-    return render(request,"login.html")
+    if request.method=="POST":
+        email = request.POST.get("email")
+        print(email)
+        password = request.POST.get("passwords")
+        print(password)
+        user = authenticate(request, email=email, password=password)
+        print(user) 
+       
+        if user is not None and isinstance(user, SupplierUser):
+            login(request, user)
+            return redirect('Home')
+        else:
+            messages.error(request, 'Invalid email or password.')
+            return redirect('Login_page')
+
+    return render(request,"Login.html")
 
 def logout_view(request):
-    return render(request,"logout.html")
+    logout(request)
+    messages.success(request, "Logged out successfully.")
+    return redirect('Login_page')
 
-@login_required(login_url="login")
+@login_required(login_url="Login_page")
 def Supp_Home(request):
     return render(request,'Home.html')
 
-@login_required(login_url="login")
+@login_required(login_url="Login_page")
 def earning(request):
     return render(request,'Earning.html')
 
-@login_required(login_url="login")
+@login_required(login_url="Login_page")
 def order(request):
     return render(request,'Order.html')
 
-@login_required(login_url="login")
+@login_required(login_url="Login_page")
 def order_list(request):
     if request.method=='GET':
         users = CustomUser.objects.select_related('location').first()
@@ -78,20 +109,10 @@ def order_list(request):
     
     return render(request,'Order_List.html',context=my_detail)
 
-@login_required(login_url="login")
+@login_required(login_url="Login_page")
 def notification(request):
     return render(request,'Notification.html')
 
-@login_required(login_url="login")
+@login_required(login_url="Login_page")
 def profile(request):
-    if request.method=="GET":
-        supp_name = DriverDetail.objects.select_related().first()
-        feedback = Feedback.objects.select_related().first()
-
-        context = {
-            'name':f"{supp_name.user.first_name} {supp_name.user.last_name}" if supp_name else 'N/A',
-            'location':supp_name.user.location.city,
-            'phone': supp_name.user.phone_number,
-            'rating': feedback.rating_value,    
-        }
-    return render(request,'Profile.html',context)
+    return render(request,'Profile.html')

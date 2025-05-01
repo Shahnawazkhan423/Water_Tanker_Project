@@ -32,7 +32,7 @@ def login_view(request):
         email = request.POST.get('email')
         password = request.POST.get('id_passwords')
         user = authenticate(request, email=email, password=password)
-        if user is not None:
+        if user is not None and isinstance(user, CustomUser):
             login(request, user)
             return redirect('home')
         else:

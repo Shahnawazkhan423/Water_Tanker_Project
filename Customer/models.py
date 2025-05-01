@@ -1,6 +1,8 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin,Group, Permission
 from django.db import models
 from django.conf import settings
+from Supplier.models import DriverDetail,TankerDetail
+
 
 # Create your models here.
 class LocationDetail(models.Model): 
@@ -35,6 +37,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     location = models.ForeignKey(LocationDetail, on_delete=models.CASCADE, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    groups = models.ManyToManyField(
+        Group,
+        related_name='customer_users',  # must be different from other custom user models
+        blank=True
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='customer_user_permissions',  # must be different too
+        blank=True
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number']
@@ -44,16 +56,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
-
-class Feedback(models.Model):
-    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]
-    rating_value = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
-    feedback_date = models.DateTimeField(auto_now_add=True)
-    feedback_comment = models.TextField(blank=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    def __str__(self):
-        return self.feedback_comment
-
+    
+# -------------------- Orders --------------------
 class OrderDetail(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -62,17 +66,17 @@ class OrderDetail(models.Model):
         ('Canceled', 'Canceled')
     ]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    driver = models.ForeignKey('Supplier.DriverDetail', on_delete=models.SET_NULL, null=True)
-    tanker = models.ForeignKey('Supplier.TankerDetail', on_delete=models.SET_NULL, null=True)
+    driver = models.ForeignKey(DriverDetail, on_delete=models.SET_NULL, null=True)
+    tanker = models.ForeignKey(TankerDetail, on_delete=models.SET_NULL, null=True)
     order_date = models.DateTimeField(auto_now_add=True)
     order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     delivery_date = models.DateTimeField(null=True, blank=True)
-    Location = models.ForeignKey(LocationDetail, on_delete=models.CASCADE)
+    location = models.ForeignKey(LocationDetail, on_delete=models.CASCADE)
+
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name} "
+        return f"Order for {self.user.first_name} on {self.order_date.date()}"
 
-    
-
+# -------------------- Payment --------------------
 class Payment(models.Model):
     PAYMENT_METHODS = [
         ('credit_card', 'Credit Card'),
@@ -92,7 +96,11 @@ class Payment(models.Model):
     payment_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_date = models.DateTimeField(auto_now_add=True)
     transaction_id = models.CharField(max_length=255, blank=True, null=True)
-    
+
+    def __str__(self):
+        return f"Payment of {self.amount} for Order {self.order.id}"
+
+# -------------------- Notification --------------------
 class Notification(models.Model):
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.TextField()
@@ -100,5 +108,4 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Notification for {self.recipient.first_name} - {self.message}"
-    
+        return f"Notification for {self.recipient.first_name}: {self.message[:30]}..."
