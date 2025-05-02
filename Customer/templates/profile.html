@@ -5,13 +5,16 @@
 <!-- Customer Profile -->
     <div class="container my-4 profile-container">
         <h2>Customer Profile</h2>
-        <div class="p-4 border rounded">
             {% if user.profile_image %}
             <img src="{{ user.profile_image.url }}" alt="Customer Photo" class="rounded-circle mb-3 d-block mx-auto" width="150">
             {% else %}
             <img src="/static/image/Profile_Default_Image.jpg" alt="Default" class="rounded-circle mb-3 d-block mx-auto" width="150">
-            {% endif %}           
-            <h4 class="text-center">{{ user.first_name }} {{ user.last_name }}</h4>
+            {% endif %}      
+            {% if user.is_authenticated %}
+                <h4 class="text-center">{{ user.first_name }} {{ user.last_name }}</h4>
+            {% else %}
+                <h4 class="text-center">Guest</h4>
+            {% endif %}            
             <p class="text-center"><strong>Rating:</strong> ⭐⭐⭐⭐☆</p>
             
             <div class="mb-3">

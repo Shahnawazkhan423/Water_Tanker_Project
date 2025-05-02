@@ -5,8 +5,12 @@
     <h4 class="text-center mb-4">🚚 Driver Profile</h4>
     <div class="card shadow-lg rounded-4 p-4">
         <div class="text-center mb-4">
-            <img src="https://via.placeholder.com/150" class="rounded-circle shadow-sm mb-3" alt="Driver Photo">
-            <h5 class="fw-bold mb-1">{{name}}</h5>
+                {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="Customer Photo" class="rounded-circle mb-3 d-block mx-auto" width="150">
+                {% else %}
+                <img src="/static/image/Profile_Default_Image.jpg" alt="Default" class="rounded-circle mb-3 d-block mx-auto" width="150">
+                {% endif %}
+            <h5 class="fw-bold mb-1">{{ user.first_name }} {{ user.last_name }}</h5>
             <p class="mb-0"><strong>Rating:</strong> ⭐⭐⭐⭐☆ <span class="text-muted">{{rating}}</span></p>
         </div>
 
