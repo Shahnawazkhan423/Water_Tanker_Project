@@ -1,17 +1,28 @@
- {% extends 'home.html'%}
- <!-- Driver Details for Customer Panel -->
+{% extends 'home.html'%}
+<!-- Driver Details for Customer Panel -->
 {%block Hero-bar%}
     <div class="container my-4 driver-container">
         <h2 class="text-center">Driver Details</h2>
         <div class="p-4 border rounded">
-            <h2>Order Details</h2>
-            <p><strong>Driver Name:</strong> {{ driver_name}}</p> 
-            <p><strong>Phone Number:</strong> {{ driver_number}}</p>
-            <p><strong>Delivery Date:</strong> {{order_date }}</p>
-            <p><strong>Status:</strong> {{order_status }}</p>
-            <button class="btn btn-danger mt-2">
-                <i class="fa-solid fa-times-circle"></i> Cancel Order
-            </button>
+            <h2>Driver Details</h2>
+            {% if context%}
+                <p><strong>Driver Name:</strong> {{ driver_name}}</p> 
+                <p><strong>Phone Number:</strong> {{ driver_number}}</p>
+                <p><strong>Delivery Date:</strong> {{order_date }}</p>
+                <p><strong>Status:</strong> {{order_status }}</p>
+                
+                {% if order_status != 'Canceled' and order_status != 'Delivered' %}
+                <form method="post" action="{% url 'customer_cancel_order' order_id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger mt-2">
+                        <i class="fa-solid fa-times-circle"></i> Cancel Order
+                    </button>
+                </form>
+                {% endif %}
+            {%else%}
+                <div class="alert alert-info">No Driver Detail.</div>
+            {% endif %}
+
         </div>
     </div>
 {% endblock %}

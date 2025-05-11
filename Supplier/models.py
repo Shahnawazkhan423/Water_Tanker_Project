@@ -38,6 +38,7 @@ class SupplierUser(AbstractBaseUser, PermissionsMixin):
     location = models.ForeignKey(LocationDetail, on_delete=models.CASCADE, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_available = models.BooleanField(default=True)
     groups = models.ManyToManyField(
         Group,
         related_name='supplier_users',

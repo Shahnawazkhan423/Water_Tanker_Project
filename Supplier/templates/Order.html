@@ -1,24 +1,29 @@
-{% extends "Home.html" %}
-{%block title%}Driver Order{%endblock%}
+<!-- In Order.html -->
 {%block sup-hero%}
 <div class="container mt-4">
-    <div class="card position-relative p-3">
-        <button class="btn-close position-absolute top-0 end-0 m-3" aria-label="Close"></button>
-        <h5 class="card-title text-center">Driver Order Panel</h5>
-        <div class="row mt-3">
-            <div class="col-md-6"><strong>Username:</strong> John Doe</div>
-            <div class="col-md-6"><strong>Size Tanker:</strong> 5000L</div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-md-6"><strong>Mobile:</strong> 9876543210</div>
-            <div class="col-md-6"><strong>Location:</strong> Indore</div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-md-6"><strong>Categories:</strong> Drinking</div>
-        </div>
-        <div class="text-center mt-4">
-            <button class="btn btn-success">Accept</button>
+    <h5 class="text-center">Pending Orders</h5>
+    {% for order in pending_orders %}
+    <div class="card mb-3 p-3">
+        <h6><strong>Customer:</strong> {{ order.user.first_name }} {{ order.user.last_name }}</h6>
+        <p><strong>Tanker Size:</strong> {{ order.tanker.capacity }}L</p>
+        <p><strong>Category:</strong> {{ order.tanker.get_category_display }}</p>
+        <p><strong>Location:</strong> {{ order.location.address_line }}, {{ order.location.city }}</p>
+        <div class="text-center">
+            <a href="{% url 'accept_order' order.id %}" class="btn btn-success">Accept</a>
+            <a href="{% url 'supplier_update_order_status' order.id 'cancel' %}" class="btn btn-danger">Reject</a>
         </div>
     </div>
+    {% empty %}
+    <div class="alert alert-info">No pending orders</div>
+    {% endfor %}
+    
+    <h5 class="text-center mt-4">Active Orders</h5>
+    {% for order in active_orders %}
+    <div class="card mb-3 p-3">
+        <!-- Show active orders -->
+    </div>
+    {% empty %}
+    <div class="alert alert-info">No active orders</div>
+    {% endfor %}
 </div>
 {%endblock%}

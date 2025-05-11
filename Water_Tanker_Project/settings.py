@@ -17,6 +17,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR /'templates'
 
 AUTH_USER_MODEL = 'Customer.CustomUser'
+AUTH_USER_MODEL = 'Supplier.SupplierUser'
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -42,6 +44,9 @@ INTERNAL_APPS = [
     'Customer',
     'Supplier',
     'django.contrib.humanize',
+    'notifications',
+    'model_utils',
+    'django.contrib.gis',
 ]
 INSTALLED_APPS +=INTERNAL_APPS
 
@@ -72,6 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notifications.context_processors.notifications',
             ],
         },
     },

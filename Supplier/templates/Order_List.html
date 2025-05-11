@@ -5,18 +5,21 @@
     <h5 class="text-center">Driver Order List</h5>
     <div class="row">
         <div class="col-md-12">
-            <div class="card mb-3 p-3">
-                <h6><strong>Username:</strong> {{ user_name }}</h6>
-                <p><strong>Size Tanker:</strong> {{ size }}</p>
-                <p><strong>Mobile:</strong> {{ cust_number }}</p>
-                <p><strong>Location:</strong> {{ location }}</p>
-                <p><strong>Category:</strong> {{ cag }}</p>
-                <div class="text-center">
-                    <button class="btn btn-danger">Cancel</button>
-                    <button class="btn btn-warning">On Way</button>
-                    <button class="btn btn-success">Order Complete</button>
+            {% if order and order.id %}
+                <div class="card mb-3 p-3">
+                    <h6><strong>Username:</strong> {{ user_name }}</h6>
+                    <p><strong>Size Tanker:</strong> {{ size }}</p>
+                    <p><strong>Mobile:</strong> {{ cust_number }}</p>
+                    <p><strong>Location:</strong> {{ location }}</p>
+                    <p><strong>Category:</strong> {{ cag }}</p>
+                    <a href="{% url 'supplier_update_order_status' order.id 'cancel' %}" class="btn btn-danger">Cancel</a>
+                    <a href="{% url 'supplier_update_order_status' order.id 'on_way' %}" class="btn btn-warning">On Way</a> 
+                    <a href="{% url 'supplier_update_order_status' order.id 'complete' %}" class="btn btn-success">Complete</a>
                 </div>
-            </div>
+            {% else %}
+                <div class="alert alert-warning">No order information available</div>
+            {% endif %}
+            
         </div>
     </div>
 </div>

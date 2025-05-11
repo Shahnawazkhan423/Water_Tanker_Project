@@ -6,8 +6,10 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
-
-
+from django.contrib.gis.measure import D
+from django.contrib.gis.geos import Point
+from django.db import transaction
+from notifications.models import Notification
 # Create your views here.
 def register_view(request):
     if request.method=="POST":
@@ -48,7 +50,6 @@ def logout_view(request):
     messages.success(request, "Logged out successfully.")
     return redirect('login')
 
-@login_required(login_url="login")
 def home(request):
     if request.user.is_authenticated:
         return render(request,'home.html')
@@ -64,34 +65,52 @@ def booking(request):
 
         if user_form.is_valid() and tanker_form.is_valid() and location_form.is_valid():
             try:
-                location = location_form.save()
-                
-                user = user_form.save(commit=False)
-                user.location = location
-                user.save()
-                
-                tanker = TankerDetail.objects.filter(available=True).first()
-                if not tanker:
-                    messages.error(request, "No available tankers at the moment.")
-                    return redirect('booking')
-                
-                # Update tanker details from form
-                tanker.capacity = tanker_form.cleaned_data['capacity']
-                tanker.category = tanker_form.cleaned_data['category']
-                tanker.save()
-                
-                # Create order
-                from Customer.models import OrderDetail
-                OrderDetail.objects.create(
-                    user=user,
-                    driver=tanker.driver,
-                    tanker=tanker,
-                    Location=location.address_line,
-                    order_status='Pending'
-                )
-                
-                messages.success(request, "Booking successful!")
-                return redirect('home')  
+                with transaction.atomic():
+                    location = location_form.save(commit=False)
+                    location.coordinates = Point(0, 0)  # Replace with actual geocoding
+                    location.save()
+                    
+                    # Get all available suppliers within 1km radius
+                    supplier_locations = LocationDetail.objects.filter(
+                        coordinates__distance_lte=(location.coordinates, D(km=1))
+                    )
+                    # Get available tankers from available suppliers
+                    available_tankers = TankerDetail.objects.filter(
+                        available=True,
+                        driver__user__is_available=True,  # Only available suppliers
+                        driver__user__location__in=supplier_locations
+                    ).select_related('driver__user')
+                    
+                    if not available_tankers:
+                        messages.error(request, "No available tankers in your area at the moment.")
+                        return redirect('booking')
+                    
+                    # Create pending order requests for all available tankers
+                    orders = []
+                    for tanker in available_tankers:
+                        order = OrderDetail(
+                            user=request.user,
+                            driver=tanker.driver,
+                            tanker=tanker,
+                            location=location,
+                            order_status='Pending'
+                        )
+                        orders.append(order)
+                    
+                    OrderDetail.objects.bulk_create(orders)
+                    
+                    # Create notifications for suppliers
+                    for tanker in available_tankers:
+                        Notification.objects.create(
+                            recipient=tanker.driver.user,
+                            sender=request.user,
+                            message=f"New booking request from {request.user.first_name}",
+                            notification_type='new_order',
+                            order_id=orders[0].id  # Assuming first order ID
+                        )
+                    
+                    messages.success(request, "Your request has been sent to nearby suppliers!")
+                    return redirect('home')
                 
             except Exception as e:
                 messages.error(request, f"Error: {str(e)}")
@@ -133,6 +152,42 @@ def profile(request):
         return redirect('login')
     
 @login_required(login_url="login")
-def notification(request):
-    return render(request,'notification.html')
+def notification_view(request):
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+    return render(request, 'notification.html', {'notifications': notifications})
 
+@login_required(login_url="login")
+def mark_notification_read(request, notification_id):
+    notification = Notification.objects.filter(
+        id=notification_id, 
+        recipient=request.user
+    ).first()
+    if notification:
+        notification.is_read = True
+        notification.save()
+    return redirect('notification')
+ 
+
+def customer_cancel_order(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(TankerDetail, id=order_id, user=request.user)
+        
+        # Only allow cancellation if order isn't already completed/canceled
+        if order.order_status not in ['Delivered', 'Canceled']:
+            order.order_status = 'Canceled'
+            order.save()
+            
+            # Create notification for supplier
+            Notification.objects.create(
+                recipient=order.driver.user,  # or the supplier user
+                sender=request.user,
+                message=f"Customer has canceled order #{order.id}",
+                notification_type='order_canceled',
+                order_id=order.id
+            )
+            
+            messages.success(request, "Your order has been canceled.")
+        else:
+            messages.error(request, "This order cannot be canceled.")
+    
+    return redirect('driver_detail')  

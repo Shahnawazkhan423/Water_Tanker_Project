@@ -1,23 +1,32 @@
-{%extends 'home.html' %}
-{%block title%}Notifications{%endblock%}
-
-<!-- Notifications -->
+{% extends "home.html" %}
 {% block Hero-bar %}
-    <div class="container my-4 notification-container">
-        <h2>Notifications</h2>
-        <div class="border rounded p-3">
-            <div class="notification-item">
-                <div><i class="fa-solid fa-truck-moving text-success"></i> Your order is on the way!</div>
-                <button class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+<div class="container">
+    <h2>Notifications</h2>
+    {% for notification in notifications %}
+    <div class="card mb-3 {% if not notification.is_read %}border-primary{% endif %}">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <h5 class="card-title">
+                    {% if notification.notification_type == 'order_canceled' %}
+                        <i class="fas fa-times-circle text-danger"></i> Order Canceled
+                    {% elif notification.notification_type == 'order_on_way' %}
+                        <i class="fas fa-truck text-warning"></i> Order On The Way
+                    {% elif notification.notification_type == 'order_completed' %}
+                        <i class="fas fa-check-circle text-success"></i> Order Completed
+                    {% else %}
+                        <i class="fas fa-bell"></i> Notification
+                    {% endif %}
+                </h5>
+                <small>{{ notification.created_at|timesince }} ago</small>
             </div>
-            <div class="notification-item">
-                <div><i class="fa-solid fa-check-circle text-primary"></i> Your booking is confirmed.</div>
-                <button class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            <div class="notification-item">
-                <div><i class="fa-solid fa-exclamation-triangle text-warning"></i> Payment pending!</div>
-                <button class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
-            </div>
+            <p class="card-text">{{ notification.message }}</p>
+            <a href="{% url 'mark_notification_read' notification.id %}" class="btn btn-sm btn-outline-primary">
+                Mark as read
+            </a>
         </div>
     </div>
+    {% empty %}
+    <div class="alert alert-info">No notifications yet.</div>
+    {% endfor %}
+</div>
 {% endblock %}

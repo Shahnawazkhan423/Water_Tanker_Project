@@ -35,13 +35,13 @@
             <div class="col-md-6 mb-2">
                 <div class="bg-light rounded-3 p-3">
                     <strong>From Location:</strong>
-                    <div class="text-dark">{{location}}</div>
+                    <div class="text-dark">{{user.location.city}}</div>
                 </div>
             </div>
             <div class="col-md-6 mb-2">
                 <div class="bg-light rounded-3 p-3">
                     <strong>Phone Number:</strong>
-                    <div class="text-dark">{{phone}}</div>
+                    <div class="text-dark">{{user.phone_number}}</div>
                 </div>
             </div>
         </div>
@@ -49,14 +49,185 @@
         <hr>
 
         <h6 class="fw-bold mb-3">🚛 Vehicle Information & Documents</h6>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Vehicle Type:</strong> Tanker 10000L</li>
-            <li class="list-group-item"><strong>Registration Number:</strong> MP09AB1234</li>
-            <li class="list-group-item"><strong>License Number:</strong> DL-12345-67890</li>
-            <li class="list-group-item"><strong>Insurance Validity:</strong> Till Dec 2025</li>
-            <li class="list-group-item"><strong>Pollution Certificate:</strong> Valid</li>
-        </ul>
+        
+        <!-- Vehicle Info Section -->
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white py-2">
+                <h6 class="mb-0">Vehicle Details</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-circle bg-primary-light me-3">
+                                    <i class="fas fa-truck text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-0 text-muted small">Vehicle Type</p>
+                                    <p class="mb-0 fw-bold">Tanker 10000L</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-circle bg-primary-light me-3">
+                                    <i class="fas fa-id-card text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-0 text-muted small">Registration No.</p>
+                                    <p class="mb-0 fw-bold">MP09AB1234</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Section -->
+        <div class="card border-success">
+            <div class="card-header bg-success text-white py-2">
+                <h6 class="mb-0">Documents</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- License Document -->
+                    <div class="col-md-4 mb-4">
+                        <div class="document-card h-100">
+                            <div class="document-header bg-success-light p-2 rounded-top">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0"><i class="fas fa-id-card me-2"></i>Driver License</h6>
+                                    <span class="badge bg-success">Valid</span>
+                                </div>
+                            </div>
+                            <div class="document-body p-3 text-center border">
+                                <img src="/static/image/license_placeholder.jpg" alt="Driver License" class="img-fluid rounded mb-2 document-image">
+                                <p class="mb-1 small text-muted">DL-12345-67890</p>
+                                <p class="mb-0 small">Expires: 15/05/2030</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- RC Document -->
+                    <div class="col-md-4 mb-4">
+                        <div class="document-card h-100">
+                            <div class="document-header bg-success-light p-2 rounded-top">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0"><i class="fas fa-file-alt me-2"></i>Registration</h6>
+                                    <span class="badge bg-success">Valid</span>
+                                </div>
+                            </div>
+                            <div class="document-body p-3 text-center border">
+                                <img src="/static/image/rc_placeholder.jpg" alt="RC" class="img-fluid rounded mb-2 document-image">
+                                <p class="mb-1 small text-muted">MP09AB1234</p>
+                                <p class="mb-0 small">Tanker 10000L</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Insurance Document -->
+                    <div class="col-md-4 mb-4">
+                        <div class="document-card h-100">
+                            <div class="document-header bg-success-light p-2 rounded-top">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Insurance</h6>
+                                    <span class="badge bg-success">Valid</span>
+                                </div>
+                            </div>
+                            <div class="document-body p-3 text-center border">
+                                <img src="/static/image/insurance_placeholder.jpg" alt="Insurance" class="img-fluid rounded mb-2 document-image">
+                                <p class="mb-1 small text-muted">INS-98765-43210</p>
+                                <p class="mb-0 small">Expires: 31/12/2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Documents -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="additional-doc p-3 bg-light rounded mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="doc-icon bg-success text-white rounded-circle me-3">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-bold">Pollution Certificate</p>
+                                    <p class="mb-0 small text-muted">Valid until 15/06/2024</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="additional-doc p-3 bg-light rounded">
+                            <div class="d-flex align-items-center">
+                                <div class="doc-icon bg-success text-white rounded-circle me-3">
+                                    <i class="fas fa-file-contract"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-bold">Fitness Certificate</p>
+                                    <p class="mb-0 small text-muted">Valid until 30/09/2024</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<style>
+    /* Custom Styles */
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .bg-primary-light {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    
+    .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+    
+    .document-image {
+        max-height: 150px;
+        width: auto;
+        border: 1px solid #dee2e6;
+    }
+    
+    .document-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .document-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .doc-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .additional-doc {
+        transition: all 0.2s;
+    }
+    
+    .additional-doc:hover {
+        background-color: #e9ecef !important;
+    }
+</style>
 {%endblock%}

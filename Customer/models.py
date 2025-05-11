@@ -39,12 +39,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     groups = models.ManyToManyField(
         Group,
-        related_name='customer_users',  # must be different from other custom user models
+        related_name='customer_users',  
         blank=True
     )
     user_permissions = models.ManyToManyField(
         Permission,
-        related_name='customer_user_permissions',  # must be different too
+        related_name='customer_user_permissions',  
         blank=True
     )
 
@@ -100,12 +100,3 @@ class Payment(models.Model):
     def __str__(self):
         return f"Payment of {self.amount} for Order {self.order.id}"
 
-# -------------------- Notification --------------------
-class Notification(models.Model):
-    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Notification for {self.recipient.first_name}: {self.message[:30]}..."
