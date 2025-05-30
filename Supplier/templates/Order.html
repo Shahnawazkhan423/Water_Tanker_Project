@@ -2,16 +2,17 @@
 {%block sup-hero%}
 <div class="container mt-4">
     <h5 class="text-center">Pending Orders</h5>
-    {% for order in pending_orders %}
+    {% for ord in order %}
     <div class="card mb-3 p-3">
-        <h6><strong>Customer:</strong> {{ order.user.first_name }} {{ order.user.last_name }}</h6>
-        <p><strong>Tanker Size:</strong> {{ order.tanker.capacity }}L</p>
-        <p><strong>Category:</strong> {{ order.tanker.get_category_display }}</p>
-        <p><strong>Location:</strong> {{ order.location.address_line }}, {{ order.location.city }}</p>
-        <div class="text-center">
-            <a href="{% url 'accept_order' order.id %}" class="btn btn-success">Accept</a>
-            <a href="{% url 'supplier_update_order_status' order.id 'cancel' %}" class="btn btn-danger">Reject</a>
-        </div>
+        <h6><strong>Customer:</strong> {{ ord.user.first_name }} {{ ord.user.last_name }}</h6>
+        <p><strong>Tanker Size:</strong> {{ ord.tanker.capacity }}L</p>
+        <p><strong>Category:</strong> {{ ord.tanker.get_category_display }}</p>
+        <p><strong>Location:</strong> {{ ord.location.address_line }}, {{ ord.location.city }}</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="supplier_update_order_status" value="accept" class="btn btn-success">Accept</button>
+            <button type="submit" name="supplier_update_order_status" value="cancel" class="btn btn-danger">Reject</button>
+        </form>
     </div>
     {% empty %}
     <div class="alert alert-info">No pending orders</div>

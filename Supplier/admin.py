@@ -5,11 +5,6 @@ class SupplierLocationDetailAdmin(admin.ModelAdmin):
     list_display = ('address_line', 'city', 'state', 'country')
     search_fields = ('city', 'state', 'country')
 
-class SupplierDetailAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'phone_number', 'email', 'password','location')
-    search_fields = ('first_name', 'last_name', 'email', 'phone_number')
-    list_filter = ('location__city', 'location__state')
-
 class DriverAvailabilityAdmin(admin.ModelAdmin):
     list_display = ('availability_date', 'start_time', 'end_time', 'status')
     list_filter = ('status', 'availability_date')
@@ -28,7 +23,7 @@ class TankerDetailAdmin(admin.ModelAdmin):
     list_display = ('capacity', 'category', 'driver', 'available')
     list_filter = ('available', 'category')
 
-admin.site.register(SupplierUser,SupplierDetailAdmin)
+admin.site.register(SupplierProfile)
 admin.site.register(LocationDetail,SupplierLocationDetailAdmin)
 admin.site.register(DriverDetail,DriverDetailAdmin)
 admin.site.register(DriverAvailability,DriverAvailabilityAdmin)

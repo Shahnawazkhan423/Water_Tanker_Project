@@ -1,15 +1,9 @@
 from django.contrib import admin
-from .models import LocationDetail, CustomUser,OrderDetail, Payment
+from .models import LocationDetail,CustomerProfile,OrderDetail, Payment
 
 class LocationDetailAdmin(admin.ModelAdmin):
     list_display = ('address_line', 'city', 'state', 'country')
     search_fields = ('city', 'state', 'country')
-
-
-class UserDetailAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'phone_number', 'email', 'password','location')
-    search_fields = ('first_name', 'last_name', 'email', 'phone_number')
-    list_filter = ('location__city', 'location__state')
 
 
 class OrderDetailAdmin(admin.ModelAdmin):
@@ -24,7 +18,7 @@ class PaymentAdmin(admin.ModelAdmin):
     search_fields = ('transaction_id',)
 
 
-admin.site.register(CustomUser,UserDetailAdmin)
+admin.site.register(CustomerProfile)
 admin.site.register(LocationDetail,LocationDetailAdmin)
 admin.site.register(OrderDetail,OrderDetailAdmin)
 admin.site.register(Payment,PaymentAdmin)

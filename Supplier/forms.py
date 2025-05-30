@@ -1,13 +1,18 @@
 from django import forms
-from Supplier.models import *
+from Supplier.models import LocationDetail,TankerDetail,WaterTankerDocument
+from UserManagement.models import CustomUser
 
-class SupplierDetailForm(forms.ModelForm):
+class SupplierRegistrationForm(forms.ModelForm):
     class Meta:
-        model = SupplierUser
+        model = CustomUser
         fields = ['first_name','last_name','phone_number','email','password','profile_image']
-        widgets = {
-            'password': forms.PasswordInput()
-        } 
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.user_type = 'supplier'  
+        if commit:
+            user.save()
+        return user
 
 class SupplierTankerDetailForm(forms.ModelForm):
     class Meta:

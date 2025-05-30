@@ -1,32 +1,115 @@
 <!-- supplier/templates/supplier/notification.html -->
 {% extends "Home.html" %}
-
 {% block content %}
-<div class="container">
-    <h2>Order Notifications</h2>
-    
-    {% for notification in notifications %}
-    <div class="card mb-3 {% if not notification.is_read %}border-danger{% endif %}">
-        <div class="card-body">
-            <div class="d-flex justify-content-between">
-                <h5 class="card-title">
-                    {% if notification.notification_type == 'order_canceled' %}
-                        <i class="fas fa-times-circle text-danger"></i> Order Canceled
-                    {% else %}
-                        <i class="fas fa-bell"></i> Notification
-                    {% endif %}
-                </h5>
-                <small>{{ notification.created_at|timesince }} ago</small>
-            </div>
-            <p class="card-text">{{ notification.message }}</p>
-            <p><strong>Order ID:</strong> #{{ notification.order_id }}</p>
-            <a href="{% url 'supplier_order_detail' notification.order_id %}" class="btn btn-sm btn-primary">
-                View Order
-            </a>
+<style>
+  .notifications-container {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    font-family: Arial, sans-serif;
+  }
+
+  .notifications-container h3 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+
+  .notification-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .notification-item {
+    background: #fff;
+    margin-bottom: 10px;
+    padding: 15px 20px;
+    border-left: 6px solid #3498db;
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .notification-item:hover {
+    background: #eef6fb;
+  }
+
+  .notification-content {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+
+  .timestamp {
+    display: block;
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+
+  .notification-item.new {
+    border-left-color: #27ae60;
+    font-weight: bold;
+  }
+
+  .notification-item.new::after {
+    content: "New";
+    color: #fff;
+    background: #27ae60;
+    font-size: 12px;
+    padding: 3px 7px;
+    border-radius: 10px;
+    position: absolute;
+    top: 15px;
+    left: -45px;
+  }
+
+  .delete-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .delete-btn:hover {
+    background-color: #c0392b;
+  }
+
+  .notification-empty {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+    padding: 20px 0;
+  }
+</style>
+
+<div class="notifications-container">
+  <h3>Notifications</h3>
+  <ul class="notification-list">
+    {% for notif in notifications %}
+      <li class="notification-item {% if not notif.is_read %}new{% endif %}">
+        <div class="notification-content">
+          {{ notif.message }}
+          <span class="timestamp">{{ notif.timestamp|date:"Y-m-d H:i" }}</span>
         </div>
-    </div>
+        <form method="post" action="{% url 'delete_notification' notif.id %}">
+          {% csrf_token %}
+          <button type="submit" class="delete-btn">Delete</button>
+        </form>
+      </li>
     {% empty %}
-    <div class="alert alert-info">No notifications yet.</div>
+      <li class="notification-empty">No notifications.</li>
     {% endfor %}
+  </ul>
 </div>
 {% endblock %}

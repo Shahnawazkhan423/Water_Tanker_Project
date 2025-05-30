@@ -1,26 +1,61 @@
 {% extends "Home.html" %}
-{%block title%}Driver Order{%endblock%}
-{%block sup-hero%}
+{% block title %}Driver Order{% endblock %}
+{% block sup-hero %}
 <div class="container mt-4">
     <h5 class="text-center">Driver Order List</h5>
     <div class="row">
         <div class="col-md-12">
-            {% if order and order.id %}
-                <div class="card mb-3 p-3">
-                    <h6><strong>Username:</strong> {{ user_name }}</h6>
-                    <p><strong>Size Tanker:</strong> {{ size }}</p>
-                    <p><strong>Mobile:</strong> {{ cust_number }}</p>
-                    <p><strong>Location:</strong> {{ location }}</p>
-                    <p><strong>Category:</strong> {{ cag }}</p>
-                    <a href="{% url 'supplier_update_order_status' order.id 'cancel' %}" class="btn btn-danger">Cancel</a>
-                    <a href="{% url 'supplier_update_order_status' order.id 'on_way' %}" class="btn btn-warning">On Way</a> 
-                    <a href="{% url 'supplier_update_order_status' order.id 'complete' %}" class="btn btn-success">Complete</a>
-                </div>
+            {% if orders %}
+                {% for order in orders %}
+                    <div class="card mb-3 p-3 shadow-sm hover-card">
+                        <h6 class="card-title"><strong>Customer:</strong> {{ order.user.first_name }} {{ order.user.last_name }}</h6>
+                        <div class="card-body">
+                            <p class="card-text"><strong>Tanker Size:</strong> {{ order.tanker.capacity }}L</p>
+                            <p class="card-text"><strong>Category:</strong> {{ order.tanker.get_category_display }}</p>
+                            {% if order.location %}
+                                <p class="card-text"><strong>Location:</strong> {{ order.location.address_line }}, {{ order.location.city }}</p>
+                            {% else %}
+                                <p class="card-text"><strong>Location:</strong> N/A</p>
+                            {% endif %}   
+                            <form method="post">
+                                {% csrf_token %}
+                                <button type="submit" name="supplier_update_order_status" value="cancel" class="btn btn-danger btn-lg rounded-pill px-4 shadow-sm hover-btn">
+                                    <i class="fas fa-times-circle me-2"></i>Cancel
+                                </button>
+                                
+                                <button type="submit" name="supplier_update_order_status" value="on_way" class="btn btn-warning btn-lg rounded-pill px-4 shadow-sm hover-btn">
+                                    <i class="fas fa-truck-moving me-2"></i>On Way
+                                </button>
+                                
+                                <button type="submit" name="supplier_update_order_status" value="complete" class="btn btn-success btn-lg rounded-pill px-4 shadow-sm hover-btn">
+                                    <i class="fas fa-check-circle me-2"></i>Complete
+                                </button>
+                            </form>                            
+                        </div>
+                    </div>
+                {% endfor %}
             {% else %}
-                <div class="alert alert-warning">No order information available</div>
+                <div class="alert alert-warning">No orders available</div>
             {% endif %}
-            
         </div>
     </div>
 </div>
-{%endblock%}
+
+<style>
+    .hover-btn {
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+    .hover-btn:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: scale(1.05);
+    }
+    
+    .hover-card {
+        transition: transform 0.3s ease;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}

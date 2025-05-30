@@ -16,8 +16,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR /'templates'
 
-AUTH_USER_MODEL = 'Customer.CustomUser'
-AUTH_USER_MODEL = 'Supplier.SupplierUser'
+AUTH_USER_MODEL = 'UserManagement.CustomUser'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -43,10 +42,10 @@ INSTALLED_APPS = [
 INTERNAL_APPS = [
     'Customer',
     'Supplier',
+    'UserManagement',
     'django.contrib.humanize',
-    'notifications',
     'model_utils',
-    'django.contrib.gis',
+    'django.contrib.gis'
 ]
 INSTALLED_APPS +=INTERNAL_APPS
 
@@ -77,7 +76,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'notifications.context_processors.notifications',
             ],
         },
     },
@@ -123,7 +121,7 @@ AUTH_USER_MODE = "Water_Tanker_Project.UserDetail"
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -133,14 +131,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  
+    BASE_DIR / "static",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -148,3 +147,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
+
+SESSION_COOKIE_SECURE = False  # for local dev, True if HTTPS
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # default

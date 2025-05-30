@@ -7,6 +7,7 @@ urlpatterns=[
     path('Home_Page/',views.Supp_Home,name='Home'),
     path('Earning/',views.earning,name='Earning'),
     path('Order/',views.order_list,name='Order_List'),
+    path('supplier/notification/delete/<int:id>/', views.delete_notification, name='delete_notification'),
     path('order/update/<int:order_id>/<str:status>/', views.update_order_status, name='supplier_update_order_status'),
     path('Notifications/',views.notification,name='Notification'),
     path('Profile/',views.profile,name='Profile'),
