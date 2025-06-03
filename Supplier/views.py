@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.utils.timezone import datetime
 from django.utils import timezone
 from django.db.models import Sum
+from django.contrib.auth.hashers import make_password
 
 def register_view(request):
     if request.method == "POST":
@@ -21,7 +22,9 @@ def register_view(request):
 
             user = user_form.save(commit=False)
             user.location = location
-            print("Before saving user")
+            user.save()
+
+            user.password = make_password(user_form.cleaned_data['password'])
             user.save()
 
             messages.success(request, 'Registration successful.')
@@ -58,15 +61,14 @@ def login_view(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
+
         user = authenticate(request, email=email, password=password)
-        if user is not None and isinstance(user, CustomUser):
+        if user is not None:
             login(request, user)
             return redirect('Home')
-        
         else:
-            messages.error(request, 'Invalid email or password.')
-            return render(request, "Login.html")
-
+            messages.error(request, "Invalid email or password")
+    
     return render(request, "Login.html")
 
 def logout_view(request):
@@ -79,22 +81,20 @@ def logout_view(request):
 def toggle_availability(request):
     if request.method == 'POST':
         supplier = request.user
-        
-        # Toggle current availability status
-        new_status = not supplier.is_available
-        supplier.is_available = new_status
-        supplier.save()
+        supplier_profile = supplier.supplier
+        new_status = not supplier_profile.is_available
+        supplier_profile.is_available = new_status
+        supplier_profile.save()
 
-        # Log or update DriverAvailability
-        if new_status:  # Going ON Duty
+        if new_status:
             DriverAvailability.objects.create(
-                user=supplier,
+                user=supplier_profile,
                 availability_date=timezone.now().date(),
                 start_time=timezone.now().time(),
                 status='available'
             )
-        else:  # Going OFF Duty - update last available record
-            last_log = DriverAvailability.objects.filter(user=supplier, status='available').last()
+        else:
+            last_log = DriverAvailability.objects.filter(user=supplier_profile, status='available').last()
             if last_log:
                 last_log.end_time = timezone.now().time()
                 last_log.status = 'unavailable'
@@ -132,7 +132,11 @@ def get_supplier_dashboard_data(user):
 
 @login_required(login_url="Login_page")
 def Supp_Home(request):
-    return render(request,'Home.html')
+    if request.user.user_type == 'supplier':
+        return render(request,'Home.html')
+    else:
+        messages.error(request, "This user does not exist or is not a supplier.")
+        return render(request,"Login.html")
 
 @login_required(login_url="Login_page")
 def earning(request):

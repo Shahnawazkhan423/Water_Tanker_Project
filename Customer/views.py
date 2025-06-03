@@ -21,8 +21,9 @@ def register_view(request):
             user.location = location
             user.password = make_password(user_form.cleaned_data['password'])
             user.save()
-            
+
             messages.success(request, 'Registration successful.')
+            CustomerProfile.objects.create(user=user, location=location)
             return redirect("login")  
         
     else:
@@ -38,6 +39,7 @@ def login_view(request):
         email = request.POST.get('email')
         password = request.POST.get('id_passwords')
         user = authenticate(request, email=email, password=password)
+        print('customer ka authentication', user)
         if user is not None and isinstance(user, CustomUser):
             login(request, user)
             return redirect('home')

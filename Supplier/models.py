@@ -15,6 +15,7 @@ class LocationDetail(models.Model):
 
 class SupplierProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='supplier')
+    is_available = models.BooleanField(default=True)
     location = models.ForeignKey(LocationDetail,on_delete=models.CASCADE)
 
     def __str__(self):
@@ -25,9 +26,10 @@ class DriverAvailability(models.Model):
         ('available', 'Available'),
         ('unavailable', 'Unavailable')
     ]
+    user = models.ForeignKey(SupplierProfile, on_delete=models.CASCADE, related_name='availabilities')
     availability_date = models.DateField()
     start_time = models.TimeField()
-    end_time = models.TimeField()
+    end_time = models.TimeField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='unavailable')
     notes = models.CharField(max_length=255, blank=True, null=True)
 

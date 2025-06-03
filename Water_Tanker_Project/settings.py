@@ -16,7 +16,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR /'templates'
 
-AUTH_USER_MODEL = 'UserManagement.CustomUser'
+AUTH_USER_MODEL = 'UserManagement.CustomUser'   
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -49,7 +49,7 @@ INTERNAL_APPS = [
 ]
 INSTALLED_APPS +=INTERNAL_APPS
 
-AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
+AUTHENTICATION_BACKENDS = ['UserManagement.backends.EmailBackend','django.contrib.auth.backends.ModelBackend']
 
 SESSION_COOKIE_SECURE = False
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
