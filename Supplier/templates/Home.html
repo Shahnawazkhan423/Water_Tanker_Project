@@ -15,339 +15,254 @@
             --light-color: #ecf0f1;
             --dark-color: #34495e;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
             color: #333;
             line-height: 1.6;
         }
-        
-        /* Navbar Styles */
+
         .navbar {
             background-color: var(--primary-color);
-            padding: 0.8rem 1rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--light-color) !important;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .navbar-brand i {
-            margin-right: 10px;
-            font-size: 1.2em;
-        }
-        
+
+        .navbar-brand,
         .nav-link {
-            font-weight: 500;
-            padding: 0.5rem 1rem !important;
-            margin: 0 3px;
-            border-radius: 4px;
             color: var(--light-color) !important;
-            transition: all 0.2s ease;
         }
-        
+
+        .nav-link.active,
         .nav-link:hover {
             background-color: rgba(255, 255, 255, 0.1);
-            color: #fff !important;
+            font-weight: bold;
         }
-        
-        .nav-item.active .nav-link {
-            background-color: rgba(255, 255, 255, 0.2);
-            font-weight: 600;
+
+        .dashboard-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            background-color: white;
         }
-        
-        /* Duty Toggle Button */
-        .duty-toggle {
-            min-width: 120px;
-            font-weight: 600;
-            margin: 0 8px;
-            border: none;
-            transition: all 0.2s ease;
-            letter-spacing: 0.5px;
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
         }
-        
-        .duty-toggle:hover {
-            transform: scale(1.03);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Logout Link */
+
         .logout-link {
             background-color: var(--danger-color);
             color: white !important;
             border-radius: 4px;
-            padding: 0.5rem 1rem !important;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            margin-left: 5px;
+            padding: 0.5rem 1rem;
         }
-        
+
         .logout-link:hover {
             background-color: #c0392b;
-            transform: translateY(-1px);
         }
-        
-        /* Card Styles */
-        .dashboard-card {
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
+
+        .duty-toggle {
+            min-width: 120px;
+            font-weight: bold;
         }
-        
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-header {
-            font-weight: 600;
-        }
-        
-        /* Map Container */
-        .map-container {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Responsive Adjustments */
-        @media (max-width: 992px) {
-            .navbar-nav {
-                padding-top: 10px;
-            }
-            
-            .nav-item {
-                margin: 3px 0;
-            }
-            
-            .duty-toggle, .logout-link {
-                margin: 8px 0;
-                width: 100%;
-                text-align: center;
-            }
-            
+
+        @media (max-width: 768px) {
             .dashboard-card {
                 margin-bottom: 20px;
             }
         }
-        
-        /* Utility Classes */
-        .text-shadow {
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
         }
-        
-        .opacity-75 {
-            opacity: 0.75;
+
+        .card-header {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-truck-water"></i> WaterTanker
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'Home' %}active{% endif %}" href="{% url 'Home' %}">
-                            <i class="fas fa-home me-1"></i> Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'Earning' %}active{% endif %}" href="{% url 'Earning' %}">
-                            <i class="fas fa-rupee-sign me-1"></i> Earning
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'Order_List' %}active{% endif %}" href="{% url 'Order_List' %}">
-                            <i class="fas fa-clipboard-list me-1"></i> Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'Profile' %}active{% endif %}" href="{% url 'Profile' %}">
-                            <i class="fas fa-user me-1"></i> Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'Notification' %}active{% endif %}" href="{% url 'Notification' %}">
-                            <i class="fas fa-bell me-1"></i> Notifications
-                            <span class="badge bg-danger ms-1">3</span>
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item d-flex align-items-center">
-                        <button class="availabilityBtn btn btn-lg btn-{% if request.user.is_available %}success{% else %}danger{% endif %} shadow-sm fw-bold py-2 px-4 rounded-pill">
-                            <i class="fas {% if request.user.is_available %}fa-check-circle{% else %}fa-times-circle{% endif %} me-2"></i>
-                            {% if request.user.is_available %}Duty On{% else %}Duty Off{% endif %}
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link logout-link" href="{% url 'Logout_page' %}">
-                            <i class="fas fa-sign-out-alt me-1"></i> Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
-    {% block sup-hero %}
-    <div class="container mt-4">
-        <div class="row g-4">
-            <!-- Earning Card -->
-            <div class="col-md-4">
-                <div class="dashboard-card p-0 bg-white shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-rupee-sign me-2"></i> Today's Earning
-                    </div>
-                    <div class="card-body text-center py-4">
-                        <h2 class="fw-bold text-primary">₹{{total_revenue}}</h2>
-                        <div class="mt-3">
-                            <span class="badge bg-success bg-opacity-10 text-success">
-                                <i class="fas fa-arrow-up me-1"></i> 12% from yesterday
-                            </span>
-                        </div>
-                        <div class="progress mt-3 bg-light" style="height: 8px;">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Order Card -->
-            <div class="col-md-4">
-                <div class="dashboard-card p-0 bg-white shadow-sm">
-                    <div class="card-header bg-success text-white">
-                        <i class="fas fa-clipboard-check me-2"></i> Completed Orders
-                    </div>
-                    <div class="card-body text-center py-4">
-                        <h2 class="fw-bold text-success">{{orders_complete}}<small class="fs-5 text-muted">/{{orders_accept}}</small></h2>
-                        <div class="mt-3">
-                            <span class="badge bg-info bg-opacity-10 text-info">
-                                <i class="fas fa-bolt me-1"></i> 3 in progress
-                            </span>
-                        </div>
-                        <div class="progress mt-3 bg-light" style="height: 8px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Availability Card -->
-            <div class="col-md-4">
-                <div class="dashboard-card p-0 bg-white shadow-sm">
-                    <div class="card-header bg-warning text-dark">
-                        <i class="fas fa-user-clock me-2"></i> Availability Status
-                    </div>
-                    <div class="card-body text-center py-4">
-                        <button class="availabilityBtn btn duty-toggle btn-{% if request.user.is_available %}success{% else %}danger{% endif %}">
-                            <i class="fas {% if request.user.is_available %}fa-check-circle{% else %}fa-times-circle{% endif %} me-1"></i>
-                            {% if request.user.is_available %}On Duty{% else %}Off Duty{% endif %}
-                        </button>
-                        <p class="small mt-3 mb-0 text-muted" id="availabilityStatus">
-                            {% if request.user.is_available %}
-                                <i class="fas fa-check-circle text-success me-1"></i> Accepting new orders
-                            {% else %}
-                                <i class="fas fa-times-circle text-danger me-1"></i> Not available for orders
-                            {% endif %}
-                        </p>                        
-                    </div>
-                </div>
-            </div>
+<nav class="navbar navbar-expand-lg navbar-dark py-3">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-truck-water"></i> WaterTanker
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'Home' %}active{% endif %}" href="{% url 'Home' %}">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'Earning' %}active{% endif %}" href="{% url 'Earning' %}">
+                        <i class="fas fa-rupee-sign me-1"></i> Earning
+                    </a>
+                </li>
+                {% if order.id %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'Order_Detail' %}active{% endif %}" href="{% url 'Order_Detail' order.id %}">
+                            <i class="fas fa-clipboard-list me-1"></i> Order #{{ order.id }}
+                        </a>
+                    </li>
+                {% endif %}           
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'Order_List' %}active{% endif %}" href="{% url 'Order_List' %}">
+                        <i class="fas fa-list me-1"></i> Orders-List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'Profile' %}active{% endif %}" href="{% url 'Profile' %}">
+                        <i class="fas fa-user me-1"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'Notification' %}active{% endif %}" href="{% url 'Notification' %}">
+                        <i class="fas fa-bell me-1"></i> Notifications
+                        <span class="badge bg-danger ms-1">3</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item me-2">
+                    <button class="availabilityBtn btn duty-toggle btn-{% if request.user.is_available %}success{% else %}danger{% endif %}">
+                        <i class="fas {% if request.user.is_available %}fa-check-circle{% else %}fa-times-circle{% endif %} me-1"></i>
+                        {% if request.user.is_available %}On Duty{% else %}Off Duty{% endif %}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link logout-link" href="{% url 'Logout_page' %}">
+                        <i class="fas fa-sign-out-alt me-1"></i> Logout
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
+</nav>
+
+{% block sup-hero %}
+<div class="container mt-4">
+    <div class="row g-4">
+
+        <!-- Earning -->
+        <div class="col-md-4">
+            <div class="dashboard-card p-3 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-rupee-sign me-2"></i> Today's Earning
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="text-primary fw-bold">₹{{ total_revenue }}</h2>
+                    <small class="text-success">
+                        <i class="fas fa-arrow-up me-1"></i> 12% from yesterday
+                    </small>
+                    <div class="progress mt-3" style="height: 6px;">
+                        <div class="progress-bar bg-primary" style="width: 75%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Orders -->
+        <div class="col-md-4">
+            <div class="dashboard-card p-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-check me-2"></i> Completed Orders
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="text-success fw-bold">{{ orders_complete }}<small class="text-muted">/{{ orders_accept }}</small></h2>
+                    <small class="text-info">
+                        <i class="fas fa-bolt me-1"></i> 3 in progress
+                    </small>
+                    <div class="progress mt-3" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: 55%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Availability -->
+        <div class="col-md-4">
+            <div class="dashboard-card p-3 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <i class="fas fa-user-clock me-2"></i> Availability Status
+                </div>
+                <div class="card-body text-center">
+                    <button class="availabilityBtn btn btn-lg btn-{% if supplier_profile.is_available %}success{% else %}danger{% endif %}">
+                        <i class="fas {% if supplier_profile.is_available %}fa-check-circle{% else %}fa-times-circle{% endif %} me-2"></i>
+                        {% if supplier_profile.is_available %}Duty On{% else %}Duty Off{% endif %}
+                    </button>
+                    <p id="availabilityStatus" class="text-muted mt-2 small">
+                        {% if supplier_profile.is_available %}
+                            <i class="fas fa-check-circle text-success me-1"></i> Accepting new orders
+                        {% else %}
+                            <i class="fas fa-times-circle text-danger me-1"></i> Not available for orders
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+<main class="container my-4">
+    {% block content %}
+    <!-- Page specific content goes here -->
     {% endblock %}
-    
-    <main class="container my-4">
-        {% block content %}
-        <!-- Main content will be inserted here -->
-        {% endblock %}
-    </main>
-    
-    <!-- Live Location Section -->
-    <div class="container mt-4 mb-5">
-        <div class="map-container">
-            <div class="card border-0">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-map-marker-alt me-2"></i> Live Location Tracking
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="ratio ratio-16x9">
-                        <iframe src="https://maps.google.com/maps?q=Indore&t=&z=13&ie=UTF8&iwloc=&output=embed" 
-                            width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-                    </div>
-                    <div class="p-3 bg-light">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">
-                                <i class="fas fa-sync-alt me-1"></i> Last updated: Just now
-                            </small>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-expand me-1"></i> Fullscreen
-                            </button>
-                        </div>
-                    </div>
-                </div>
+</main>
+
+<!-- Live Location -->
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-map-marker-alt me-2"></i> Live Location Tracking
+        </div>
+        <div class="card-body p-0">
+            <div class="ratio ratio-16x9">
+                <iframe src="https://maps.google.com/maps?q=Indore&t=&z=13&ie=UTF8&iwloc=&output=embed" loading="lazy" allowfullscreen></iframe>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.querySelectorAll('.availabilityBtn').forEach(button => {
-            button.addEventListener('click', function () {
-                fetch('{% url "toggle_availability" %}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({})
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Update all buttons
-                        document.querySelectorAll('.availabilityBtn').forEach(btn => {
-                            if (data.is_available) {
-                                btn.className = 'availabilityBtn btn btn-success';
-                                btn.innerHTML = '<i class="fas fa-check-circle me-1"></i> On Duty';
-                            } else {
-                                btn.className = 'availabilityBtn btn btn-danger';
-                                btn.innerHTML = '<i class="fas fa-times-circle me-1"></i> Off Duty';
-                            }
-                        });
-    
-                        // Optional: update availability message if you have an element for it
-                        const statusMsg = document.getElementById('availabilityStatus');
-                        if (statusMsg) {
-                            if (data.is_available) {
-                                statusMsg.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Accepting new orders';
-                            } else {
-                                statusMsg.innerHTML = '<i class="fas fa-times-circle text-danger me-1"></i> Not available for orders';
-                            }
-                        }
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelectorAll('.availabilityBtn').forEach(button => {
+        button.addEventListener('click', () => {
+            fetch('{% url "toggle_availability" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.querySelectorAll('.availabilityBtn').forEach(btn => {
+                        btn.className = 'availabilityBtn btn btn-' + (data.is_available ? 'success' : 'danger');
+                        btn.innerHTML = `<i class="fas ${data.is_available ? 'fa-check-circle' : 'fa-times-circle'} me-1"></i> ${data.is_available ? 'On Duty' : 'Off Duty'}`;
+                    });
+                    const statusText = document.getElementById("availabilityStatus");
+                    if (statusText) {
+                        statusText.innerHTML = data.is_available ?
+                            '<i class="fas fa-check-circle text-success me-1"></i> Accepting new orders' :
+                            '<i class="fas fa-times-circle text-danger me-1"></i> Not available for orders';
                     }
-                });
+                }
             });
         });
-    </script>
-    </body>
+    });
+</script>
+
+</body>
 </html>

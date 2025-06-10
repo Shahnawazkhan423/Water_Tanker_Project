@@ -1,30 +1,48 @@
-<!-- In Order.html -->
-{%block sup-hero%}
+{% extends "Home.html" %}
+{% block sup-hero %}
 <div class="container mt-4">
-    <h5 class="text-center">Pending Orders</h5>
-    {% for ord in order %}
-    <div class="card mb-3 p-3">
-        <h6><strong>Customer:</strong> {{ ord.user.first_name }} {{ ord.user.last_name }}</h6>
-        <p><strong>Tanker Size:</strong> {{ ord.tanker.capacity }}L</p>
-        <p><strong>Category:</strong> {{ ord.tanker.get_category_display }}</p>
-        <p><strong>Location:</strong> {{ ord.location.address_line }}, {{ ord.location.city }}</p>
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" name="supplier_update_order_status" value="accept" class="btn btn-success">Accept</button>
-            <button type="submit" name="supplier_update_order_status" value="cancel" class="btn btn-danger">Reject</button>
-        </form>
-    </div>
-    {% empty %}
-    <div class="alert alert-info">No pending orders</div>
-    {% endfor %}
-    
-    <h5 class="text-center mt-4">Active Orders</h5>
-    {% for order in active_orders %}
-    <div class="card mb-3 p-3">
-        <!-- Show active orders -->
-    </div>
-    {% empty %}
-    <div class="alert alert-info">No active orders</div>
-    {% endfor %}
+
+    {% if view_type == 'list' %}
+        <h4 class="text-center mb-4">Nearby Pending Orders</h4>
+        {% for ord in orders %}
+        <div class="card mb-3 p-3">
+            <h6><strong>Customer:</strong> {{ ord.user.first_name }} {{ ord.user.last_name }}</h6>
+            <p><strong>Tanker Size:</strong> {{ ord.tanker.capacity }}L</p>
+            <p><strong>Category:</strong> {{ ord.tanker.get_category_display }}</p>
+            <p><strong>Location:</strong> {{ ord.location.address_line }}, {{ ord.location.city }}</p>
+            <a href="{% url 'Order_Detail' ord.id %}" class="btn btn-primary mt-2">View & Accept</a>
+        </div>
+        {% empty %}
+        <div class="alert alert-info text-center">No nearby pending orders found.</div>
+        {% endfor %}
+
+    {% elif view_type == 'detail' %}
+        <h4 class="text-center mb-4">Accept or Reject Order</h4>
+        {% for ord in orders %}
+        <div class="card mb-3 p-3">
+            <h6><strong>Customer:</strong> {{ ord.user.first_name }} {{ ord.user.last_name }}</h6>
+            <p><strong>Tanker Size:</strong> {{ ord.tanker.capacity }}L</p>
+            <p><strong>Category:</strong> {{ ord.tanker.get_category_display }}</p>
+            <p><strong>Location:</strong> {{ ord.location.address_line }}, {{ ord.location.city }}</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="action" value="accept" class="btn btn-success">Accept</button>
+                <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+            </form>
+        </div>
+        {% endfor %}
+
+        <hr>
+        <h5 class="text-center my-4">All Pending Orders</h5>
+        {% for o in all_orders %}
+        <div class="card mb-2 p-3">
+            <h6>Order #{{ o.id }} - {{ o.user.first_name }} ({{ o.location.city }})</h6>
+            <a href="{% url 'Order_Detail' o.id %}" class="btn btn-outline-primary btn-sm">View</a>
+        </div>
+        {% empty %}
+        <p class="text-center text-muted">No pending orders in the system.</p>
+        {% endfor %}
+    {% endif %}
+
 </div>
-{%endblock%}
+{% endblock %}

@@ -1,42 +1,51 @@
 {% extends "Home.html" %}
-{%block title%}Driver Earning{%endblock%}
-{%block sup-hero%}
+{% block title %}Driver Earning{% endblock %}
+
+{% block sup-hero %}
 <div class="container mt-4">
     <h2 class="text-center">Driver Earnings</h2>
-    {%if earnings_today %}
+
+    {% if earnings_today %}
         <div class="row text-center mt-3">
             <div class="col-md-6">
                 <div class="card p-3 shadow">
-                    <h5>Today Earning</h5>
-                    <h3>₹ {{earnings_today.amount}}</h3>
+                    <h5>Today's Earning</h5>
+                    <h3>₹ {{ earnings_today.amount }}</h3>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card p-3 shadow">
-                    <h5>Complete Order</h5>
+                    <h5>Completed Orders</h5>
                     <h3>{{ earnings_today.completed_orders }} / {{ earnings_today.total_orders }}</h3>
                 </div>
             </div>
         </div>
-    {%else%}
-        <p>No earnings data for today.</p>
+    {% else %}
+        <p class="text-center mt-3">No earnings data for today.</p>
     {% endif %}
-    <div class="mt-4">
-        <h4 class="text-center">Daily Earnings (Last 7 Days)</h4>
+
+    <div class="mt-5">
+        <h4 class="text-center mb-3">Daily Earnings (Last 7 Days)</h4>
         <table class="table table-bordered text-center">
             <thead class="table-dark">
                 <tr>
                     <th>Date</th>
                     <th>Earnings (₹)</th>
                 </tr>
-                {%for entry in last_7_earnings%}
             </thead>
             <tbody>
-                <tr><td>{{ entry.date }}</td><td>{{ entry.amount }}</td></tr>
+                {% for entry in last_7_earnings %}
+                <tr>
+                    <td>{{ entry.date }}</td>
+                    <td>₹ {{ entry.amount }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">No earnings data found.</td>
+                </tr>
+                {% endfor %}
             </tbody>
-            {%endfor%}
         </table>
     </div>
 </div>
-
-{%endblock%}
+{% endblock %}

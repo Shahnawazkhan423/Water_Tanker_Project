@@ -7,6 +7,8 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from geopy.distance import geodesic
+from django.db.models import Subquery
 
 # Create your views here.
 def register_view(request):
@@ -81,26 +83,21 @@ def booking(request):
         if user_form.is_valid() and tanker_form.is_valid() and location_form.is_valid():
             try:
                 with transaction.atomic():
-                    # Update logged-in user's basic info
                     user = user_form.save()
 
-                    # Save Tanker details
                     tanker = tanker_form.save(commit=False)
                     tanker.user = user
                     tanker.save()
 
-                    # Calculate price
                     capacity = tanker.capacity
                     total_price = pricing.get(capacity, 500.00)
 
-                    # Save Location details
                     location = location_form.save(commit=False)
                     location.user = user
                     location.tanker = tanker
                     location.save()
 
-                    # Create Order
-                    OrderDetail.objects.create(
+                    order = OrderDetail.objects.create(
                         user=user,
                         tanker=tanker,
                         location=location,
@@ -108,6 +105,24 @@ def booking(request):
                         price=total_price,
                         order_status='Pending'
                     )
+
+                    # Step 1: Notify available drivers in 1 km
+                    user_coords = (location.latitude, location.longitude)
+                    available_user_ids = SupplierProfile.objects.filter(is_available=True).values('user_id')
+
+                    available_drivers = DriverDetail.objects.filter(user__in=Subquery(available_user_ids))
+                    for driver in available_drivers:
+                        driver_coords = (driver.latitude, driver.longitude)
+                        distance = geodesic(user_coords, driver_coords).km
+
+                        if distance <= 1.0:
+                            Notification.objects.create(
+                                recipient=driver.user,
+                                sender=user,
+                                message=f"New booking request within 1 km for {capacity} liters",
+                                notification_type='booking_request',
+                                order_id=order.id
+                            )
 
                     messages.success(request, f"Booking successful! Price: ₹{total_price:.2f} for {capacity} liters")
                     return redirect('booking')
@@ -131,7 +146,6 @@ def booking(request):
         'location_form': location_form,
         'pricing': pricing,
     })
-    
 @login_required(login_url="login")
 def driver_detail(request):
     # Get the latest order for the current customer
@@ -156,8 +170,13 @@ def profile(request):
     
 @login_required(login_url="login")
 def notification_view(request):
-    supplier = DriverDetail.objects.get(user=request.user)  # or DriverDetail
-    notifications = Notification.objects.filter(supplier=supplier)
+    try:
+        supplier_profile = request.user.supplier  # Correctly fetch SupplierProfile
+    except Exception:
+        messages.error(request, "Supplier profile not found.")
+        return render(request, 'notification.html', {'notifications': []})
+
+    notifications = Notification.objects.filter(supplier=supplier_profile).order_by('-timestamp')
     return render(request, 'notification.html', {'notifications': notifications})
 
 @login_required

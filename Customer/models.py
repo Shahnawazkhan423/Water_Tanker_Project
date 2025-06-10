@@ -10,10 +10,18 @@ class LocationDetail(models.Model):
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.address_line}, {self.city}"
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='customer')
     location = models.ForeignKey(LocationDetail,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}"
 # -------------------- Orders --------------------
 class OrderDetail(models.Model):
     STATUS_CHOICES = [

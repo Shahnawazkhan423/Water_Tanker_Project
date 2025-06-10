@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import*
-# Register your models here.
+
 class SupplierLocationDetailAdmin(admin.ModelAdmin):
     list_display = ('address_line', 'city', 'state', 'country')
     search_fields = ('city', 'state', 'country')

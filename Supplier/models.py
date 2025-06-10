@@ -9,17 +9,19 @@ class LocationDetail(models.Model):
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
                                     
     def __str__(self):
         return f"{self.address_line}, {self.city}"
 
 class SupplierProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='supplier')
-    is_available = models.BooleanField(default=True)
+    is_available = models.BooleanField(default=False)
     location = models.ForeignKey(LocationDetail,on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.user.first_name}, {self.user.last_name}"
+        return f"{self.user.first_name} {self.user.last_name}"
 # -------------------- Driver --------------------
 class DriverAvailability(models.Model):
     STATUS_CHOICES = [
@@ -34,32 +36,41 @@ class DriverAvailability(models.Model):
     notes = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return self.status
+        return 
+    def __str__(self):
+        return f"{self.user.user.first_name} {self.user.user.last_name} {self.status}"
 
 class DriverDetail(models.Model):
     user = models.OneToOneField(SupplierProfile, on_delete=models.CASCADE)
-    availability = models.ForeignKey(DriverAvailability, on_delete=models.SET_NULL, null=True, related_name='drivers')
+    availability = models.ForeignKey(DriverAvailability, on_delete=models.CASCADE,related_name='supplier')
 
     def __str__(self):
         return f"{self.user.user.first_name} {self.user.user.last_name}"
 
 # -------------------- Water Tanker Document --------------------
+def upload_to(instance, filename):
+    return f'media/water_tanker_documents/{filename}'
+
 class WaterTankerDocument(models.Model):
     water_tanker_name = models.CharField(max_length=255)
-    profile_photo = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
-    driving_license = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
-    aadhar_card = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
-    pan_card = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
-    registration_cert = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
-    vechicle_insurance = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
-    vechicle_permit = models.ImageField(upload_to="media/profile_image.jpg",null=True, blank=True)
+
+    profile_photo = models.FileField(upload_to=upload_to, null=True, blank=True)
+    driving_license = models.FileField(upload_to=upload_to, null=True, blank=True)
+    aadhar_card = models.FileField(upload_to=upload_to, null=True, blank=True)
+    pan_card = models.FileField(upload_to=upload_to, null=True, blank=True)
+    registration_cert = models.FileField(upload_to=upload_to, null=True, blank=True)
+    vechicle_insurance = models.FileField(upload_to=upload_to, null=True, blank=True)
+    vechicle_permit = models.FileField(upload_to=upload_to, null=True, blank=True)
+
     upload_date = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
-       return self.water_tanker_name
+        return self.water_tanker_name
+
 # -------------------- Tanker --------------------
 class TankerDetail(models.Model):
-    driver = models.ForeignKey('DriverDetail', on_delete=models.CASCADE, null=True, blank=True)
-    document = models.ForeignKey('WaterTankerDocument', on_delete=models.CASCADE, null=True, blank=True)
+    driver = models.ForeignKey(DriverDetail, on_delete=models.CASCADE, null=True, blank=True)
+    document = models.ForeignKey(WaterTankerDocument, on_delete=models.CASCADE, null=True, blank=True)
 
     CAPACITY_CHOICES = [
         (1000, '1000 liters'),
