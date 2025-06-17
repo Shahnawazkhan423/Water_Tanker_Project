@@ -28,26 +28,44 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="logo.png" alt="Logo" width="40"> Water Tanker
-            </a>
+            <i class="fas fa-water fa-lg me-2 text-light"></i> <span class="fw-bold">Water Tanker</span>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+    
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home'%}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'booking'%}">Place Order</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'driver_detail'%}">Driver Detail</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'profile'%}">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'notification'%}">
-                        <i class="fas fa-bell"></i> Notifications
-                        {% if unread_notifications_count > 0 %}
-                            <span class="badge bg-danger">{{ unread_notifications_count }}</span>
-                        {% endif %}
-                         </a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'booking' %}">Place Order</a>
+                    </li>
+    
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'driver_detail' %}">Driver Detail</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+                    </li>
+    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'notification' %}">
+                            <i class="fas fa-bell"></i> Notifications
+                            {% if unread_notifications_count > 0 %}
+                                <span class="badge bg-danger">{{ unread_notifications_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="fa-solid fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

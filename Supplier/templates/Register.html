@@ -10,34 +10,48 @@
   <style>
     body {
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
+      min-height: 100vh; /* Ensures body takes full viewport height */
+      display: flex; /* Enables flexbox */
+      align-items: center; /* Centers content vertically */
+      justify-content: center; /* Centers content horizontally */
+      padding: 20px; /* Add padding around the card for small screens */
+      box-sizing: border-box; /* Include padding in element's total width and height */
     }
-    
+
+    .container {
+        /* Remove default Bootstrap container padding on very small screens if it interferes */
+        padding-left: 0;
+        padding-right: 0;
+        width: 100%; /* Ensure container takes full width of its flex parent */
+        max-width: 900px; /* Limit the max width of the container itself */
+    }
+
     .registration-card {
       border: none;
       border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       overflow: hidden;
       animation: fadeIn 0.6s ease-out forwards;
+      width: 100%; /* Ensures the card takes full width of its parent (container) */
     }
-    
+
     .card-header-gradient {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-bottom: none;
     }
-    
+
     .gradient-btn {
       background: linear-gradient(135deg, #2bde8c 0%, #1dc8cd 100%);
       border: none;
       border-radius: 50px;
       transition: all 0.3s ease;
     }
-    
+
     .gradient-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(43, 222, 140, 0.4);
     }
-    
+
     .section-title {
       color: #4a6baf;
       font-weight: 600;
@@ -45,12 +59,12 @@
       border-bottom: 2px solid #f0f0f0;
       margin-bottom: 1.2rem;
     }
-    
+
     .form-floating > label {
       color: #6c757d;
       left: 1px; /* Adjust label positioning */
     }
-    
+
     .form-control {
       border-radius: 8px;
       padding: 1rem 1.2rem;
@@ -58,28 +72,66 @@
       transition: all 0.3s;
       height: calc(3.5rem + 2px); /* Fixed height for floating labels */
     }
-    
+
     .form-control:focus {
       border-color: #667eea;
       box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
     }
-    
+
+    /* Adjust profile image size and ensure it's centered */
+    #preview-image {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      cursor: pointer;
+      display: block; /* Make it a block element to center with margin auto */
+      margin: 0 auto 1rem auto; /* Center the image and add bottom margin */
+    }
+
+    /* Style for the actual file input to hide it but keep it accessible */
+    input[type="file"] {
+      display: none;
+    }
+
+    /* Style for validation feedback */
+    .form-control:invalid ~ .invalid-feedback {
+        display: block;
+    }
+    .invalid-feedback {
+        font-size: 0.875em;
+        color: #dc3545;
+        margin-top: 0.25rem;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
-    @media (max-width: 768px) {
+
+    @media (max-width: 767.98px) { /* Use max-width for breakpoint for better mobile-first approach */
       .card-body {
         padding: 1.5rem !important;
       }
-      
+
       .section-title {
         font-size: 1.1rem;
       }
-      
+
       .form-control {
         padding: 0.8rem 1rem;
+      }
+
+      /* Stack columns on small screens by default */
+      .col-md-6 {
+        width: 100%;
+      }
+    }
+
+    /* For screens wider than 768px, use 50% width for col-md-6 */
+    @media (min-width: 768px) {
+      .col-md-6 {
+        flex: 0 0 auto;
+        width: 50%;
       }
     }
   </style>
@@ -87,119 +139,133 @@
 <body class="d-flex align-items-center py-3">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-12 col-lg-10 col-xl-8">
+      <div class="col-12">
         <div class="card registration-card mb-4">
           <div class="card-header card-header-gradient text-white text-center py-3">
             <h3 class="mb-0 fw-semibold"><i class="bi bi-person-plus-fill me-2"></i>Supplier Registration</h3>
           </div>
           <div class="card-body bg-light p-4 p-lg-5">
-            {% block form_page %}
-            <form method="post" class="row g-3 needs-validation" novalidate action="{% url 'Register_page' %}">
-            {% endblock %}
+            <form method="post" class="row g-3 needs-validation" enctype="multipart/form-data" novalidate action="{% url 'Register_page' %}">
               {% csrf_token %}
-              {%if messages%}
+              {% if messages %}
                 <div class="alert alert-primary" role="alert">
-                  {%for message in messages%}
-                  {{message}}
-                  {%endfor%}
+                  {% for message in messages %}
+                    {{ message }}
+                  {% endfor %}
                 </div>
-              {%endif%}
+              {% endif %}
+
               <div class="col-12 text-center mb-4">
                 <label for="id_profile_image">
-                  <img id="preview-image" src="/static/image/Profile_Default_Image.jpg" alt="Profile Preview" class="rounded-circle shadow mb-2" width="120" height="120" style="object-fit: cover; cursor: pointer;">
+                  <img id="preview-image" src="/static/image/Profile_Default_Image.jpg" alt="Profile Preview" class="rounded-circle shadow mb-2">
                 </label>
-              
-                <!-- File Input (Hidden Initially) -->
-                <input type="file" id="id_profile_image" name="profile_image" accept="image/*" class="form-control-file" style="display: none;">
+                <input type="file" id="id_profile_image" name="profile_image" accept="image/*" class="form-control-file">
+                <div class="invalid-feedback d-block" id="profile_image_error"></div>
               </div>
-              <!-- USER INFO -->
+
               <div class="col-12">
                 <h5 class="section-title"><i class="bi bi-person-circle me-2"></i>User Information</h5>
               </div>
-              
-              <div class="col-md-6">
+
+              <div class="col-md-6 col-12">
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="id_first_name" name="first_name" placeholder="First Name" required>
                   <label for="id_first_name">First Name</label>
-                </div>
-              </div>
-              
-              <div class="col-md-6">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_last_name" name="last_name" placeholder="Last Name" required>
-                  <label for="id_last_name">Last Name</label>
-                </div>
-              </div>
-              
-              <div class="col-md-6">
-                <div class="form-floating mb-3">
-                  <input type="tel" class="form-control" id="id_phone_number" name="phone_number" placeholder="Phone Number" required>
-                  <label for="id_phone_number">Phone Number</label>
-                </div>
-              </div>
-              
-              <div class="col-md-6">
-                <div class="form-floating mb-3">
-                  <input type="email" class="form-control" id="id_email" name="email" placeholder="Email" required>
-                  <label for="id_email">Email</label>
-                </div>
-              </div>
-              
-              <div class="col-12">
-                <div class="form-floating mb-3">
-                  <input type="password" class="form-control" id="id_passwords" name="password" placeholder="Password" required>
-                  <label for="id_passwords">Password</label>
+                  <div class="invalid-feedback">Please enter your first name.</div>
                 </div>
               </div>
 
-              <!-- ADDRESS INFO -->
+              <div class="col-md-6 col-12">
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="id_last_name" name="last_name" placeholder="Last Name" required>
+                  <label for="id_last_name">Last Name</label>
+                  <div class="invalid-feedback">Please enter your last name.</div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-12">
+                <div class="form-floating mb-3">
+                  <input type="tel" class="form-control" id="id_phone_number" name="phone_number" placeholder="Phone Number" required pattern="[0-9]{10}">
+                  <label for="id_phone_number">Phone Number</label>
+                  <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-12">
+                <div class="form-floating mb-3">
+                  <input type="email" class="form-control" id="id_email" name="email" placeholder="Email" required>
+                  <label for="id_email">Email</label>
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="form-floating mb-3">
+                  <input type="password" class="form-control" id="id_passwords" name="password" placeholder="Password" required minlength="8">
+                  <label for="id_passwords">Password</label>
+                  <div class="invalid-feedback">Password must be at least 8 characters long.</div>
+                </div>
+              </div>
+
               <div class="col-12 mt-2">
                 <h5 class="section-title"><i class="bi bi-geo-alt-fill me-2"></i>Address Information</h5>
               </div>
-              
-              <div class="col-md-6">
+
+              <div class="col-md-6 col-12">
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="id_address_line" name="address_line" placeholder="Address Line" required>
                   <label for="id_address_line">Address Line</label>
+                  <div class="invalid-feedback">Please enter your address line.</div>
                 </div>
               </div>
-              
-              <div class="col-md-6">
+
+              <div class="col-md-6 col-12">
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="id_street" name="street" placeholder="Street" required>
                   <label for="id_street">Street</label>
+                  <div class="invalid-feedback">Please enter your street.</div>
                 </div>
               </div>
-              
-              <div class="col-md-6">
+
+              <div class="col-md-6 col-12">
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="id_landmark" name="landmark" placeholder="Landmark">
                   <label for="id_landmark">Landmark</label>
                 </div>
               </div>
-              
-              <div class="col-md-6">
+
+              <div class="col-md-6 col-12">
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="id_city" name="city" placeholder="City" required>
                   <label for="id_city">City</label>
-                </div>
-              </div>
-              
-              <div class="col-md-6">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_state" name="state" placeholder="State" required>
-                  <label for="id_state">State</label>
-                </div>
-              </div>
-              
-              <div class="col-md-6">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_country" name="country" placeholder="Country" required>
-                  <label for="id_country">Country</label>
+                  <div class="invalid-feedback">Please enter your city.</div>
                 </div>
               </div>
 
-              <!-- SUBMIT -->
+              <div class="col-md-6 col-12">
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="id_state" name="state" placeholder="State" required>
+                  <label for="id_state">State</label>
+                  <div class="invalid-feedback">Please enter your state.</div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-12">
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="id_country" name="country" placeholder="Country" required>
+                  <label for="id_country">Country</label>
+                  <div class="invalid-feedback">Please enter your country.</div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-12">
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="id_pincode" name="pincode" placeholder="Pincode" required pattern="[0-9]{6}">
+                  <label for="id_pincode">Pincode</label>
+                  <div class="invalid-feedback">Please enter a valid 6-digit pincode.</div>
+                </div>
+              </div>
+
               <div class="col-12 text-center mt-3">
                 <button type="submit" class="btn gradient-btn text-white px-5 py-2 fw-semibold">
                   <i class="bi bi-check-circle me-2"></i> Register Now
@@ -215,7 +281,63 @@
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const profileImageInput = document.getElementById('id_profile_image');
+      const previewImage = document.getElementById('preview-image');
+      const profileImageErrorDiv = document.getElementById('profile_image_error');
+      const form = document.querySelector('.needs-validation');
+
+      // Image preview logic
+      if (profileImageInput) {
+        profileImageInput.addEventListener('change', function(event) {
+          if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            // Clear any previous error
+            profileImageErrorDiv.textContent = '';
+
+            // Basic file type and size validation (client-side)
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            const maxSize = 2 * 1024 * 1024; // 2MB
+
+            if (!allowedTypes.includes(file.type)) {
+              profileImageErrorDiv.textContent = 'Invalid file type. Please upload a JPEG, PNG, or GIF image.';
+              previewImage.src = "/static/image/Profile_Default_Image.jpg"; // Reset to default
+              profileImageInput.value = ''; // Clear the input
+              return;
+            }
+
+            if (file.size > maxSize) {
+              profileImageErrorDiv.textContent = 'Image size exceeds 2MB limit.';
+              previewImage.src = "/static/image/Profile_Default_Image.jpg"; // Reset to default
+              profileImageInput.value = ''; // Clear the input
+              return;
+            }
+
+            reader.onload = function(e) {
+              previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          } else {
+            // If no file is selected, reset to default image
+            previewImage.src = "/static/image/Profile_Default_Image.jpg";
+            profileImageErrorDiv.textContent = ''; // Clear error if no file
+          }
+        });
+      }
+
+      // Bootstrap form validation (client-side)
+      form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  </script>
 </body>
 </html>

@@ -4,82 +4,192 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Water Tanker Supplier{% endblock %}</title>
+    <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Inter (for a modern look) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #2ecc71;
-            --danger-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #34495e;
+            --primary-color: #2c3e50; /* Dark Blue Gray */
+            --secondary-color: #3498db; /* Bright Blue */
+            --success-color: #2ecc71; /* Emerald Green */
+            --danger-color: #e74c3c; /* Alizarin Red */
+            --warning-color: #f39c12; /* Orange Yellow */
+            --light-color: #ecf0f1; /* Cloud Gray */
+            --dark-color: #34495e; /* Midnight Blue */
+            --info-color: #1abc9c; /* Turquoise */
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif; /* Using Inter for a modern feel */
+            background-color: var(--light-color); /* Lighter background */
+            color: var(--dark-color);
+            line-height: 1.7; /* Slightly increased line height for readability */
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            display: flex;
+            flex-direction: column;
         }
 
         .navbar {
             background-color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color); /* Accent border */
         }
 
-        .navbar-brand,
+        .navbar-brand {
+            color: var(--light-color) !important;
+            font-weight: 700; /* Bold brand name */
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand i {
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
+            color: var(--secondary-color); /* Accent color for icon */
+        }
+
         .nav-link {
             color: var(--light-color) !important;
+            padding: 0.75rem 1rem;
+            border-radius: 5px; /* Slightly rounded tabs */
+            transition: background-color 0.3s ease, font-weight 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link i {
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
         }
 
         .nav-link.active,
         .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.15); /* More visible hover/active */
+            font-weight: 600; /* Semi-bold on hover/active */
+            color: white !important;
         }
 
         .dashboard-card {
-            border-radius: 10px;
+            border-radius: 12px; /* More rounded corners */
             overflow: hidden;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             background-color: white;
+            border: none; /* Remove default card border */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Soft shadow */
         }
 
         .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+            transform: translateY(-8px); /* More pronounced lift */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); /* Larger shadow on hover */
+        }
+
+        .card-header {
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: none; /* Remove default border */
+            border-top-left-radius: 12px; /* Match card border-radius */
+            border-top-right-radius: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 1.5rem; /* More padding inside body */
         }
 
         .logout-link {
             background-color: var(--danger-color);
             color: white !important;
-            border-radius: 4px;
-            padding: 0.5rem 1rem;
+            border-radius: 6px; /* More rounded */
+            padding: 0.6rem 1.2rem; /* Larger padding */
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
 
         .logout-link:hover {
-            background-color: #c0392b;
+            background-color: #c0392b; /* Darker red on hover */
+            transform: translateY(-2px); /* Slight lift */
         }
 
         .duty-toggle {
-            min-width: 120px;
+            min-width: 140px; /* Wider button */
             font-weight: bold;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
         }
 
-        @media (max-width: 768px) {
-            .dashboard-card {
-                margin-bottom: 20px;
-            }
+        .duty-toggle.btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        .duty-toggle.btn-success:hover {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+        .duty-toggle.btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        .duty-toggle.btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+
+        .progress {
+            height: 8px; /* Slightly thicker progress bar */
+            border-radius: 4px;
+            background-color: rgba(0, 0, 0, 0.1); /* Lighter background for progress bar */
+        }
+
+        .progress-bar {
+            border-radius: 4px;
+        }
+
+        .map-container {
+            border-radius: 12px; /* Match card border-radius */
+            overflow: hidden; /* Ensure iframe corners are rounded */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Consistent shadow */
         }
 
         .map-container iframe {
             width: 100%;
-            height: 100%;
+            height: 400px; /* Fixed height for consistency, responsive width */
             border: 0;
         }
 
-        .card-header {
-            font-weight: bold;
+        /* Responsive adjustments */
+        @media (max-width: 991.98px) { /* Adjust for smaller desktops and tablets */
+            .navbar-nav {
+                margin-top: 1rem;
+            }
+            .navbar-collapse {
+                text-align: center;
+            }
+            .nav-item {
+                margin-bottom: 0.5rem;
+            }
+            .duty-toggle, .logout-link {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        @media (max-width: 767.98px) { /* Adjust for mobile phones */
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .card-body {
+                padding: 1rem;
+            }
+            .map-container iframe {
+                height: 300px; /* Shorter map on mobile */
+            }
         }
     </style>
 </head>
@@ -90,51 +200,54 @@
         <a class="navbar-brand" href="#">
             <i class="fas fa-truck-water"></i> WaterTanker
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'Home' %}active{% endif %}" href="{% url 'Home' %}">
-                        <i class="fas fa-home me-1"></i> Home
+                        <i class="fas fa-home"></i> Home
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'Earning' %}active{% endif %}" href="{% url 'Earning' %}">
-                        <i class="fas fa-rupee-sign me-1"></i> Earning
+                        <i class="fas fa-rupee-sign"></i> Earning
                     </a>
                 </li>
                 {% if order.id %}
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'Order_Detail' %}active{% endif %}" href="{% url 'Order_Detail' order.id %}">
-                            <i class="fas fa-clipboard-list me-1"></i> Order #{{ order.id }}
+                            <i class="fas fa-clipboard-list"></i> Order #{{ order.id }}
                         </a>
                     </li>
                 {% endif %}           
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'Order_List' %}active{% endif %}" href="{% url 'Order_List' %}">
-                        <i class="fas fa-list me-1"></i> Orders-List
+                        <i class="fas fa-list"></i> Orders-List
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'Profile' %}active{% endif %}" href="{% url 'Profile' %}">
-                        <i class="fas fa-user me-1"></i> Profile
+                        <i class="fas fa-user"></i> Profile
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'Notification' %}active{% endif %}" href="{% url 'Notification' %}">
-                        <i class="fas fa-bell me-1"></i> Notifications
-                        <span class="badge bg-danger ms-1">3</span>
+                        <i class="fas fa-bell"></i> Notifications
                     </a>
                 </li>
             </ul>
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item me-2">
-                    <button class="availabilityBtn btn duty-toggle btn-{% if request.user.is_available %}success{% else %}danger{% endif %}">
-                        <i class="fas {% if request.user.is_available %}fa-check-circle{% else %}fa-times-circle{% endif %} me-1"></i>
-                        {% if request.user.is_available %}On Duty{% else %}Off Duty{% endif %}
-                    </button>
+                <li class="nav-item me-lg-2 mb-2 mb-lg-0">
+                    {% if request.user.is_authenticated and request.user.user_type == 'supplier' %}
+                        <li class="nav-item me-lg-2 mb-2 mb-lg-0">
+                            <button class="availabilityBtn btn duty-toggle btn-{% if request.user.supplier.is_available %}success{% else %}danger{% endif %}">
+                                <i class="fas {% if request.user.supplier.is_available %}fa-check-circle{% else %}fa-times-circle{% endif %} me-1"></i>
+                                {% if request.user.supplier.is_available %}On Duty{% else %}Off Duty{% endif %}
+                            </button>
+                        </li>
+                    {% endif %}                
                 </li>
                 <li class="nav-item">
                     <a class="nav-link logout-link" href="{% url 'Logout_page' %}">
@@ -147,58 +260,58 @@
 </nav>
 
 {% block sup-hero %}
-<div class="container mt-4">
-    <div class="row g-4">
+<div class="container my-5">
+    <div class="row g-4 justify-content-center">
 
-        <!-- Earning -->
-        <div class="col-md-4">
-            <div class="dashboard-card p-3 shadow-sm">
+        <!-- Earning Card -->
+        <div class="col-sm-10 col-md-6 col-lg-4">
+            <div class="dashboard-card p-0">
                 <div class="card-header bg-primary text-white">
                     <i class="fas fa-rupee-sign me-2"></i> Today's Earning
                 </div>
                 <div class="card-body text-center">
-                    <h2 class="text-primary fw-bold">₹{{ total_revenue }}</h2>
-                    <small class="text-success">
-                        <i class="fas fa-arrow-up me-1"></i> 12% from yesterday
-                    </small>
-                    <div class="progress mt-3" style="height: 6px;">
-                        <div class="progress-bar bg-primary" style="width: 75%"></div>
+                    <h2 class="text-primary fw-bolder mb-2">₹{{ total_revenue|default:"0.00" }}</h2>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Completed Orders -->
-        <div class="col-md-4">
-            <div class="dashboard-card p-3 shadow-sm">
+        <!-- Completed Orders Card -->
+        <div class="col-sm-10 col-md-6 col-lg-4">
+            <div class="dashboard-card p-0">
                 <div class="card-header bg-success text-white">
                     <i class="fas fa-check me-2"></i> Completed Orders
                 </div>
                 <div class="card-body text-center">
-                    <h2 class="text-success fw-bold">{{ orders_complete }}<small class="text-muted">/{{ orders_accept }}</small></h2>
-                    <small class="text-info">
-                        <i class="fas fa-bolt me-1"></i> 3 in progress
-                    </small>
-                    <div class="progress mt-3" style="height: 6px;">
-                        <div class="progress-bar bg-success" style="width: 55%"></div>
+                    <h2 class="text-success fw-bolder mb-2">{{ orders_complete|default:0 }}<small class="text-muted fs-5">/{{ orders_accept|default:0 }}</small></h2>
+                    <p class="text-info small mb-3">
+                    </p>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Availability -->
-        <div class="col-md-4">
-            <div class="dashboard-card p-3 shadow-sm">
+        <!-- Availability Card -->
+        <div class="col-sm-10 col-md-6 col-lg-4">
+            <div class="dashboard-card p-0">
                 <div class="card-header bg-warning text-dark">
                     <i class="fas fa-user-clock me-2"></i> Availability Status
                 </div>
                 <div class="card-body text-center">
-                    <button class="availabilityBtn btn btn-lg btn-{% if supplier_profile.is_available %}success{% else %}danger{% endif %}">
-                        <i class="fas {% if supplier_profile.is_available %}fa-check-circle{% else %}fa-times-circle{% endif %} me-2"></i>
-                        {% if supplier_profile.is_available %}Duty On{% else %}Duty Off{% endif %}
-                    </button>
-                    <p id="availabilityStatus" class="text-muted mt-2 small">
-                        {% if supplier_profile.is_available %}
+                    {% if request.user.is_authenticated and request.user.user_type == 'supplier' %}
+                    <li class="nav-item me-lg-2 mb-2 mb-lg-0">
+                        <button class="availabilityBtn btn duty-toggle btn-{% if request.user.supplier.is_available %}success{% else %}danger{% endif %}">
+                            <i class="fas {% if request.user.supplier.is_available %}fa-check-circle{% else %}fa-times-circle{% endif %} me-1"></i>
+                            {% if request.user.supplier.is_available %}On Duty{% else %}Off Duty{% endif %}
+                        </button>
+                    </li>
+                    {% endif %}
+                    <p id="availabilityStatus" class="text-muted small">
+                        {% if is_available and request.user.supplier.is_available %}
                             <i class="fas fa-check-circle text-success me-1"></i> Accepting new orders
                         {% else %}
                             <i class="fas fa-times-circle text-danger me-1"></i> Not available for orders
@@ -207,7 +320,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 {% endblock %}
@@ -218,47 +330,75 @@
     {% endblock %}
 </main>
 
-<!-- Live Location -->
+<!-- Live Location Section -->
 <div class="container mt-4 mb-5">
-    <div class="card shadow-sm">
+    <div class="card shadow-sm map-container">
         <div class="card-header bg-primary text-white">
             <i class="fas fa-map-marker-alt me-2"></i> Live Location Tracking
         </div>
         <div class="card-body p-0">
             <div class="ratio ratio-16x9">
-                <iframe src="https://maps.google.com/maps?q=Indore&t=&z=13&ie=UTF8&iwloc=&output=embed" loading="lazy" allowfullscreen></iframe>
+                <!-- Using a more general Google Maps embed for Indore for demonstration -->
+                <iframe src="https://maps.google.com/maps?q=Indore,MadhyaPradesh,India&t=&z=13&ie=UTF8&iwloc=&output=embed" loading="lazy" allowfullscreen></iframe>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Bootstrap JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.querySelectorAll('.availabilityBtn').forEach(button => {
-        button.addEventListener('click', () => {
-            fetch('{% url "toggle_availability" %}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    document.querySelectorAll('.availabilityBtn').forEach(btn => {
-                        btn.className = 'availabilityBtn btn btn-' + (data.is_available ? 'success' : 'danger');
-                        btn.innerHTML = `<i class="fas ${data.is_available ? 'fa-check-circle' : 'fa-times-circle'} me-1"></i> ${data.is_available ? 'On Duty' : 'Off Duty'}`;
-                    });
-                    const statusText = document.getElementById("availabilityStatus");
-                    if (statusText) {
-                        statusText.innerHTML = data.is_available ?
-                            '<i class="fas fa-check-circle text-success me-1"></i> Accepting new orders' :
-                            '<i class="fas fa-times-circle text-danger me-1"></i> Not available for orders';
+    document.addEventListener('DOMContentLoaded', function () {
+        // Find all buttons with the class 'availabilityBtn'
+        document.querySelectorAll('.availabilityBtn').forEach(button => {
+            // Add a click event listener to each button
+            button.addEventListener('click', () => {
+                // Perform a fetch (AJAX) request to the toggle_availability URL
+                fetch('{% url "toggle_availability" %}', {
+                    method: 'POST', // Use POST method as it changes state
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}', // Include CSRF token for security (Django requirement)
+                        'Content-Type': 'application/json' // Specify content type as JSON
+                    },
+                    credentials: 'same-origin', // Send cookies for the same origin
+                    body: JSON.stringify({}) // Send an empty JSON object as the body
+                })
+                .then(response => {
+                    // Check if the response is OK (status code 200-299)
+                    if (!response.ok) {
+                        console.error('Network response was not ok', response.statusText);
+                        // Optionally, handle error gracefully in UI
+                        return Promise.reject('Server responded with an error.');
                     }
-                }
+                    return response.json(); // Parse the JSON response
+                })
+                .then(data => {
+                    // Check if the API call was successful
+                    if (data.status === 'success') {
+                        // Update all availability buttons on the page
+                        document.querySelectorAll('.availabilityBtn').forEach(btn => {
+                            // Change button class based on availability status
+                            btn.className = 'availabilityBtn btn duty-toggle btn-' + (data.is_available ? 'success' : 'danger');
+                            // Update button text and icon
+                            btn.innerHTML = `<i class="fas ${data.is_available ? 'fa-check-circle' : 'fa-times-circle'} me-1"></i> ${data.is_available ? 'On Duty' : 'Off Duty'}`;
+                        });
+                        // Update the availability status text below the button
+                        const statusText = document.getElementById("availabilityStatus");
+                        if (statusText) {
+                            statusText.innerHTML = data.is_available ?
+                                '<i class="fas fa-check-circle text-success me-1"></i> Accepting new orders' :
+                                '<i class="fas fa-times-circle text-danger me-1"></i> Not available for orders';
+                        }
+                    } else {
+                        // Log or display error message from the server
+                        console.error('API call failed:', data.message || 'Unknown error');
+                    }
+                })
+                .catch(error => {
+                    // Catch any network or parsing errors
+                    console.error('Error during fetch operation:', error);
+                    // Optionally, display a user-friendly error message
+                });
             });
         });
     });

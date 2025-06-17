@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'Water_Tanker_Project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Water_Tanker_Supply',
+        'NAME': 'Water_Tanker_Supply2',
         'USER':'root',
         'PASSWORD':'mrkhan@123',
     }
@@ -150,3 +150,5 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 
 SESSION_COOKIE_SECURE = False  # for local dev, True if HTTPS
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # default
+
+SESSION_COOKIE_AGE = 3600

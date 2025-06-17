@@ -1,42 +1,59 @@
-{% extends 'home.html'%}
-
+{% extends 'home.html' %}
 {% block Hero-bar %}
 <div class="container my-4 driver-container">
     <h2 class="text-center">Driver Details</h2>
     <div class="p-4 border rounded">
-        <h2>Driver Details</h2>
+
         {% if messages %}
         <div class="container mt-3">
-          {% for message in messages %}
+            {% for message in messages %}
             <div class="alert alert-{{ message.tags }} d-flex align-items-center" role="alert">
-              {% if message.tags == "success" %}
-                <i class="fas fa-check-circle me-2 text-success"></i>
-              {% elif message.tags == "warning" %}
-                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
-              {% else %}
-                <i class="fas fa-info-circle me-2 text-info"></i>
-              {% endif %}
-              <div>
-                {{ message }}
-                <div class="text-muted" style="font-size: 0.8em;">just now</div>
-              </div>
+                {% if message.tags == "success" %}
+                    <i class="fas fa-check-circle me-2 text-success"></i>
+                {% elif message.tags == "warning" %}
+                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                {% else %}
+                    <i class="fas fa-info-circle me-2 text-info"></i>
+                {% endif %}
+                <div>
+                    {{ message }}
+                    <div class="text-muted" style="font-size: 0.8em;">just now</div>
+                </div>
             </div>
-          {% endfor %}
+            {% endfor %}
         </div>
-      {% endif %} 
-        {% if order %}
-            <p><strong>Driver Name:</strong> {{ driver.user.first_name }} {{ driver.user.last_name }}</p> 
-            <p><strong>Phone Number:</strong> {{ driver.user.phone_number }}</p>
-            <p><strong>Delivery Date:</strong> {{ order.delivery_date|date:"Y-m-d H:i" }}</p>
-            <p><strong>Status:</strong> {{ order.order_status }}</p>
-            {% if order.order_status != 'Canceled' and order.order_status != 'Delivered' %}
-                <form method="post" action="{% url 'customer_cancel_order' order.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger mt-2">
-                        <i class="fa-solid fa-times-circle"></i> Cancel Order
-                    </button>
-                </form>
-            {% endif %}
+        {% endif %}
+
+        {% if orders %}
+            {% for order in orders %}
+                <hr>
+                {% if order.order_status == 'Canceled' %}
+                    <p><strong>Driver Name:</strong> N/A</p> 
+                    <p><strong>Phone Number:</strong> N/A</p>
+                    <p><strong>Delivery Date:</strong> N/A</p>
+                    <p><strong>Status:</strong> Canceled</p>
+                    <div class="alert alert-info">This order has been canceled.</div>
+                {% else %}
+                    {% if order.driver %}
+                        <p><strong>Driver Name:</strong> {{ order.driver.user.first_name }} {{ order.driver.user.last_name }}</p> 
+                        <p><strong>Phone Number:</strong> {{ order.driver.user.phone_number }}</p>
+                    {% else %}
+                        <p><strong>Driver Name:</strong> N/A</p> 
+                        <p><strong>Phone Number:</strong> N/A</p>
+                    {% endif %}
+                    <p><strong>Delivery Date:</strong> {{ order.delivery_date|date:"Y-m-d H:i" }}</p>
+                    <p><strong>Status:</strong> {{ order.order_status }}</p>
+
+                    {% if order.order_status != 'Delivered' %}
+                        <form method="post" action="{% url 'customer_cancel_order' order.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger mt-2">
+                                <i class="fa-solid fa-times-circle"></i> Cancel Order
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
         {% else %}
             <div class="alert alert-info">No active orders found.</div>
         {% endif %}

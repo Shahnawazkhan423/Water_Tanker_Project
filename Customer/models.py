@@ -10,6 +10,7 @@ class LocationDetail(models.Model):
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
+    pincode = models.CharField(max_length=6,blank=True, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
 
@@ -54,9 +55,11 @@ class Payment(models.Model):
         ('cash', 'Cash')
     ]
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('completed', 'Completed'),
-        ('failed', 'Failed')
+        ('Pending', 'Pending'),
+        ('Accepted', 'Accepted'),
+        ('On the Way', 'On the Way'),
+        ('Delivered', 'Delivered'),
+        ('Canceled', 'Canceled')
     ]
     order = models.ForeignKey(OrderDetail, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)

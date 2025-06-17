@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to BizConnect</title>
+    <!-- Bootstrap 4 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --transition: all 0.4s ease;
+        }
+        
+        body {
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+            transition: var(--transition);
+            border: none;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 18px 40px rgba(50, 50, 93, 0.2), 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            border: none;
+        }
+        
+        .role-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .role-btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            margin-top: 1.5rem;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .role-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .role-card {
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+        
+        .role-card:hover {
+            border-color: var(--primary);
+        }
+        
+        .role-card h3 {
+            color: var(--dark);
+            font-weight: 700;
+        }
+        
+        .role-card p {
+            color: #6c757d;
+        }
+        
+        .container {
+            max-width: 900px;
+        }
+        
+        .welcome-text {
+            font-weight: 300;
+            font-size: 1.1rem;
+        }
+        
+        .badge-custom {
+            background: linear-gradient(45deg, var(--success), var(--primary));
+            color: white;
+            font-weight: 500;
+            padding: 5px 15px;
+            border-radius: 30px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .feature-list li {
+            margin-bottom: 8px;
+            padding-left: 10px;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "•";
+            color: var(--primary);
+            font-size: 1.2rem;
+            position: absolute;
+            left: -10px;
+            top: -2px;
+        }
+        
+        .brand-logo {
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 30px;
+            }
+            
+            .welcome-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center mb-5">
+                <div class="badge-custom">NEW</div>
+                <h1 class="display-4 font-weight-bold mb-3">Welcome to <span class="brand-logo">BizConnect</span></h1>
+                <p class="welcome-text lead">
+                    Join our platform to access exclusive features tailored for your needs.<br>
+                    Select your role below to get started with your registration.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Django Form Implementation -->
+        <form method="post" action="{% url 'role_selection' %}">
+            {% csrf_token %}
+            <div class="row">
+                <!-- Customer Card -->
+                <div class="col-md-6 mb-4">
+                    <label class="w-100">
+                        <input type="radio" name="user_role" value="customer" class="d-none">
+                        <div class="card role-card h-100">
+                            <div class="card-header">
+                                <div class="role-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h2>Customer</h2>
+                            </div>
+                            <div class="card-body p-4">
+                                <h3>Join as Customer</h3>
+                                <p class="mt-4">
+                                    Access thousands of suppliers, manage orders in one place, 
+                                    get personalized recommendations, and exclusive benefits.
+                                </p>
+                                <ul class="feature-list mt-4 mb-4 pl-4">
+                                    <li>Personalized shopping experience</li>
+                                    <li>Exclusive deals and discounts</li>
+                                    <li>24/7 customer support</li>
+                                    <li>Fast checkout options</li>
+                                </ul>
+                                <button type="submit" class="btn role-btn">Register as Customer</button>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                
+                <!-- Supplier Card -->
+                <div class="col-md-6 mb-4">
+                    <label class="w-100">
+                        <input type="radio" name="user_role" value="supplier" class="d-none">
+                        <div class="card role-card h-100">
+                            <div class="card-header">
+                                <div class="role-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <h2>Supplier</h2>
+                            </div>
+                            <div class="card-body p-4">
+                                <h3>Join as Supplier</h3>
+                                <p class="mt-4">
+                                    Reach thousands of customers, manage your inventory, track orders in real-time, 
+                                    and grow your business with our platform.
+                                </p>
+                                <ul class="feature-list mt-4 mb-4 pl-4">
+                                    <li>Business profile customization</li>
+                                    <li>Advanced inventory management</li>
+                                    <li>Sales analytics dashboard</li>
+                                    <li>Marketing tools</li>
+                                </ul>
+                                <button type="submit" class="btn role-btn">Register as Supplier</button>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </form>
+        
+        <div class="footer">
+            <p>Already have an account? <a href="#">Sign in</a></p>
+            <p>&copy; 2023 BizConnect. All rights reserved. <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Simple enhancement to highlight selected card
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove active class from all cards
+                document.querySelectorAll('.role-card').forEach(c => {
+                    c.classList.remove('border-primary');
+                });
+                
+                // Add active class to clicked card
+                this.classList.add('border-primary');
+                
+                // Check the radio input inside this card
+                const radioInput = this.parentElement.querySelector('input[type="radio"]');
+                if (radioInput) {
+                    radioInput.checked = true;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

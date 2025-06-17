@@ -8,9 +8,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from geopy.distance import geodesic
-from django.db.models import Subquery
+from django.views.decorators.csrf import csrf_exempt
 
-# Create your views here.
+@csrf_exempt
 def register_view(request):
     if request.method == "POST":
         user_form = UserDetailForm(request.POST, request.FILES)
@@ -36,12 +36,16 @@ def register_view(request):
         'user_form': user_form,
         'location_form': location_form
     })
+
+@csrf_exempt
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
+        print(email)
         password = request.POST.get('id_passwords')
+        print(password)
         user = authenticate(request, email=email, password=password)
-        print('customer ka authentication', user)
+        print(user)
         if user is not None and isinstance(user, CustomUser):
             login(request, user)
             return redirect('home')
@@ -52,7 +56,7 @@ def login_view(request):
 
     return render(request, 'login.html')
 
-
+@csrf_exempt
 @login_required(login_url="login")
 def logout_view(request):
     logout(request)
@@ -61,11 +65,13 @@ def logout_view(request):
 
 @login_required(login_url="login")
 def home(request):
-    if request.user.is_authenticated:
+    user = request.user
+    if user.is_authenticated and hasattr(user, 'user_type') and user.user_type == 'customer':
         return render(request,'home.html')
     else:
         return redirect('login')
 
+@csrf_exempt
 @login_required(login_url="login")
 def booking(request):
     pricing = {
@@ -81,7 +87,7 @@ def booking(request):
         location_form = LocationDetailForm(request.POST)
 
         if user_form.is_valid() and tanker_form.is_valid() and location_form.is_valid():
-            try:
+           
                 with transaction.atomic():
                     user = user_form.save()
 
@@ -106,35 +112,9 @@ def booking(request):
                         order_status='Pending'
                     )
 
-                    # Step 1: Notify available drivers in 1 km
-                    user_coords = (location.latitude, location.longitude)
-                    available_user_ids = SupplierProfile.objects.filter(is_available=True).values('user_id')
-
-                    available_drivers = DriverDetail.objects.filter(user__in=Subquery(available_user_ids))
-                    for driver in available_drivers:
-                        driver_coords = (driver.latitude, driver.longitude)
-                        distance = geodesic(user_coords, driver_coords).km
-
-                        if distance <= 1.0:
-                            Notification.objects.create(
-                                recipient=driver.user,
-                                sender=user,
-                                message=f"New booking request within 1 km for {capacity} liters",
-                                notification_type='booking_request',
-                                order_id=order.id
-                            )
-
                     messages.success(request, f"Booking successful! Price: ₹{total_price:.2f} for {capacity} liters")
                     return redirect('booking')
 
-            except Exception as e:
-                messages.error(request, f"Error: {str(e)}")
-        else:
-            errors = []
-            for form in [user_form, tanker_form, location_form]:
-                for field, error in form.errors.items():
-                    errors.append(f"{form.fields[field].label}: {error[0]}")
-            messages.error(request, " ".join(errors))
     else:
         user_form = BookingUserForm(instance=request.user)
         tanker_form = TankerDetailForm()
@@ -146,32 +126,34 @@ def booking(request):
         'location_form': location_form,
         'pricing': pricing,
     })
+
 @login_required(login_url="login")
 def driver_detail(request):
-    # Get the latest order for the current customer
-    order = OrderDetail.objects.filter(
-        user=request.user
-    ).exclude(order_status__in=['Canceled', 'Delivered']).order_by('-order_date').first()
-    
-    context = {
-        'order': order,
-        'driver': order.driver if order else None,
-        'order_status': order.order_status if order else 'No orders',
-        'order_date': order.delivery_date if order else 'N/A'
-    }
-    return render(request, 'driver_detail.html', context)
+    orders = OrderDetail.objects.filter(user=request.user,order_status='Accepted')
+    print("Orders======",orders)
+    return render(request, 'driver_detail.html', {'orders':orders})
 
 @login_required(login_url="login")
 def profile(request):
-    if request.user.is_authenticated:
+    user =request.user
+    if request.user.is_authenticated and hasattr(user, 'user_type') and user.user_type == 'customer':
         return render(request, 'profile.html', {'user': request.user})
     else:
         return redirect('login')
-    
+
+@login_required
+def update_profile_image(request):
+    if request.method == 'POST' and 'profile_image' in request.FILES:
+        profile_image = request.FILES['profile_image']
+        user = request.user
+        user.profile_image = profile_image
+        user.save()
+    return redirect('profile')  
+   
 @login_required(login_url="login")
 def notification_view(request):
     try:
-        supplier_profile = request.user.supplier  # Correctly fetch SupplierProfile
+        supplier_profile = request.user.supplier 
     except Exception:
         messages.error(request, "Supplier profile not found.")
         return render(request, 'notification.html', {'notifications': []})
@@ -179,29 +161,32 @@ def notification_view(request):
     notifications = Notification.objects.filter(supplier=supplier_profile).order_by('-timestamp')
     return render(request, 'notification.html', {'notifications': notifications})
 
-@login_required
 def cancel_order(request, order_id):
     order = get_object_or_404(OrderDetail, id=order_id, user=request.user)
 
     if order.order_status in ['On the Way', 'Delivered']:
         messages.warning(request, "This order cannot be cancelled.")
-        context ={
-            "order_id":order.id
-        }
-        return render(request,"home.html",context)
+        return redirect("driver_detail", order_id=order.id)  
 
     if request.method == "POST":
         order.order_status = 'Canceled'
         order.save()
 
+        driver = order.driver  
+
         Notification.objects.create(
-            customer=request.user,  
-            supplier=order.driver,  
-            message=f"Order ID {order.id} has been cancelled by the customer.",
-            id=order.id
+            customer=request.user,
+            supplier=driver.user,  
+            message=f"Order ID {order.id} has been cancelled by the customer."
         )
+
         messages.success(request, "Order has been cancelled successfully.")
-        return render(request,"driver_detail.html")
+        context = {
+            'order': order,
+            'driver': driver
+        }
+    return render(request, "driver_detail.html", context)
+
     
 @login_required
 def delete_notification(request, id):

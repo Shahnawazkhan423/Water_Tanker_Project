@@ -4,100 +4,267 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Water Tanker Registration</title>
+    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #f8f9fa; /* Light background color */
+            font-family: 'Inter', sans-serif; /* Using Inter font as per instructions */
+        }
         .form-container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
+            max-width: 700px; /* Increased max-width for better spacing */
+            margin: 40px auto; /* Centered with top/bottom margin */
+            padding: 30px;
+            background-color: #ffffff; /* White background for the form */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
         }
         .form-container h2 {
             text-align: center;
+            margin-bottom: 30px;
+            color: #007bff; /* Primary blue color for heading */
+            font-weight: bold;
+        }
+        .form-group label {
+            font-weight: 600; /* Bolder labels */
+            color: #343a40; /* Darker text for labels */
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            font-weight: bold;
+            padding: 10px 0;
+            margin-top: 20px;
+            border-radius: 5px; /* Rounded corners for button */
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .alert {
             margin-bottom: 20px;
+            text-align: center;
+            border-radius: 5px; /* Rounded corners for alerts */
+        }
+        /* Custom styles to properly display invalid feedback from Django */
+        .is-invalid {
+            border-color: #dc3545 !important; /* Red border for invalid fields */
+        }
+        .invalid-feedback {
+            display: none; /* Bootstrap default */
+            width: 100%;
+            margin-top: .25rem;
+            font-size: 80%;
+            color: #dc3545; /* Red text for error messages */
+        }
+        /* Override Bootstrap's display: none for invalid-feedback when Django marks it invalid */
+        .is-invalid + .invalid-feedback,
+        .form-control-file.is-invalid ~ .invalid-feedback {
+            display: block;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-container {
+                margin: 20px auto;
+                padding: 15px;
+            }
+            .form-container h2 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+            .btn-primary {
+                padding: 8px 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="form-container">
         <h2>Water Tanker Registration Form</h2>
-        <form method="POST" enctype="multipart/form-data">
+        <!-- The 'novalidate' attribute disables browser's default HTML5 validation -->
+        <form method="POST" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-              {%if messages%}
+            <!-- Display Django messages (e.g., success, error) -->
+            {% if messages %}
                 <div class="alert alert-primary" role="alert">
-                  {%for message in messages%}
-                  {{message}}
-                  {%endfor%}
+                  {% for message in messages %}
+                  {{ message }}
+                  {% endfor %}
                 </div>
-              {%endif%}
-            <!-- Tanker Name -->
+            {% endif %}
+
+            <!-- Tanker Name Field -->
             <div class="form-group">
-                <label for="water_tanker_name">Tanker Name</label>
-                <input type="text" class="form-control" id="water_tanker_name" name="water_tanker_name" required>
+                <label for="id_water_tanker_name">Tanker Name</label>
+                <!-- Input field rendered with dynamic attributes and validation class -->
+                <input type="text" class="form-control {% if document.water_tanker_name.errors %}is-invalid{% endif %}"
+                       id="id_water_tanker_name" name="water_tanker_name"
+                       value="{{ document.water_tanker_name.value|default:'' }}" placeholder="Enter tanker name" required>
+                <!-- Display specific field errors from Django -->
+                {% if document.water_tanker_name.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in document.water_tanker_name.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- Profile Photo -->
+            <!-- Profile Photo Field -->
             <div class="form-group">
-                <label for="profile_photo">Profile Photo</label>
-                <input type="file" class="form-control-file" id="profile_photo" name="profile_photo" required>
+                <label for="id_profile_photo">Profile Photo</label>
+                <input type="file" class="form-control-file {% if document.profile_photo.errors %}is-invalid{% endif %}"
+                       id="id_profile_photo" name="profile_photo" required>
+                {% if document.profile_photo.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in document.profile_photo.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- Driving License -->
+            <!-- Driving License Field -->
             <div class="form-group">
-                <label for="driving_license">Driving License</label>
-                <input type="file" class="form-control-file" id="driving_license" name="driving_license" required>
+                <label for="id_driving_license">Driving License</label>
+                <input type="file" class="form-control-file {% if document.driving_license.errors %}is-invalid{% endif %}"
+                       id="id_driving_license" name="driving_license" required>
+                {% if document.driving_license.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in document.driving_license.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- Aadhar Card -->
+            <!-- Aadhar Card Field -->
             <div class="form-group">
-                <label for="aadhar_card">Aadhar Card</label>
-                <input type="file" class="form-control-file" id="aadhar_card" name="aadhar_card" required>
+                <label for="id_aadhar_card">Aadhar Card</label>
+                <input type="file" class="form-control-file {% if document.aadhar_card.errors %}is-invalid{% endif %}"
+                       id="id_aadhar_card" name="aadhar_card" required>
+                {% if document.aadhar_card.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in document.aadhar_card.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- PAN Card -->
+            <!-- PAN Card Field -->
             <div class="form-group">
-                <label for="pan_card">PAN Card</label>
-                <input type="file" class="form-control-file" id="pan_card" name="pan_card" required>
+                <label for="id_pan_card">PAN Card</label>
+                <input type="file" class="form-control-file {% if document.pan_card.errors %}is-invalid{% endif %}"
+                       id="id_pan_card" name="pan_card" required>
+                {% if document.pan_card.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in document.pan_card.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- Registration Certificate -->
+            <!-- Registration Certificate Field -->
             <div class="form-group">
-                <label for="registration_cert">Registration Certificate</label>
-                <input type="file" class="form-control-file" id="registration_cert" name="registration_cert" required>
+                <label for="id_registration_cert">Registration Certificate</label>
+                <input type="file" class="form-control-file {% if document.registration_cert.errors %}is-invalid{% endif %}"
+                       id="id_registration_cert" name="registration_cert" required>
+                {% if document.registration_cert.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in document.registration_cert.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- Vehicle Insurance -->
+            <!-- Vehicle Insurance Field -->
             <div class="form-group">
-                <label for="vehicle_insurance">Vehicle Insurance</label>
-                <input type="file" class="form-control-file" id="vehicle_insurance" name="vehicle_insurance" required>
+                <label for="id_vehicle_insurance">Vehicle Insurance</label>
+                <input type="file" class="form-control-file {% if document.vechicle_insurance.errors %}is-invalid{% endif %}"
+                       id="id_vehicle_insurance" name="vechicle_insurance" required>
+                {% if document.vechicle_insurance.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in document.vechicle_insurance.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- Vehicle Permit -->
+            <!-- Vehicle Permit Field -->
             <div class="form-group">
-                <label for="vehicle_permit">Vehicle Permit</label>
-                <input type="file" class="form-control-file" id="vehicle_permit" name="vehicle_permit" required>
+                <label for="id_vehicle_permit">Vehicle Permit</label>
+                <input type="file" class="form-control-file {% if document.vechicle_permit.errors %}is-invalid{% endif %}"
+                       id="id_vehicle_permit" name="vechicle_permit" required>
+                {% if document.vechicle_permit.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in document.vechicle_permit.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- Capacity -->
+            <!-- Capacity Field (Now with updated choices) -->
             <div class="form-group">
-                <label for="capacity">Capacity</label>
-                <input type="number" class="form-control" id="capacity" name="capacity" required>
-            </div>
-
-            <!-- Category -->
-            <div class="form-group">
-                <label for="category">Category</label>
-                <select class="form-control" id="category" name="category" required>
-                    <option value="DRINKING">Drinking Water</option>
-                    <option value="NON_DRINKING">Non-Drinking Water</option>
-                    <option value="BOTH">Drinking & Usage Water</option>
+                <label for="id_capacity">Capacity (in Liters)</label>
+                <select class="form-control {% if tanker_detail.capacity.errors %}is-invalid{% endif %}"
+                        id="id_capacity" name="capacity" required>
+                    <option value="">Select Capacity</option>
+                    <option value="1000" {% if tanker_detail.capacity.value == 1000 %}selected{% endif %}>1000 Liters</option>
+                    <option value="2000" {% if tanker_detail.capacity.value == 2000 %}selected{% endif %}>2000 Liters</option>
+                    <option value="5000" {% if tanker_detail.capacity.value == 5000 %}selected{% endif %}>5000 Liters</option>
+                    <option value="10000" {% if tanker_detail.capacity.value == 10000 %}selected{% endif %}>10000 Liters</option>
                 </select>
+                {% if tanker_detail.capacity.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in tanker_detail.capacity.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Register</button>
+            <!-- Category Field (Using Django form's choices) -->
+            <div class="form-group">
+                <label for="id_category">Water Category</label>
+                <select class="form-control {% if tanker_detail.category.errors %}is-invalid{% endif %}"
+                        id="id_category" name="category" required>
+                    <option value="">Select Category</option>
+                    {% for value, text in tanker_detail.category.field.choices %}
+                        <option value="{{ value }}" {% if tanker_detail.category.value == value %}selected{% endif %}>{{ text }}</option>
+                    {% endfor %}
+                </select>
+                {% if tanker_detail.category.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in tanker_detail.category.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Register Tanker</button>
         </form>
     </div>
+    <!-- Bootstrap JavaScript dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Optional JavaScript for dynamically updating file input label (no validation logic)
+        $(document).ready(function() {
+            $('.form-control-file').on('change', function() {
+                var fileName = $(this).val().split('\\').pop();
+                if (fileName) {
+                    console.log('Selected file:', fileName);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

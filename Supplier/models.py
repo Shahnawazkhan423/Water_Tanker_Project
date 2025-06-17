@@ -9,6 +9,7 @@ class LocationDetail(models.Model):
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
+    pincode = models.CharField(max_length=10)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
                                     
@@ -18,17 +19,18 @@ class LocationDetail(models.Model):
 class SupplierProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='supplier')
     is_available = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
     location = models.ForeignKey(LocationDetail,on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return f"{self.user.first_name} {self.user.last_name},{self.user.email}.{self.user.password}"
 # -------------------- Driver --------------------
 class DriverAvailability(models.Model):
     STATUS_CHOICES = [
         ('available', 'Available'),
         ('unavailable', 'Unavailable')
     ]
-    user = models.ForeignKey(SupplierProfile, on_delete=models.CASCADE, related_name='availabilities')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='availabilities')
     availability_date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField(null=True, blank=True)
@@ -38,14 +40,14 @@ class DriverAvailability(models.Model):
     def __str__(self):
         return 
     def __str__(self):
-        return f"{self.user.user.first_name} {self.user.user.last_name} {self.status}"
+        return f"{self.user.first_name} {self.user.last_name} {self.status}"
 
 class DriverDetail(models.Model):
-    user = models.OneToOneField(SupplierProfile, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     availability = models.ForeignKey(DriverAvailability, on_delete=models.CASCADE,related_name='supplier')
 
     def __str__(self):
-        return f"{self.user.user.first_name} {self.user.user.last_name}"
+        return f"{self.user.first_name} {self.user.last_name}"
 
 # -------------------- Water Tanker Document --------------------
 def upload_to(instance, filename):
@@ -53,7 +55,6 @@ def upload_to(instance, filename):
 
 class WaterTankerDocument(models.Model):
     water_tanker_name = models.CharField(max_length=255)
-
     profile_photo = models.FileField(upload_to=upload_to, null=True, blank=True)
     driving_license = models.FileField(upload_to=upload_to, null=True, blank=True)
     aadhar_card = models.FileField(upload_to=upload_to, null=True, blank=True)

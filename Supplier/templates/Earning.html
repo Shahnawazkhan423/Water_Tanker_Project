@@ -16,7 +16,7 @@
             <div class="col-md-6">
                 <div class="card p-3 shadow">
                     <h5>Completed Orders</h5>
-                    <h3>{{ earnings_today.completed_orders }} / {{ earnings_today.total_orders }}</h3>
+                    <h3>{{ orders_complete }} / {{ orders_accept }}</h3>
                 </div>
             </div>
         </div>
@@ -26,26 +26,28 @@
 
     <div class="mt-5">
         <h4 class="text-center mb-3">Daily Earnings (Last 7 Days)</h4>
-        <table class="table table-bordered text-center">
-            <thead class="table-dark">
+        <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Time Range</th>
+            <th>Earnings</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if last_7_earnings %}
+            {% for entry in last_7_earnings %}
                 <tr>
-                    <th>Date</th>
-                    <th>Earnings (₹)</th>
+                    <td>{{ entry.time_range }}</td>
+                    <td>₹ {{ entry.amount|floatformat:2 }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for entry in last_7_earnings %}
-                <tr>
-                    <td>{{ entry.date }}</td>
-                    <td>₹ {{ entry.amount }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="2">No earnings data found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="2" class="text-center">No earnings data found.</td>
+            </tr>
+        {% endif %}
+    </tbody>
+    </table>
     </div>
 </div>
 {% endblock %}
