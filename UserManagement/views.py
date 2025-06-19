@@ -2,11 +2,18 @@ from django.shortcuts import render,redirect
 
 def role_selection(request):
     if request.method == 'POST':
-        user_role = request.POST.get('user_role')
+        role = request.POST.get('user_role') or request.POST.get('user_role_login')
         
-        if user_role == 'customer':
-            return redirect('register')
-        elif user_role == 'supplier':
-            return redirect('Register_page')
-    
+        if role == 'customer':
+            if 'user_role' in request.POST:
+                return redirect('register')      
+            elif 'user_role_login' in request.POST:
+                return redirect('login')          
+
+        elif role == 'supplier':
+            if 'user_role' in request.POST:
+                return redirect('Register_page')  
+            elif 'user_role_login' in request.POST:
+                return redirect('Login_page')         
+
     return render(request, 'base.html')

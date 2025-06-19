@@ -1,264 +1,388 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to BizConnect</title>
-    <!-- Bootstrap 4 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --success: #4cc9f0;
-            --transition: all 0.4s ease;
-        }
-        
-        body {
-            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .card {
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
-            transition: var(--transition);
-            border: none;
-            background: rgba(255, 255, 255, 0.95);
-        }
-        
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 18px 40px rgba(50, 50, 93, 0.2), 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-header {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            text-align: center;
-            padding: 2rem 1rem;
-            border: none;
-        }
-        
-        .role-icon {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-            color: rgba(255, 255, 255, 0.85);
-        }
-        
-        .role-btn {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            border: none;
-            border-radius: 50px;
-            padding: 15px 30px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            transition: var(--transition);
-            margin-top: 1.5rem;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
-            color: white;
-            font-size: 1.1rem;
-        }
-        
-        .role-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.4);
-            color: white;
-            text-decoration: none;
-        }
-        
-        .role-card {
-            cursor: pointer;
-            transition: var(--transition);
-            border: 2px solid transparent;
-        }
-        
-        .role-card:hover {
-            border-color: var(--primary);
-        }
-        
-        .role-card h3 {
-            color: var(--dark);
-            font-weight: 700;
-        }
-        
-        .role-card p {
-            color: #6c757d;
-        }
-        
-        .container {
-            max-width: 900px;
-        }
-        
-        .welcome-text {
-            font-weight: 300;
-            font-size: 1.1rem;
-        }
-        
-        .badge-custom {
-            background: linear-gradient(45deg, var(--success), var(--primary));
-            color: white;
-            font-weight: 500;
-            padding: 5px 15px;
-            border-radius: 30px;
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-        
-        .feature-list li {
-            margin-bottom: 8px;
-            padding-left: 10px;
-            position: relative;
-        }
-        
-        .feature-list li:before {
-            content: "•";
-            color: var(--primary);
-            font-size: 1.2rem;
-            position: absolute;
-            left: -10px;
-            top: -2px;
-        }
-        
-        .brand-logo {
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: 1px;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            color: rgba(0, 0, 0, 0.6);
-            font-size: 0.9rem;
-        }
-        
-        @media (max-width: 768px) {
-            .card {
-                margin-bottom: 30px;
-            }
-            
-            .welcome-text {
-                font-size: 1rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-10 text-center mb-5">
-                <div class="badge-custom">NEW</div>
-                <h1 class="display-4 font-weight-bold mb-3">Welcome to <span class="brand-logo">BizConnect</span></h1>
-                <p class="welcome-text lead">
-                    Join our platform to access exclusive features tailored for your needs.<br>
-                    Select your role below to get started with your registration.
-                </p>
-            </div>
-        </div>
-        
-        <!-- Django Form Implementation -->
-        <form method="post" action="{% url 'role_selection' %}">
-            {% csrf_token %}
-            <div class="row">
-                <!-- Customer Card -->
-                <div class="col-md-6 mb-4">
-                    <label class="w-100">
-                        <input type="radio" name="user_role" value="customer" class="d-none">
-                        <div class="card role-card h-100">
-                            <div class="card-header">
-                                <div class="role-icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <h2>Customer</h2>
-                            </div>
-                            <div class="card-body p-4">
-                                <h3>Join as Customer</h3>
-                                <p class="mt-4">
-                                    Access thousands of suppliers, manage orders in one place, 
-                                    get personalized recommendations, and exclusive benefits.
-                                </p>
-                                <ul class="feature-list mt-4 mb-4 pl-4">
-                                    <li>Personalized shopping experience</li>
-                                    <li>Exclusive deals and discounts</li>
-                                    <li>24/7 customer support</li>
-                                    <li>Fast checkout options</li>
-                                </ul>
-                                <button type="submit" class="btn role-btn">Register as Customer</button>
-                            </div>
-                        </div>
-                    </label>
-                </div>
-                
-                <!-- Supplier Card -->
-                <div class="col-md-6 mb-4">
-                    <label class="w-100">
-                        <input type="radio" name="user_role" value="supplier" class="d-none">
-                        <div class="card role-card h-100">
-                            <div class="card-header">
-                                <div class="role-icon">
-                                    <i class="fas fa-building"></i>
-                                </div>
-                                <h2>Supplier</h2>
-                            </div>
-                            <div class="card-body p-4">
-                                <h3>Join as Supplier</h3>
-                                <p class="mt-4">
-                                    Reach thousands of customers, manage your inventory, track orders in real-time, 
-                                    and grow your business with our platform.
-                                </p>
-                                <ul class="feature-list mt-4 mb-4 pl-4">
-                                    <li>Business profile customization</li>
-                                    <li>Advanced inventory management</li>
-                                    <li>Sales analytics dashboard</li>
-                                    <li>Marketing tools</li>
-                                </ul>
-                                <button type="submit" class="btn role-btn">Register as Supplier</button>
-                            </div>
-                        </div>
-                    </label>
-                </div>
-            </div>
-        </form>
-        
-        <div class="footer">
-            <p>Already have an account? <a href="#">Sign in</a></p>
-            <p>&copy; 2023 BizConnect. All rights reserved. <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
-        </div>
-    </div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome to WaterTankerPro</title>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Simple enhancement to highlight selected card
-        document.querySelectorAll('.role-card').forEach(card => {
-            card.addEventListener('click', function() {
-                // Remove active class from all cards
-                document.querySelectorAll('.role-card').forEach(c => {
-                    c.classList.remove('border-primary');
-                });
-                
-                // Add active class to clicked card
-                this.classList.add('border-primary');
-                
-                // Check the radio input inside this card
-                const radioInput = this.parentElement.querySelector('input[type="radio"]');
-                if (radioInput) {
-                    radioInput.checked = true;
-                }
-            });
-        });
-    </script>
+  <!-- Bootstrap 4 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --primary: #0077b6;
+      --secondary: #00b4d8;
+      --tertiary: #90e0ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --text-muted: #6c757d;
+      --transition: all 0.4s ease-in-out;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0f7fa 0%, #caf0f8 100%);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: var(--dark);
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      color: white !important;
+      font-size: 1.8rem;
+    }
+
+    .nav-link {
+      font-weight: 600;
+      color: white !important;
+      transition: var(--transition);
+      padding: 0.75rem 1.25rem;
+      border-radius: 50px;
+    }
+
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .dropdown-menu a {
+      color: var(--dark) !important;
+      font-weight: 500;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 3rem 0;
+    }
+
+    .card {
+      border: none;
+      border-radius: 20px;
+      transition: var(--transition);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      background-color: white;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+      background: linear-gradient(45deg, var(--secondary), var(--primary));
+      color: white;
+      text-align: center;
+      padding: 2.5rem 1rem;
+      border-bottom: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header::before {
+      content: '';
+      position: absolute;
+      bottom: -50px;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.2' d='M0,192L60,192C120,192,240,192,360,197.3C480,203,600,213,720,208C840,203,960,181,1080,181.3C1200,181,1320,203,1380,213.3L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: cover;
+      opacity: 0.7;
+    }
+
+    .role-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .card-body {
+      padding: 2.5rem;
+    }
+
+    .card-body h4 {
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+    }
+
+    .card-body p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .feature-list li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 0.8rem;
+      font-size: 0.95rem;
+      color: var(--dark);
+    }
+
+    .feature-list li::before {
+      content: "\f00c";
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      color: var(--primary);
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 1rem;
+    }
+
+    .role-btn {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 50px;
+      padding: 14px 25px;
+      color: white;
+      font-weight: 700;
+      width: 100%;
+      font-size: 1.1rem;
+      transition: var(--transition);
+      box-shadow: 0 5px 20px rgba(0, 119, 182, 0.2);
+    }
+
+    .role-btn:hover {
+      background: linear-gradient(45deg, var(--secondary), var(--primary));
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 119, 182, 0.3);
+      text-decoration: none;
+    }
+
+    .badge-custom {
+      background: var(--tertiary);
+      color: var(--primary);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .role-card input[type="radio"] {
+      display: none;
+    }
+
+    .role-card {
+      transition: border var(--transition);
+      border: 3px solid transparent;
+      border-radius: 20px;
+    }
+
+    .role-card.selected {
+      border: 3px solid var(--primary);
+      box-shadow: 0 15px 35px rgba(0, 119, 182, 0.3);
+    }
+
+    .display-4 {
+      font-weight: 800;
+      color: var(--dark);
+    }
+
+    .lead {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      margin-top: 1rem;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding: 20px;
+      background-color: #f0f0f0;
+      border-top: 1px solid #eee;
+    }
+
+    @media (max-width: 992px) {
+      .card {
+        margin-bottom: 2rem;
+      }
+      .main-content {
+        align-items: flex-start;
+      }
+      .display-4 {
+        font-size: 2.5rem;
+      }
+      .lead {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .navbar-brand {
+        font-size: 1.5rem;
+      }
+      .nav-link {
+        padding: 0.5rem 1rem;
+        text-align: center;
+      }
+      .card-header {
+        padding: 1.5rem 1rem;
+      }
+      .role-icon {
+        font-size: 2.8rem;
+      }
+      .card-body {
+        padding: 1.5rem;
+      }
+      .role-btn {
+        font-size: 1rem;
+        padding: 12px 20px;
+      }
+      .display-4 {
+        font-size: 2rem;
+      }
+      .lead {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="fas fa-water"></i> Water Tanker</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="loginDropdown" role="button" data-toggle="dropdown">
+              Login
+            </a>
+            <div class="dropdown-menu" aria-labelledby="loginDropdown">
+              <a class="dropdown-item" href="{% url 'login' %}">Customer</a>
+              <a class="dropdown-item" href="{% url 'Login_page' %}">Supplier</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Section -->
+  <div class="main-content">
+    <div class="container">
+      <div class="text-center mb-5 mt-5 pt-5">
+        <div class="badge-custom">Reliable Water Delivery</div>
+        <h1 class="display-4 mb-3">Welcome to <span style="color: var(--primary);">WaterTankerPro</span></h1>
+        <p class="lead">Choose your role to get started with our services.</p>
+      </div>
+
+      <form method="post" action="{% url 'role_selection' %}">
+        {% csrf_token %}
+        <div class="row justify-content-center">
+          <!-- Customer Card -->
+          <div class="col-md-6 col-lg-5 mb-4">
+            <label class="role-card w-100">
+              <input type="radio" name="user_role" value="customer" />
+              <div class="card h-100">
+                <div class="card-header">
+                  <div class="role-icon"><i class="fas fa-home"></i></div>
+                  <h4>For Homes & Events</h4>
+                </div>
+                <div class="card-body text-center">
+                  <p>Need clean and safe water for your household or special events?</p>
+                  <ul class="feature-list text-left">
+                    <li>Instant booking & scheduling</li>
+                    <li>Real-time delivery tracking</li>
+                    <li>Multiple payment options</li>
+                    <li>24/7 customer support</li>
+                  </ul>
+                  <button type="submit" class="btn role-btn mt-3">Register as Customer</button>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Supplier Card -->
+          <div class="col-md-6 col-lg-5 mb-4">
+            <label class="role-card w-100">
+              <input type="radio" name="user_role" value="supplier" />
+              <div class="card h-100">
+                <div class="card-header">
+                  <div class="role-icon"><i class="fas fa-truck-pickup"></i></div>
+                  <h4>For Businesses & Supply</h4>
+                </div>
+                <div class="card-body text-center">
+                  <p>Own a tanker fleet or supply water commercially?</p>
+                  <ul class="feature-list text-left">
+                    <li>Manage incoming orders efficiently</li>
+                    <li>Live delivery tracking & dispatch</li>
+                    <li>Detailed payment & earning reports</li>
+                    <li>Fleet & driver management tools</li>
+                  </ul>
+                  <button type="submit" class="btn role-btn mt-3">Register as Supplier</button>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 WaterTankerPro. All rights reserved.
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Highlight selected card
+    document.querySelectorAll('.role-card input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        document.querySelectorAll('.role-card').forEach(label => label.classList.remove('selected'));
+        if (this.checked) this.closest('.role-card').classList.add('selected');
+      });
+    });
+
+    // Pre-select check highlight
+    document.addEventListener('DOMContentLoaded', () => {
+      const checkedRadio = document.querySelector('.role-card input[type="radio"]:checked');
+      if (checkedRadio) checkedRadio.closest('.role-card').classList.add('selected');
+    });
+
+    // Prevent submission if no role is selected
+    document.querySelector('form').addEventListener('submit', function (e) {
+      const selected = this.querySelector('input[name="user_role"]:checked');
+      if (!selected) {
+        e.preventDefault();
+        alert("Please select a role before proceeding.");
+      }
+    });
+  </script>
 </body>
 </html>
