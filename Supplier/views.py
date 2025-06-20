@@ -313,11 +313,12 @@ def earning(request):
         'orders_accept': OrderDetail.objects.filter(order_status='Accepted', driver=driver).count(),
         'orders_complete': OrderDetail.objects.filter(order_status='Delivered', driver=driver).count(),
     })
+
 @csrf_exempt
 @login_required(login_url="Login_page")
 def order_list(request, order_id=None):
     try:
-        supplier = request.user.supplier
+        supplier = request.user.supplier  
         driver_detail = DriverDetail.objects.get(user=request.user)
     except SupplierProfile.DoesNotExist:
         messages.error(request, "You are not a registered supplier.")
@@ -326,24 +327,21 @@ def order_list(request, order_id=None):
         messages.error(request, "Driver profile not found. Please complete your driver profile.")
         return redirect('Home')
 
-    context = {
-        'view_type': 'list',
-        'pending_orders': [],
-        'accepted_orders': [],
-        'order': None,
-        'is_available': supplier.is_available, 
-    }
     pending_orders = []
-    accepted_orders = []
-
     accepted_orders = OrderDetail.objects.filter(
         order_status='Accepted',
         driver=driver_detail
     ).select_related('user', 'location', 'driver', 'tanker')
+    ontheway_orders = OrderDetail.objects.filter(
+        order_status='On the Way',
+        driver=driver_detail
+    ).select_related('user', 'location', 'driver', 'tanker')
 
     if supplier.is_available:
+        supplier_pincode = supplier.location.pincode
         pending_orders = OrderDetail.objects.filter(
-            order_status='Pending'
+            order_status='Pending',
+            location__pincode=supplier_pincode
         ).select_related('user', 'location', 'tanker')
     elif order_id:
         messages.warning(request, "You must be on duty to view order details")
@@ -353,31 +351,28 @@ def order_list(request, order_id=None):
         'view_type': 'list',
         'pending_orders': pending_orders,
         'accepted_orders': accepted_orders,
+        'ontheway_orders' :ontheway_orders,
         'is_available': supplier.is_available, 
     }
 
     return render(request, 'Order_List.html', context)
-    
+
 @login_required(login_url="Login_page")
 def notification(request):
-    if request.user.user_type == 'supplier':
-        dashboard_context = get_supplier_dashboard_data(request)
-        notifications = Notification.objects.filter(customer=request.user).order_by('-timestamp')
-        context = {
-            **dashboard_context,
-            'notifications': notifications
-        }
-        return render(request,'Notification.html',context)
+    try:
+        supplier_profile = request.user.supplier 
+    except Exception:
+        messages.error(request, "Supplier profile not found.")
+        return render(request, 'notification.html', {'notifications': []})
 
-    else:
-        messages.error(request, "This user does not exist or is not a supplier.")
-        return render(request,"Login.html")
+    notifications = Notification.objects.filter(supplier=supplier_profile).order_by('-timestamp')
+    return render(request, 'notification.html', {'notifications': notifications})
 
 
 @login_required(login_url="Login_page")
 def profile(request):
-    if request.user.user_type == 'supplier':
-        user = request.user
+    user = request.user
+    if user.is_authenticated and hasattr(user, 'supplier') and request.user.user_type == 'supplier':
         driver = DriverDetail.objects.select_related('user', 'availability').get(user=user)
         tanker_detail = TankerDetail.objects.select_related('document').filter(driver=driver).first()
         document = tanker_detail.document if tanker_detail else None
@@ -464,7 +459,13 @@ def update_order_status(request):
             if status_update in status_map:
                 order.order_status = status_map[status_update]
                 order.save()
-                messages.success(request, f"Order status updated to {order.get_order_status_display()}")
+                if status_update == 'On the Way':
+                    Notification.objects.create(
+                        customer=order.user,
+                        supplier=driver_detail.user.supplier,
+                        message=f"Order ID {order.id} is now on the way."
+                    )
+                    messages.success(request, f"Order status updated to {order.get_order_status_display()}")
             else:
                 messages.error(request, "Invalid status update request.")
         

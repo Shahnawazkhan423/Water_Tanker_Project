@@ -66,7 +66,7 @@ def logout_view(request):
 @login_required(login_url="login")
 def home(request):
     user = request.user
-    if user.is_authenticated and hasattr(user, 'user_type') and user.user_type == 'customer':
+    if user.is_authenticated and hasattr(user, 'customer') and user.user_type == 'customer':
         return render(request,'home.html')
     else:
         return redirect('login')
@@ -172,18 +172,18 @@ def cancel_order(request, order_id):
         order.order_status = 'Canceled'
         order.save()
 
-        driver = order.driver  
+        driver_detail = order.driver  
+        supplier = driver_detail.user.supplier  
 
         Notification.objects.create(
             customer=request.user,
-            supplier=driver.user,  
+            supplier=supplier,  
             message=f"Order ID {order.id} has been cancelled by the customer."
         )
-
         messages.success(request, "Order has been cancelled successfully.")
         context = {
             'order': order,
-            'driver': driver
+            'driver': supplier
         }
     return render(request, "driver_detail.html", context)
 

@@ -35,6 +35,12 @@
                     <div class="alert alert-info">This order has been canceled.</div>
                 {% else %}
                     {% if order.driver %}
+                         <div class="mb-3 text-center ">
+                            <img src="{{ order.driver.user.profile_image.url }}" 
+                                alt="Driver Photo" 
+                                class="img-thumbnail rounded-circle img-fluid" 
+                                style="max-width: 150px;">
+                        </div>
                         <p><strong>Driver Name:</strong> {{ order.driver.user.first_name }} {{ order.driver.user.last_name }}</p> 
                         <p><strong>Phone Number:</strong> {{ order.driver.user.phone_number }}</p>
                     {% else %}
