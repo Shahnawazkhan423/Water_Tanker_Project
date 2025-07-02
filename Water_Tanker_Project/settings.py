@@ -44,8 +44,7 @@ INTERNAL_APPS = [
     'Supplier',
     'UserManagement',
     'django.contrib.humanize',
-    'model_utils',
-    'django.contrib.gis'
+    'model_utils'
 ]
 INSTALLED_APPS +=INTERNAL_APPS
 
@@ -90,11 +89,11 @@ WSGI_APPLICATION = 'Water_Tanker_Project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Water_Tanker_Supply2',
+        'NAME': 'Water_Tanker_Project_DB',
         'USER':'root',
-        'PASSWORD':'mrkhan@123',
+        'PASSWORD':'mrkhan',
     }
-}
+}   
 
 
 # Password validation
