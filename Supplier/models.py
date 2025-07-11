@@ -38,8 +38,6 @@ class DriverAvailability(models.Model):
     notes = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return 
-    def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} {self.status}"
 
 class DriverDetail(models.Model):
@@ -54,20 +52,29 @@ def upload_to(instance, filename):
     return f'media/water_tanker_documents/{filename}'
 
 class WaterTankerDocument(models.Model):
-    water_tanker_name = models.CharField(max_length=255)
-    profile_photo = models.FileField(upload_to=upload_to, null=True, blank=True)
-    driving_license = models.FileField(upload_to=upload_to, null=True, blank=True)
-    aadhar_card = models.FileField(upload_to=upload_to, null=True, blank=True)
-    pan_card = models.FileField(upload_to=upload_to, null=True, blank=True)
-    registration_cert = models.FileField(upload_to=upload_to, null=True, blank=True)
-    vechicle_insurance = models.FileField(upload_to=upload_to, null=True, blank=True)
-    vechicle_permit = models.FileField(upload_to=upload_to, null=True, blank=True)
+    water_tanker_name = models.CharField(max_length=100)
 
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+    is_approved = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='Pending'
+    )
+
+    profile_photo = models.ImageField(upload_to='tanker/profile/', blank=True, null=True)
+    driving_license = models.FileField(upload_to='tanker/license/', blank=True, null=True)
+    aadhar_card = models.FileField(upload_to='tanker/aadhar/', blank=True, null=True)
+    pan_card = models.FileField(upload_to='tanker/pan/', blank=True, null=True)
+    registration_cert = models.FileField(upload_to='tanker/rc/', blank=True, null=True)
+    vehicle_insurance = models.FileField(upload_to='tanker/insurance/', blank=True, null=True)
+    vehicle_permit = models.FileField(upload_to='tanker/permit/', blank=True, null=True)
     upload_date = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
         return self.water_tanker_name
-
 # -------------------- Tanker --------------------
 class TankerDetail(models.Model):
     driver = models.ForeignKey(DriverDetail, on_delete=models.CASCADE, null=True, blank=True)

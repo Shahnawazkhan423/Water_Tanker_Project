@@ -11,7 +11,6 @@
                 <img src="/static/image/Profile_Default_Image.jpg" alt="Default profile photo" class="rounded-circle mb-3 d-block mx-auto" width="150">
             {% endif %}
             <h5 class="fw-bold mb-1">{{ user.first_name }} {{ user.last_name }}</h5>
-            <p class="mb-0"><strong>Rating:</strong> ⭐⭐⭐⭐☆ <span class="text-muted">{{ rating|default:"No Rating" }}</span></p>
         </div>
 
         <hr>
@@ -300,7 +299,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a id="documentDownload" href="" class="btn btn-primary" target="_blank">Download</a>
+                <a id="documentDownload" href="" class="btn btn-primary" target="_blank">Open</a>
             </div>
         </div>
     </div>

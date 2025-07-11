@@ -184,11 +184,11 @@
             <!-- Vehicle Insurance Field -->
             <div class="form-group">
                 <label for="id_vehicle_insurance">Vehicle Insurance</label>
-                <input type="file" class="form-control-file {% if document.vechicle_insurance.errors %}is-invalid{% endif %}"
-                       id="id_vehicle_insurance" name="vechicle_insurance" required>
-                {% if document.vechicle_insurance.errors %}
+                <input type="file" class="form-control-file {% if document.vehicle_insurance.errors %}is-invalid{% endif %}"
+                       id="id_vehicle_insurance" name="vehicle_insurance" required>
+                {% if document.vehicle_insurance.errors %}
                     <div class="invalid-feedback">
-                        {% for error in document.vechicle_insurance.errors %}
+                        {% for error in document.vehicle_insurance.errors %}
                             {{ error }}
                         {% endfor %}
                     </div>
@@ -198,11 +198,11 @@
             <!-- Vehicle Permit Field -->
             <div class="form-group">
                 <label for="id_vehicle_permit">Vehicle Permit</label>
-                <input type="file" class="form-control-file {% if document.vechicle_permit.errors %}is-invalid{% endif %}"
-                       id="id_vehicle_permit" name="vechicle_permit" required>
-                {% if document.vechicle_permit.errors %}
+                <input type="file" class="form-control-file {% if document.vehicle_permit.errors %}is-invalid{% endif %}"
+                       id="id_vehicle_permit" name="vehicle_permit" required>
+                {% if document.vehicle_permit.errors %}
                     <div class="invalid-feedback">
-                        {% for error in document.vechicle_permit.errors %}
+                        {% for error in document.vehicle_permit.errors %}
                             {{ error }}
                         {% endfor %}
                     </div>

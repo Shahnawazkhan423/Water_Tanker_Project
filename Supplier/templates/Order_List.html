@@ -64,9 +64,9 @@
     {% endif %}
      <!-- On The Way Orders -->
         <h5 class="mt-5 mb-3 text-primary">Your On The Way Orders</h5>
-        {% if onthewayorders %}
+        {% if ontheway_orders %}
             <div class="row">
-                {% for order in on_the_way_orders %}
+                {% for order in ontheway_orders %}
                     <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow-sm order-card border-warning">
                             <div class="card-body">
@@ -116,7 +116,6 @@
                                 {% endif %}
                                 <p class="card-text mb-3"><strong>Status:</strong> {{ order.order_status }}</p>
                                 
-                                <!-- FIXED: Added action to form -->
                                 <!-- Accepted Orders Form -->
                                 <form method="post" action="{% url 'update_order_status' %}">
                                     {% csrf_token %}

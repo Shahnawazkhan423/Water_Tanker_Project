@@ -30,28 +30,25 @@ def register_view(request):
             user.password = make_password(user_form.cleaned_data['password'])
             user.save()
 
-            # Create SupplierProfile
             SupplierProfile.objects.create(
                 user=user,
                 location=location,
                 is_available=False
             )
 
-            # Create DriverAvailability
+
             driver_availability = DriverAvailability.objects.create(
-                user=user,  # CustomUser used
+                user=user,  
                 status="unavailable",
                 availability_date=timezone.now(),
-                start_time=timezone.now().time(),  # Must not be null
+                start_time=timezone.now().time(), 
             )
 
-            # Create DriverDetail
             DriverDetail.objects.create(
                 user=user,  
                 availability=driver_availability
             )
 
-            # Save email to session
             request.session['supplier_email'] = user.email
 
             messages.success(request, 'Registration successful.')
@@ -142,59 +139,89 @@ def logout_view(request):
     messages.success(request, "Logged out successfully.")
     return render(request, "Login.html")
 
-@csrf_exempt
 def toggle_availability(request):
-    if request.user.user_type == 'supplier':
-        if request.method == 'POST':
-            supplier = request.user
-            supplier_profile = supplier.supplier  
+    # ✅ Step 1: Ensure the user is authenticated and is a supplier
+    if not request.user.is_authenticated or request.user.user_type != 'supplier':
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Unauthorized access. Only suppliers can perform this action.'
+        })
 
-            new_status = not supplier_profile.is_available
-            supplier_profile.is_available = new_status
-            supplier_profile.save()
+    # ✅ Step 2: Check method
+    if request.method != 'POST':
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid request method. Use POST.'
+        })
 
-            if new_status:
-                availability = DriverAvailability.objects.create(
-                    user=supplier, 
-                    availability_date=timezone.now().date(),
-                    start_time=timezone.now().time(),
-                    status='available'
-                )
+    supplier = request.user
 
-                try:
-                    driver_detail = DriverDetail.objects.get(user=supplier)
-                    driver_detail.availability = availability
-                    driver_detail.save()
+    try:
+        driver_detail = DriverDetail.objects.get(user=supplier)
 
-                    tanker_detail = TankerDetail.objects.get(driver=driver_detail)
-                    tanker_detail.available = True
-                    tanker_detail.save()
+        tanker_detail = TankerDetail.objects.get(driver=driver_detail)
 
-                except DriverDetail.DoesNotExist:
-                    driver_detail = DriverDetail.objects.create(user=supplier, availability=availability)
+        document = tanker_detail.document
+        if not document or document.is_approved != "Approved":
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Please upload and get your documents approved first before becoming available.'
+            })
 
-            else:
-                last_log = DriverAvailability.objects.filter(user=supplier, status='available').last()
-                if last_log:
-                    last_log.end_time = timezone.now().time()
-                    last_log.status = 'unavailable'
-                    last_log.save()
+        supplier_profile = supplier.supplier  # OneToOneField relation
+        new_status = not supplier_profile.is_available
+        supplier_profile.is_available = new_status
+        supplier_profile.save()
 
-                try:
-                    driver_detail = DriverDetail.objects.get(user=supplier)
-                    # Also mark tanker unavailable
-                    tanker_detail = TankerDetail.objects.get(driver=driver_detail)
-                    tanker_detail.available = False
-                    tanker_detail.save()
-                except (DriverDetail.DoesNotExist, TankerDetail.DoesNotExist):
-                    pass
+        if new_status:
+            availability = DriverAvailability.objects.create(
+                user=supplier,
+                availability_date=timezone.now().date(),
+                start_time=timezone.now().time(),
+                status='available'
+            )
+            driver_detail.availability = availability
+            driver_detail.save()
 
-            return JsonResponse({'status': 'success', 'is_available': new_status})
-        
-    else:
-        messages.error(request, "This user does not exist or is not a supplier.")
-        return render(request,"Login.html")
+            tanker_detail.available = True
+            tanker_detail.save()
+        else:
+            last_log = DriverAvailability.objects.filter(
+                user=supplier,
+                status='available'
+            ).last()
 
+            if last_log:
+                last_log.end_time = timezone.now().time()
+                last_log.status = 'unavailable'
+                last_log.save()
+
+            tanker_detail.available = False
+            tanker_detail.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'is_available': new_status,
+            'message': f"Availability set to {'Available' if new_status else 'Unavailable'}."
+        })
+
+    except DriverDetail.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Driver profile not found. Please complete your profile first.'
+        })
+
+    except TankerDetail.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Tanker details not found. Please register your tanker.'
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f"Unexpected error occurred: {str(e)}"
+        })
 @csrf_exempt
 @login_required(login_url="Login_page")
 def get_supplier_dashboard_data(request):
@@ -219,7 +246,7 @@ def get_supplier_dashboard_data(request):
     if not driver:
         return data
 
-    last_24_hours = now() - timedelta(hours=12)
+    last_24_hours = now() - timedelta(hours=24)
 
     orders_last_24h = OrderDetail.objects.filter(
         order_status='Delivered',
@@ -236,13 +263,33 @@ def get_supplier_dashboard_data(request):
 @csrf_exempt
 @login_required(login_url="Login_page")
 def Supp_Home(request):
-    if request.user.user_type == 'supplier':
-        context = get_supplier_dashboard_data(request)
-        return render(request,'Home.html',context)
+    context = {}
+
+    if request.user.is_authenticated and request.user.user_type == 'supplier':
+        supplier = request.user.supplier
+        driver_detail = DriverDetail.objects.get(user=request.user)
+        if supplier.is_available:
+            supplier_pincode = supplier.location.pincode
+
+            latest_order = OrderDetail.objects.filter(
+                order_status='Pending',
+                location__pincode=supplier_pincode
+            ).select_related('user', 'location', 'tanker') # fetch latest 5
+    
+            context['latest_order'] = latest_order
+        recent_orders = OrderDetail.objects.filter(
+            order_status='Accepted',
+            driver=driver_detail
+        ).select_related('user', 'location', 'driver', 'tanker').order_by('-order_date').first()
+        context['recent_orders'] = recent_orders
+        dashboard_data = get_supplier_dashboard_data(request)
+        context.update(dashboard_data)
+
+        return render(request, 'Home.html', context)
+
     else:
         messages.error(request, "This user does not exist or is not a supplier.")
-        return render(request,"Login.html")
-
+        return render(request, "Login.html")
 @login_required(login_url="Login_page")
 @csrf_exempt
 def earning(request):
@@ -293,7 +340,7 @@ def earning(request):
             'order_times': [dt.strftime('%d %b, %I:%M %p') for dt in order_list]
         })
         total_earnings += total
-
+        
         if i == 0:
             earnings_today = {
                 'amount': total,
@@ -304,7 +351,7 @@ def earning(request):
                     order_date__lt=end_time
                 ).count()
             }
-    
+
     return render(request, 'Earning.html', {
         'earnings_today': earnings_today,
         'last_7_earnings': last_7_earnings,
@@ -358,15 +405,16 @@ def order_list(request, order_id=None):
     return render(request, 'Order_List.html', context)
 
 @login_required(login_url="Login_page")
-def notification(request):
+def notifications(request):
     try:
         supplier_profile = request.user.supplier 
     except Exception:
         messages.error(request, "Supplier profile not found.")
-        return render(request, 'notification.html', {'notifications': []})
-
+        return render(request, 'Notification.html', {'notifications': []})
     notifications = Notification.objects.filter(supplier=supplier_profile).order_by('-timestamp')
-    return render(request, 'notification.html', {'notifications': notifications})
+    context = get_supplier_dashboard_data(request)
+    context['notifications'] = notifications  
+    return render(request, 'Notification.html',context)
 
 
 @login_required(login_url="Login_page")
@@ -447,7 +495,6 @@ def update_order_status(request):
             )
             messages.success(request, f"Order {order.id} {action}ed.")
         
-        # Handle status updates for accepted orders
         elif action == 'update_status':
             status_update = request.POST.get('supplier_update_order_status')
             status_map = {

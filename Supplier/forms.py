@@ -4,16 +4,86 @@ from UserManagement.models import CustomUser
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 import os
+import re
 
 class SupplierRegistrationForm(forms.ModelForm):
-    phone_number = forms.CharField(
-        required=True,
-        validators=[RegexValidator(r'^[6-9]\d{9}$', 'Enter a valid 10-digit phone number')]
-    )
     class Meta:
         model = CustomUser
         fields = ['first_name','last_name','phone_number','email','password','profile_image']
+    first_name = forms.CharField(
+        max_length=30,
+        min_length=2,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_first_name',
+            'placeholder': 'First Name',
+            'pattern': '[A-Za-z\\s]+',
+            'title': 'Only letters and spaces allowed.',
+        })
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        min_length=2,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_last_name',
+            'placeholder': 'Last Name',
+            'pattern': '[A-Za-z\\s]+',
+            'title': 'Only letters and spaces allowed.',
+        })
+    )
+    phone_number = forms.CharField(
+        label="Phone Number",
+        min_length=10,
+        max_length=10,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Phone Number',
+            'pattern': '[0-9]{10}',
+            'title': 'Enter a 10-digit phone number',
+            'id': 'id_phone_number'
+        })
+    )
 
+    email = forms.EmailField(
+        label="Email",
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Email',
+            'pattern': '^[a-zA-Z0-9._%+-]+@gmail\\.com$',
+            'title': 'Only Gmail addresses allowed',
+            'id': 'id_email'
+        })
+    )
+
+    def clean_phone_number(self):
+        phone = self.cleaned_data['phone_number']
+        if not re.match(r'^[0-9]{10}$', phone):
+            raise forms.ValidationError("Phone number must be exactly 10 digits.")
+        return phone
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@gmail\.com$', email):
+            raise forms.ValidationError("Only Gmail addresses are allowed.")
+        return email
+    
+    def clean_first_name(self):
+        data = self.cleaned_data['first_name']
+        if not re.match(r'^[A-Za-z\s]+$', data):
+            raise forms.ValidationError("First name can only contain letters and spaces.")
+        return data
+
+    def clean_last_name(self):
+        data = self.cleaned_data['last_name']
+        if not re.match(r'^[A-Za-z\s]+$', data):
+            raise forms.ValidationError("Last name can only contain letters and spaces.")
+        return data
+    
     def save(self, commit=True):
         user = super().save(commit=False)
         user.user_type = 'supplier'  
@@ -44,7 +114,7 @@ class SupplierLocationDetailForm(forms.ModelForm):
         fields = ['address_line', 'street', 'landmark', 'city', 'state', 'country','pincode']
 
 
-ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.pdf']  
+ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.png']  
 class WaterTankerForm(forms.ModelForm):
 
     water_tanker_name = forms.CharField(
@@ -56,8 +126,9 @@ class WaterTankerForm(forms.ModelForm):
     class Meta:
         model = WaterTankerDocument
         fields = [
+            'water_tanker_name',
             'profile_photo', 'driving_license', 'aadhar_card', 'pan_card',
-            'registration_cert', 'vechicle_insurance', 'vechicle_permit'
+            'registration_cert', 'vehicle_insurance', 'vehicle_permit'
         ]
         widgets = {
             'profile_photo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
@@ -65,8 +136,8 @@ class WaterTankerForm(forms.ModelForm):
             'aadhar_card': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
             'pan_card': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
             'registration_cert': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
-            'vechicle_insurance': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
-            'vechicle_permit': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'vehicle_insurance': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'vehicle_permit': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
 
     # Custom clean methods for each file field
@@ -86,10 +157,10 @@ class WaterTankerForm(forms.ModelForm):
         return self._clean_file_field('registration_cert')
 
     def clean_vehicle_insurance(self):
-        return self._clean_file_field('vechicle_insurance')
+        return self._clean_file_field('vehicle_insurance')
 
     def clean_vehicle_permit(self):
-        return self._clean_file_field('vechicle_permit')
+        return self._clean_file_field('vehicle_permit')
 
     def _clean_file_field(self, field_name):
         """
@@ -100,6 +171,6 @@ class WaterTankerForm(forms.ModelForm):
             name, ext = os.path.splitext(uploaded_file.name)
             if ext.lower() not in ALLOWED_FILE_EXTENSIONS:
                 raise ValidationError(
-                    f"Invalid file type for {self.fields[field_name].label}. Only JPG, PNG, and PDF files are allowed."
+                    f"Invalid file type for {self.fields[field_name].label}. Only JPG, PNG,files are allowed."
                 )
         return uploaded_file

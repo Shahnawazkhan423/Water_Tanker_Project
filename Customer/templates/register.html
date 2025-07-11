@@ -10,34 +10,27 @@
   <style>
     body {
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh; /* Ensures body takes full viewport height */
-      display: flex; /* Enables flexbox */
-      align-items: center; /* Centers content vertically */
-      justify-content: center; /* Centers content horizontally */
-      padding: 20px; /* Add padding around the card for small screens */
-      box-sizing: border-box; /* Include padding in element's total width and height */
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
     }
 
     .container {
-        /* Remove default Bootstrap container padding on very small screens if it interferes */
-        padding-left: 0;
-        padding-right: 0;
-        width: 100%; /* Ensure container takes full width of its flex parent */
-        max-width: 900px; /* Limit the max width of the container itself */
+      max-width: 950px;
+      width: 100%;
     }
 
     .registration-card {
-      border: none;
       border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
       animation: fadeIn 0.6s ease-out forwards;
-      width: 100%; /* Ensures the card takes full width of its parent (container) */
     }
 
     .card-header-gradient {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-bottom: none;
     }
 
     .gradient-btn {
@@ -52,25 +45,16 @@
       box-shadow: 0 6px 20px rgba(43, 222, 140, 0.4);
     }
 
-    .section-title {
-      color: #4a6baf;
-      font-weight: 600;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid #f0f0f0;
-      margin-bottom: 1.2rem;
-    }
-
     .form-floating > label {
       color: #6c757d;
-      left: 1px; /* Adjust label positioning */
+      left: 1rem;
     }
 
     .form-control {
       border-radius: 8px;
       padding: 1rem 1.2rem;
       border: 1px solid #e0e0e0;
-      transition: all 0.3s;
-      height: calc(3.5rem + 2px); /* Fixed height for floating labels */
+      height: calc(3.5rem + 2px);
     }
 
     .form-control:focus {
@@ -78,29 +62,30 @@
       box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
     }
 
-    /* Adjust profile image size and ensure it's centered */
+    .invalid-feedback {
+      font-size: 0.875em;
+      color: #dc3545;
+    }
+
     #preview-image {
       width: 120px;
       height: 120px;
       object-fit: cover;
       cursor: pointer;
-      display: block; /* Make it a block element to center with margin auto */
-      margin: 0 auto 1rem auto; /* Center the image and add bottom margin */
+      display: block;
+      margin: 0 auto 1rem auto;
     }
 
-    /* Style for the actual file input to hide it but keep it accessible */
     input[type="file"] {
       display: none;
     }
 
-    /* Style for validation feedback */
-    .form-control:invalid ~ .invalid-feedback {
-        display: block;
-    }
-    .invalid-feedback {
-        font-size: 0.875em;
-        color: #dc3545;
-        margin-top: 0.25rem;
+    .section-title {
+      font-weight: 600;
+      color: #4a6baf;
+      border-bottom: 2px solid #e0e0e0;
+      margin-bottom: 1rem;
+      padding-bottom: 0.25rem;
     }
 
     @keyframes fadeIn {
@@ -108,235 +93,289 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 767.98px) { /* Use max-width for breakpoint for better mobile-first approach */
-      .card-body {
-        padding: 1.5rem !important;
-      }
-
-      .section-title {
-        font-size: 1.1rem;
-      }
-
+    @media (max-width: 768px) {
       .form-control {
         padding: 0.8rem 1rem;
       }
 
-      /* Stack columns on small screens by default */
-      .col-md-6 {
-        width: 100%;
+      .section-title {
+        font-size: 1rem;
       }
-    }
 
-    /* For screens wider than 768px, use 50% width for col-md-6 */
-    @media (min-width: 768px) {
-      .col-md-6 {
-        flex: 0 0 auto;
-        width: 50%;
+      .gradient-btn {
+        width: 100%;
       }
     }
   </style>
 </head>
-<body class="d-flex align-items-center py-3">
+<body>
   <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12">
-        <div class="card registration-card mb-4">
-          <div class="card-header card-header-gradient text-white text-center py-3">
-            <h3 class="mb-0 fw-semibold"><i class="bi bi-person-plus-fill me-2"></i>Customer Registration</h3>
+    <div class="card registration-card">
+      <div class="card-header card-header-gradient text-white text-center py-3">
+        <h3 class="fw-semibold mb-0"><i class="bi bi-person-plus-fill me-2"></i>Customer Registration</h3>
+      </div>
+
+      <div class="card-body bg-light p-4 p-lg-5">
+        <form method="post" class="row g-3 needs-validation" enctype="multipart/form-data" novalidate action="{% url 'register' %}">
+          {% csrf_token %}
+
+          {% if messages %}
+            <div class="alert alert-primary">
+              {% for message in messages %}
+                {{ message }}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Profile Image -->
+         <div class="col-12 text-center mb-4">
+              <!-- Profile Preview Image -->
+              <label for="id_profile_image" class="d-inline-block" style="cursor: pointer;">
+                <img id="preview-image" 
+                    src="/static/image/Profile_Default_Image.jpg" 
+                    alt="Profile Preview"
+                    class="rounded-circle shadow border"
+                    style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #007bff;">
+              </label>
+
+              <!-- File Upload Input -->
+              <div class="mt-3">
+                <input type="file" id="id_profile_image" name="profile_image" accept="image/*" class="form-control">
+                <small class="form-text text-muted">Click the image or browse to upload. JPG, PNG only.</small>
+
+                <!-- Validation Feedback -->
+                <div class="invalid-feedback d-block" id="profile_image_error">
+                  <!-- Django or client-side error message here -->
+                </div>
+              </div>
           </div>
-          <div class="card-body bg-light p-4 p-lg-5">
-            <form method="post" class="row g-3 needs-validation" enctype="multipart/form-data" novalidate action="{% url 'register' %}">
-              {% csrf_token %}
-              {% if messages %}
-                <div class="alert alert-primary" role="alert">
-                  {% for message in messages %}
-                    {{ message }}
-                  {% endfor %}
-                </div>
-              {% endif %}
 
-              <div class="col-12 text-center mb-4">
-                <label for="id_profile_image">
-                  <img id="preview-image" src="/static/image/Profile_Default_Image.jpg" alt="Profile Preview" class="rounded-circle shadow mb-2">
-                </label>
-                <input type="file" id="id_profile_image" name="profile_image" accept="image/*" class="form-control-file">
-                <div class="invalid-feedback d-block" id="profile_image_error"></div>
-              </div>
+        
+          <!-- Section -->
+          <div class="col-12">
+            <h5 class="section-title"><i class="bi bi-person-circle me-2"></i>User Information</h5>
+          </div>
 
-              <div class="col-12">
-                <h5 class="section-title"><i class="bi bi-person-circle me-2"></i>User Information</h5>
-              </div>
+          <!-- First Name -->
+          <div class="form-floating col-md-6">
+            <input type="text" name="first_name" id="id_first_name"
+                  class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                  value="{{ form.first_name.value|default_if_none:'' }}"
+                  placeholder="First Name" required pattern="[A-Za-z\s]{2,30}">
+            <label for="id_first_name">First Name</label>
+            {% if form.first_name.errors %}
+              <div class="invalid-feedback d-block">{{ form.first_name.errors.0 }}</div>
+            {% else %}
+              <div class="invalid-feedback">Please enter a valid first name.</div>
+            {% endif %}
+          </div>
 
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_first_name" name="first_name" placeholder="First Name" required pattern="[A-Za-z\s]+">
-                  <label for="id_first_name">First Name</label>
-                  <div class="invalid-feedback">Please enter your first name.</div>
-                </div>
-              </div>
+          <!-- Last Name -->
+          <div class="form-floating col-md-6">
+            <input type="text" name="last_name" id="id_last_name"
+                  class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                  value="{{ form.last_name.value|default_if_none:'' }}"
+                  placeholder="Last Name" required pattern="[A-Za-z\s]{2,30}">
+            <label for="id_last_name">Last Name</label>
+            {% if form.last_name.errors %}
+              <div class="invalid-feedback d-block">{{ form.last_name.errors.0 }}</div>
+            {% else %}
+              <div class="invalid-feedback">Please enter a valid last name.</div>
+            {% endif %}
+          </div>
 
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_last_name" name="last_name" placeholder="Last Name" required pattern="[A-Za-z\s]+">
-                  <label for="id_last_name">Last Name</label>
-                  <div class="invalid-feedback">Please enter your last name.</div>
-                </div>
-              </div>
-
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="tel" class="form-control" id="id_phone_number" name="phone_number" placeholder="Phone Number" required pattern="[0-9]{10}">
-                  <label for="id_phone_number">Phone Number</label>
+          <!-- Phone Number -->
+            <div class="form-floating col-md-6">
+                <input type="tel" name="phone_number" id="id_phone_number"
+                      class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
+                      value="{{ form.phone_number.value|default_if_none:'' }}"
+                      placeholder="Phone Number" required pattern="[0-9]{10}" minlength="10" maxlength="10"
+                      title="Enter a valid 10-digit phone number">
+                <label for="id_phone_number">Phone Number</label>
+                {% if form.phone_number.errors %}
+                  <div class="invalid-feedback d-block">{{ form.phone_number.errors.0 }}</div>
+                {% else %}
                   <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
-                </div>
-              </div>
+                {% endif %}
+            </div>
 
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="email" class="form-control" id="id_email" name="email" placeholder="Email" required pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$">
-                  <label for="id_email">Email</label>
-                  <div class="invalid-feedback">Please enter a valid email address.</div>
-                </div>
-              </div>
 
-              <div class="col-12">
-                <div class="form-floating mb-3">
-                  <input type="password" class="form-control" id="id_passwords" name="password" placeholder="Password" required minlength="8">
-                  <label for="id_passwords">Password</label>
-                  <div class="invalid-feedback">Password must be at least 8 characters long.</div>
-                </div>
-              </div>
-
-              <div class="col-12 mt-2">
-                <h5 class="section-title"><i class="bi bi-geo-alt-fill me-2"></i>Address Information</h5>
-              </div>
-
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_address_line" name="address_line" placeholder="Address Line" required>
-                  <label for="id_address_line">Address Line</label>
-                  <div class="invalid-feedback">Please enter your address line.</div>
-                </div>
-              </div>
-
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_street" name="street" placeholder="Street" required>
-                  <label for="id_street">Street</label>
-                  <div class="invalid-feedback">Please enter your street.</div>
-                </div>
-              </div>
-
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_landmark" name="landmark" placeholder="Landmark">
-                  <label for="id_landmark">Landmark</label>
-                </div>
-              </div>
-
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_city" name="city" placeholder="City" required pattern="[A-Za-z\s]+">
-                  <label for="id_city">City</label>
-                  <div class="invalid-feedback">Please enter your city.</div>
-                </div>
-              </div>
-
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_state" name="state" placeholder="State" required pattern="[A-Za-z\s]+">
-                  <label for="id_state">State</label>
-                  <div class="invalid-feedback">Please enter your state.</div>
-                </div>
-              </div>
-
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_country" name="country" placeholder="Country" required pattern="[A-Za-z\s]+">
-                  <label for="id_country">Country</label>
-                  <div class="invalid-feedback">Please enter your country.</div>
-                </div>
-              </div>
-
-              <div class="col-md-6 col-12">
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="id_pincode" name="pincode" placeholder="Pincode" required pattern="[0-9]{6}">
-                  <label for="id_pincode">Pincode</label>
-                  <div class="invalid-feedback">Please enter a valid 6-digit pincode.</div>
-                </div>
-              </div>
-
-              <div class="col-12 text-center mt-3">
-                <button type="submit" class="btn gradient-btn text-white px-5 py-2 fw-semibold">
-                  <i class="bi bi-check-circle me-2"></i> Register Now
-                </button>
-              </div>
-            </form>
+        <!-- Email -->
+          <div class="form-floating col-md-6">
+            <input type="email" name="email" id="id_email"
+                  class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                  value="{{ form.email.value|default_if_none:'' }}"
+                  placeholder="Email" required
+                  pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+                  title="Only Gmail addresses are allowed">
+            <label for="id_email">Email</label>
+            {% if form.email.errors %}
+              <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+            {% else %}
+              <div class="invalid-feedback">Please enter a valid Gmail address (e.g. yourname@gmail.com).</div>
+            {% endif %}
           </div>
-          <div class="card-footer bg-transparent text-center py-3 small">
-            Already have an account? <a href="{% url 'login' %}" class="text-primary fw-semibold text-decoration-none">Login here</a>
+
+
+          <!-- Password -->
+          <div class="col-12">
+            <div class="form-floating mb-3">
+              <input type="password" class="form-control" id="id_passwords" name="password" placeholder="Password" required minlength="8">
+              <label for="id_passwords">Password</label>
+              <div class="invalid-feedback">Minimum 8 characters required.</div>
+            </div>
           </div>
-        </div>
+
+          <!-- Section -->
+          <div class="col-12">
+            <h5 class="section-title"><i class="bi bi-geo-alt-fill me-2"></i>Address Information</h5>
+          </div>
+
+         <!-- Address Line -->
+          <div class="col-md-6">
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="id_address_line" name="address_line"
+                    placeholder="Address Line" required pattern="^[A-Za-z0-9\s,.-]{5,100}$"
+                    title="Address should be 5-100 characters and may include letters, numbers, commas, dots, and hyphens.">
+              <label for="id_address_line">Address Line</label>
+              <div class="invalid-feedback">Please enter a valid address (min 5 characters).</div>
+            </div>
+          </div>
+
+          <!-- Street -->
+          <div class="col-md-6">
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="id_street" name="street"
+                    placeholder="Street" required pattern="^[A-Za-z\s]{3,50}$"
+                    title="Street name should contain only letters and spaces, min 3 characters.">
+              <label for="id_street">Street</label>
+              <div class="invalid-feedback">Enter a valid street name.</div>
+            </div>
+          </div>
+
+          <!-- Landmark (Optional) -->
+          <div class="col-md-6">
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="id_landmark" name="landmark"
+                    placeholder="Landmark" pattern="^[A-Za-z0-9\s,.-]{0,100}$"
+                    title="Optional: letters, numbers, commas, dots, or hyphens allowed.">
+              <label for="id_landmark">Landmark</label>
+            </div>
+          </div>
+
+          <!-- City -->
+          <div class="col-md-6">
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="id_city" name="city"
+                    placeholder="City" required pattern="^[A-Za-z\s]{2,50}$"
+                    title="City name must contain only letters and spaces (min 2 characters).">
+              <label for="id_city">City</label>
+              <div class="invalid-feedback">Enter a valid city name (letters only).</div>
+            </div>
+          </div>
+
+
+          <div class="col-md-6">
+            <div class="form-floating mb-3">
+              <select class="form-select" id="id_state" name="state" required>
+                <option value="" selected disabled>Select State</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Gujarat">Gujarat</option>
+                <!-- Add more states as needed -->
+              </select>
+              <label for="id_state">State</label>
+              <div class="invalid-feedback">Please select a state.</div>
+            </div>
+          </div>
+
+
+          <div class="col-md-6">
+            <div class="form-floating mb-3">
+              <select class="form-select" id="id_country" name="country" required>
+                <option value="" selected disabled>Select Country</option>
+                <option value="India">India</option>
+                <option value="USA">USA</option>
+                <option value="UK">UK</option>
+                <option value="Canada">Canada</option>
+                <option value="Australia">Australia</option>
+                <!-- Add more countries as needed -->
+              </select>
+              <label for="id_country">Country</label>
+              <div class="invalid-feedback">Please select a country.</div>
+            </div>
+          </div>
+
+
+         <div class="col-md-6">
+            <div class="form-floating mb-3">
+                      <input type="text" class="form-control" id="id_pincode" name="pincode"
+                placeholder="Pincode" required
+                pattern="^(?!([0-9])\1{5})[0-9]{6}$">
+          <label for="id_pincode">Pincode</label>
+          <div class="invalid-feedback">Enter a valid 6-digit pincode (not all same digits).</div>
+            </div>
+          </div>
+
+          <div class="col-12 text-center mt-3">
+            <button type="submit" class="btn gradient-btn text-white px-5 py-2 fw-semibold">
+              <i class="bi bi-check-circle me-2"></i>Register Now
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card-footer bg-transparent text-center py-3">
+        Already have an account?
+        <a href="{% url 'login' %}" class="text-decoration-none fw-semibold text-primary">Login here</a>
       </div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.querySelector('.needs-validation');
       const profileImageInput = document.getElementById('id_profile_image');
       const previewImage = document.getElementById('preview-image');
       const profileImageErrorDiv = document.getElementById('profile_image_error');
-      const form = document.querySelector('.needs-validation');
 
-      // Image preview logic
-      if (profileImageInput) {
-        profileImageInput.addEventListener('change', function(event) {
-          if (event.target.files && event.target.files[0]) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
+      profileImageInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        profileImageErrorDiv.textContent = '';
 
-            // Clear any previous error
-            profileImageErrorDiv.textContent = '';
+        if (file) {
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          const maxSize = 2 * 1024 * 1024;
 
-            // Basic file type and size validation (client-side)
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            const maxSize = 2 * 1024 * 1024; // 2MB
-
-            if (!allowedTypes.includes(file.type)) {
-              profileImageErrorDiv.textContent = 'Invalid file type. Please upload a JPEG, PNG, or GIF image.';
-              previewImage.src = "/static/image/Profile_Default_Image.jpg"; // Reset to default
-              profileImageInput.value = ''; // Clear the input
-              return;
-            }
-
-            if (file.size > maxSize) {
-              profileImageErrorDiv.textContent = 'Image size exceeds 2MB limit.';
-              previewImage.src = "/static/image/Profile_Default_Image.jpg"; // Reset to default
-              profileImageInput.value = ''; // Clear the input
-              return;
-            }
-
-            reader.onload = function(e) {
-              previewImage.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-          } else {
-            // If no file is selected, reset to default image
+          if (!allowedTypes.includes(file.type)) {
+            profileImageErrorDiv.textContent = 'Allowed: JPG, PNG, GIF.';
             previewImage.src = "/static/image/Profile_Default_Image.jpg";
-            profileImageErrorDiv.textContent = ''; // Clear error if no file
+            profileImageInput.value = '';
+            return;
           }
-        });
-      }
 
-      // Bootstrap form validation (client-side)
-      form.addEventListener('submit', function(event) {
+          if (file.size > maxSize) {
+            profileImageErrorDiv.textContent = 'Max size 2MB.';
+            previewImage.src = "/static/image/Profile_Default_Image.jpg";
+            profileImageInput.value = '';
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = e => previewImage.src = e.target.result;
+          reader.readAsDataURL(file);
+        }
+      });
+
+      form.addEventListener('submit', function (event) {
         if (!form.checkValidity()) {
           event.preventDefault();
           event.stopPropagation();
         }
         form.classList.add('was-validated');
-      }, false);
+      });
     });
   </script>
 </body>

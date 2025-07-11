@@ -41,11 +41,8 @@ def register_view(request):
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
-        print(email)
         password = request.POST.get('id_passwords')
-        print(password)
         user = authenticate(request, email=email, password=password)
-        print(user)
         if user is not None and isinstance(user, CustomUser):
             login(request, user)
             return redirect('home')
@@ -87,10 +84,9 @@ def booking(request):
         location_form = LocationDetailForm(request.POST)
 
         if user_form.is_valid() and tanker_form.is_valid() and location_form.is_valid():
-           
+            try:
                 with transaction.atomic():
                     user = user_form.save()
-
                     tanker = tanker_form.save(commit=False)
                     tanker.user = user
                     tanker.save()
@@ -103,7 +99,7 @@ def booking(request):
                     location.tanker = tanker
                     location.save()
 
-                    order = OrderDetail.objects.create(
+                    OrderDetail.objects.create(
                         user=user,
                         tanker=tanker,
                         location=location,
@@ -112,9 +108,13 @@ def booking(request):
                         order_status='Pending'
                     )
 
-                    messages.success(request, f"Booking successful! Price: ₹{total_price:.2f} for {capacity} liters")
+                    messages.success(request, f"✅ Booking successful! Price: ₹{total_price:.2f} for {capacity} liters")
                     return redirect('booking')
 
+            except Exception as e:
+                messages.error(request, f"❌ Something went wrong: {str(e)}")
+        else:
+            messages.error(request, "⚠️ Please correct the errors in the form.")
     else:
         user_form = BookingUserForm(instance=request.user)
         tanker_form = TankerDetailForm()
@@ -126,7 +126,6 @@ def booking(request):
         'location_form': location_form,
         'pricing': pricing,
     })
-
 @login_required(login_url="login")
 def driver_detail(request):
     orders = OrderDetail.objects.filter(user=request.user,order_status='Accepted')

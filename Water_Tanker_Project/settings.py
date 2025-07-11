@@ -90,8 +90,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'Water_Tanker_Project_DB',
-        'USER':'root',
-        'PASSWORD':'mrkhan',
+        'USER':'MRKHAN',
+        'PASSWORD':'root',
     }
 }   
 

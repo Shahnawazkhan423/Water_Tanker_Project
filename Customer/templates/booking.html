@@ -7,88 +7,206 @@
 <div class="container my-5">
     {% if messages %}
         {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
-                {{ message }}
-            </div>
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         {% endfor %}
     {% endif %}
-    
-    <form method="post" class="p-4 border rounded shadow bg-light">
-        {% csrf_token %}
-        <!-- User Details Section -->
-        <h4 class="mb-3 text-primary">User Details</h4>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                {{ user_form.first_name.label_tag }}
-                {{ user_form.first_name }}
-            </div>
-            <div class="col-md-6 mb-3">
-                {{ user_form.last_name.label_tag }}
-                {{ user_form.last_name }}
-            </div>
-            <div class="col-md-6 mb-3">
-                {{ user_form.phone_number.label_tag }}
-                {{ user_form.phone_number }}
-            </div>
-        </div>
-        <!-- Location Details Section -->
-        <h4 class="mb-3 text-primary">Location Details</h4>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                {{ location_form.address_line.label_tag }}
-                {{ location_form.address_line }}
-            </div>
-            <div class="col-md-6 mb-3">
-                {{ location_form.street.label_tag }}
-                {{ location_form.street }}
-            </div>
-            <div class="col-md-6 mb-3">
-                {{ location_form.landmark.label_tag }}
-                {{ location_form.landmark }}
-            </div>
-            <div class="col-md-6 mb-3">
-                {{ location_form.city.label_tag }}
-                {{ location_form.city }}
-            </div>
-            <div class="col-md-6 mb-3">
-                {{ location_form.state.label_tag }}
-                {{ location_form.state }}
-            </div>
-            <div class="col-md-6 mb-3">
-                {{ location_form.country.label_tag }}
-                {{ location_form.country }}
-            </div>
-            <div class="col-md-6 mb-3">
-                {{ location_form.pincode.label_tag }}
-                {{ location_form.pincode }}
-            </div>
+
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4 text-center py-3">
+            <h3 class="mb-0">🚚 Book Water Tanker</h3>
         </div>
 
-        <!-- Tanker Details Section -->
-        <h4 class="mb-3 text-primary">Tanker Details</h4>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                {{ tanker_form.capacity.label_tag }}
-                {{ tanker_form.capacity }}
-            </div>
-            <div class="col-md-6 mb-3">
-                {{ tanker_form.category.label_tag }}
-                {{ tanker_form.category }}
-            </div>
+        <div class="card-body p-4">
+            <form method="post" action="{% url 'booking' %}" class="row g-4 needs-validation" novalidate>
+                {% csrf_token %}
+
+                <!-- User Details -->
+                <div class="col-12">
+                    <h5 class="text-secondary"><i class="bi bi-person-circle me-2"></i>User Details</h5>
+                </div>
+
+                <!-- First Name -->
+                <div class="form-floating col-md-6">
+                    <input type="text" name="first_name" id="id_first_name"
+                        class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                        value="{{ form.first_name.value|default_if_none:'' }}"
+                        placeholder="First Name" required pattern="[A-Za-z\s]{2,30}">
+                    <label for="id_first_name">First Name</label>
+                    {% if form.first_name.errors %}
+                    <div class="invalid-feedback d-block">{{ form.first_name.errors.0 }}</div>
+                    {% else %}
+                    <div class="invalid-feedback">Please enter a valid first name.</div>
+                    {% endif %}
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-floating col-md-6">
+                    <input type="text" name="last_name" id="id_last_name"
+                        class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                        value="{{ form.last_name.value|default_if_none:'' }}"
+                        placeholder="Last Name" required pattern="[A-Za-z\s]{2,30}">
+                    <label for="id_last_name">Last Name</label>
+                    {% if form.last_name.errors %}
+                    <div class="invalid-feedback d-block">{{ form.last_name.errors.0 }}</div>
+                    {% else %}
+                    <div class="invalid-feedback">Please enter a valid last name.</div>
+                    {% endif %}
+                </div>
+
+                <!-- Phone Number -->
+                <div class="form-floating col-md-6">
+                    <input type="tel" name="phone_number" id="id_phone_number"
+                        class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
+                        value="{{ form.phone_number.value|default_if_none:'' }}"
+                        placeholder="Phone Number" required pattern="[0-9]{10}" maxlength="10">
+                    <label for="id_phone_number">Phone Number</label>
+                    {% if form.phone_number.errors %}
+                    <div class="invalid-feedback d-block">{{ form.phone_number.errors.0 }}</div>
+                    {% else %}
+                    <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div class="form-floating col-md-6">
+                    <input type="email" name="email" id="id_email"
+                        class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                        value="{{ form.email.value|default_if_none:'' }}"
+                        placeholder="Email" required pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$">
+                    <label for="id_email">Email</label>
+                    {% if form.email.errors %}
+                    <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                    {% else %}
+                    <div class="invalid-feedback">Only Gmail addresses are allowed.</div>
+                    {% endif %}
+                </div>
+
+                <!-- Address Section -->
+                <div class="col-12">
+                    <h5 class="text-secondary mt-3"><i class="bi bi-geo-alt-fill me-2"></i>Address Information</h5>
+                </div>
+
+                <!-- Address Line -->
+                <div class="form-floating col-md-6">
+                    <input type="text" name="address_line" id="id_address_line"
+                        class="form-control {% if location_form.address_line.errors %}is-invalid{% endif %}"
+                        value="{{ location_form.address_line.value|default_if_none:'' }}"
+                        placeholder="Address Line" required>
+                    <label for="id_address_line">Address Line</label>
+                    {% if location_form.address_line.errors %}
+                    <div class="invalid-feedback d-block">{{ location_form.address_line.errors.0 }}</div>
+                    {% else %}
+                    <div class="invalid-feedback">Enter a valid address.</div>
+                    {% endif %}
+                </div>
+
+                <!-- Street -->
+                <div class="form-floating col-md-6">
+                    <input type="text" name="street" id="id_street"
+                        class="form-control" placeholder="Street" required pattern="[A-Za-z\s]{3,50}">
+                    <label for="id_street">Street</label>
+                    <div class="invalid-feedback">Enter a valid street name.</div>
+                </div>
+
+                <!-- Landmark -->
+                <div class="form-floating col-md-6">
+                    <input type="text" name="landmark" id="id_landmark"
+                        class="form-control" placeholder="Landmark" pattern="[A-Za-z0-9\s,.-]{0,100}">
+                    <label for="id_landmark">Landmark (optional)</label>
+                </div>
+
+                <!-- City -->
+                <div class="form-floating col-md-6">
+                    <input type="text" name="city" id="id_city"
+                        class="form-control {% if location_form.city.errors %}is-invalid{% endif %}"
+                        value="{{ location_form.city.value|default_if_none:'' }}"
+                        placeholder="City" required>
+                    <label for="id_city">City</label>
+                    {% if location_form.city.errors %}
+                    <div class="invalid-feedback d-block">{{ location_form.city.errors.0 }}</div>
+                    {% else %}
+                    <div class="invalid-feedback">Enter a valid city.</div>
+                    {% endif %}
+                </div>
+
+                <!-- State -->
+                <div class="form-floating col-md-6">
+                    <select name="state" id="id_state" class="form-select" required>
+                        <option value="" selected disabled>Select State</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Gujarat">Gujarat</option>
+                    </select>
+                    <label for="id_state">State</label>
+                    <div class="invalid-feedback">Please select a state.</div>
+                </div>
+
+                <!-- Country -->
+                <div class="form-floating col-md-6">
+                    <select name="country" id="id_country" class="form-select" required>
+                        <option value="" selected disabled>Select Country</option>
+                        <option value="India">India</option>
+                        <option value="USA">USA</option>
+                        <option value="UK">UK</option>
+                        <option value="Canada">Canada</option>
+                    </select>
+                    <label for="id_country">Country</label>
+                    <div class="invalid-feedback">Please select a country.</div>
+                </div>
+
+                <!-- Pincode -->
+                <div class="form-floating col-md-6">
+                    <input type="text" name="pincode" id="id_pincode"
+                        class="form-control {% if location_form.pincode.errors %}is-invalid{% endif %}"
+                        value="{{ location_form.pincode.value|default_if_none:'' }}"
+                        placeholder="Pincode" required pattern="[0-9]{6}">
+                    <label for="id_pincode">Pincode</label>
+                    {% if location_form.pincode.errors %}
+                    <div class="invalid-feedback d-block">{{ location_form.pincode.errors.0 }}</div>
+                    {% else %}
+                    <div class="invalid-feedback">Enter a valid 6-digit pincode.</div>
+                    {% endif %}
+                </div>
+
+                <!-- Tanker Section -->
+                <div class="col-12">
+                    <h5 class="text-secondary mt-4"><i class="bi bi-truck me-2"></i>Tanker Details</h5>
+                </div>
+
+                {% for field in tanker_form %}
+                <div class="col-md-6">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="text-danger small">{{ field.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <!-- Pricing Info -->
+                <div class="col-12 mt-3">
+                    <div class="alert alert-info">
+                        <strong>Price:</strong>
+                        {% if request.method == "POST" and tanker_form.capacity.value %}
+                            ₹{{ pricing|get_item:tanker_form.capacity.value|floatformat:2 }}
+                            for {{ tanker_form.capacity.value }} liters
+                        {% else %}
+                            Select a tanker capacity to see the price.
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="col-12 d-grid">
+                    <button type="submit" class="btn btn-success btn-lg rounded-pill">🚀 Book Now</button>
+                </div>
+            </form>
         </div>
-        
-        <!-- Price Information -->
-        <div class="alert alert-info">
-            <strong>Price:</strong> 
-            {% if request.method == "POST" and tanker_form.capacity.value %}
-                ₹{{ pricing|get_item:tanker_form.capacity.value|floatformat:2 }} 
-                for {{ tanker_form.capacity.value }} liters
-            {% else %}
-                Select a tanker capacity to see the price
-            {% endif %}
-        </div>
-        
-        <button type="submit" class="btn btn-primary mt-3 w-100">Book Now</button>
-    </form>
+    </div>
 </div>
 {% endblock %}

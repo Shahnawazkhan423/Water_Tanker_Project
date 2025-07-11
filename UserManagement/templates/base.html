@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome to WaterTankerPro</title>
+  <title>Welcome to WaterTanker</title>
 
   <!-- Bootstrap 4 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
@@ -269,7 +269,7 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
-      <a class="navbar-brand" href="#"><i class="fas fa-water"></i> Water Tanker</a>
+      <a class="navbar-brand" href="#">Water Tanker</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -284,6 +284,15 @@
               <a class="dropdown-item" href="{% url 'Login_page' %}">Supplier</a>
             </div>
           </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="loginDropdown" role="button" data-toggle="dropdown">
+              SignUp
+            </a>
+            <div class="dropdown-menu" aria-labelledby="loginDropdown">
+              <a class="dropdown-item" href="{% url 'register' %}">Customer</a>
+              <a class="dropdown-item" href="{% url 'Register_page' %}">Supplier</a>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
@@ -294,12 +303,10 @@
     <div class="container">
       <div class="text-center mb-5 mt-5 pt-5">
         <div class="badge-custom">Reliable Water Delivery</div>
-        <h1 class="display-4 mb-3">Welcome to <span style="color: var(--primary);">WaterTankerPro</span></h1>
+        <h1 class="display-4 mb-3">Welcome to <span style="color: var(--primary);">WaterTanker</span></h1>
         <p class="lead">Choose your role to get started with our services.</p>
       </div>
 
-      <form method="post" action="{% url 'role_selection' %}">
-        {% csrf_token %}
         <div class="row justify-content-center">
           <!-- Customer Card -->
           <div class="col-md-6 col-lg-5 mb-4">
@@ -318,7 +325,7 @@
                     <li>Multiple payment options</li>
                     <li>24/7 customer support</li>
                   </ul>
-                  <button type="submit" class="btn role-btn mt-3">Register as Customer</button>
+                  <a class="btn role-btn mt-3" href="{% url 'register' %}">Register as Customer</a>
                 </div>
               </div>
             </label>
@@ -341,13 +348,13 @@
                     <li>Detailed payment & earning reports</li>
                     <li>Fleet & driver management tools</li>
                   </ul>
-                  <button type="submit" class="btn role-btn mt-3">Register as Supplier</button>
+                  <a class="btn role-btn mt-3" href="{% url 'Register_page' %}">Register as Supplier</a>
                 </div>
               </div>
             </label>
           </div>
         </div>
-      </form>
+     
     </div>
   </div>
 
@@ -360,29 +367,6 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script>
-    // Highlight selected card
-    document.querySelectorAll('.role-card input[type="radio"]').forEach(radio => {
-      radio.addEventListener('change', function () {
-        document.querySelectorAll('.role-card').forEach(label => label.classList.remove('selected'));
-        if (this.checked) this.closest('.role-card').classList.add('selected');
-      });
-    });
-
-    // Pre-select check highlight
-    document.addEventListener('DOMContentLoaded', () => {
-      const checkedRadio = document.querySelector('.role-card input[type="radio"]:checked');
-      if (checkedRadio) checkedRadio.closest('.role-card').classList.add('selected');
-    });
-
-    // Prevent submission if no role is selected
-    document.querySelector('form').addEventListener('submit', function (e) {
-      const selected = this.querySelector('input[name="user_role"]:checked');
-      if (!selected) {
-        e.preventDefault();
-        alert("Please select a role before proceeding.");
-      }
-    });
-  </script>
+ 
 </body>
 </html>
