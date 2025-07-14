@@ -138,9 +138,8 @@ def logout_view(request):
     logout(request)
     messages.success(request, "Logged out successfully.")
     return render(request, "Login.html")
-
+        
 def toggle_availability(request):
-    # ✅ Step 1: Ensure the user is authenticated and is a supplier
     if not request.user.is_authenticated or request.user.user_type != 'supplier':
         return JsonResponse({
             'status': 'error',
@@ -409,7 +408,6 @@ def notifications(request):
     try:
         supplier_profile = request.user.supplier 
     except Exception:
-        messages.error(request, "Supplier profile not found.")
         return render(request, 'Notification.html', {'notifications': []})
     notifications = Notification.objects.filter(supplier=supplier_profile).order_by('-timestamp')
     context = get_supplier_dashboard_data(request)

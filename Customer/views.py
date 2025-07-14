@@ -129,7 +129,6 @@ def booking(request):
 @login_required(login_url="login")
 def driver_detail(request):
     orders = OrderDetail.objects.filter(user=request.user,order_status='Accepted')
-    print("Orders======",orders)
     return render(request, 'driver_detail.html', {'orders':orders})
 
 @login_required(login_url="login")
@@ -154,7 +153,6 @@ def notification_view(request):
     try:
         supplier_profile = request.user.supplier 
     except Exception:
-        messages.error(request, "Supplier profile not found.")
         return render(request, 'notification.html', {'notifications': []})
 
     notifications = Notification.objects.filter(supplier=supplier_profile).order_by('-timestamp')

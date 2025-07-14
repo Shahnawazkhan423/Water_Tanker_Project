@@ -122,7 +122,7 @@ class WaterTankerForm(forms.ModelForm):
         max_length=255,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-
+    
     class Meta:
         model = WaterTankerDocument
         fields = [
@@ -139,7 +139,7 @@ class WaterTankerForm(forms.ModelForm):
             'vehicle_insurance': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
             'vehicle_permit': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
-
+    
     # Custom clean methods for each file field
     def clean_profile_photo(self):
         return self._clean_file_field('profile_photo')

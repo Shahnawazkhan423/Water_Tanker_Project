@@ -116,28 +116,7 @@
                 {% if tankers %}
                     {% for tanker in tankers%}
                     <div class="row">
-                        <div class="col-12 col-md-4 mb-4">
-                            <div class="document-card h-100" role="region" aria-labelledby="profile-photo-header">
-                                <div class="document-header bg-success-light p-2 rounded-top">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 id="profile-photo-header" class="mb-0"><i class="fas fa-user-circle me-2"></i>Profile Photo</h6>
-                                        {% if tanker.document.profile_photo %}
-                                            <span class="badge bg-success">Uploaded</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Missing</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="document-body p-3 text-center border">
-                                    {% if document.profile_photo %}
-                                        <img src="{{ tanker.document.profile_photo.url }}" alt="Profile photo of {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.profile_photo.url }}" data-document-title="Profile Photo">
-                                    {% else %}
-                                        <img src="/static/image/document_placeholder.jpg" alt="Placeholder for profile photo" class="img-fluid rounded mb-2 document-image">
-                                    {% endif %}
-                                    <p class="mb-0 small text-muted">Status: {% if document.profile_photo %}Available{% else %}Not Uploaded{% endif %}</p>
-                                </div>
-                            </div>
-                        </div>
+            
 
                         <div class="col-12 col-md-4 mb-4">
                             <div class="document-card h-100" role="region" aria-labelledby="driving-license-header">
@@ -236,7 +215,7 @@
                                 <div class="document-header bg-success-light p-2 rounded-top">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 id="vehicle-insurance-header" class="mb-0"><i class="fas fa-shield-alt me-2"></i>Vehicle Insurance</h6>
-                                        {% if tanker.document.vechicle_insurance %}
+                                        {% if tanker.document.vehicle_insurance %}
                                             <span class="badge bg-success">Uploaded</span>
                                         {% else %}
                                             <span class="badge bg-danger">Missing</span>
@@ -245,11 +224,11 @@
                                 </div>
                                 <div class="document-body p-3 text-center border">
                                     {% if tanker.document.vehicle_insurance %}
-                                        <img src="{{ document.vechicle_insurance.url }}" alt="Vehicle insurance for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.vehicle_insurance.url }}" data-document-title="Vehicle Insurance">
+                                        <img src="{{ document.vehicle_insurance.url }}" alt="Vehicle insurance for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.vehicle_insurance.url }}" data-document-title="Vehicle Insurance">
                                     {% else %}
                                         <img src="/static/image/document_placeholder.jpg" alt="Placeholder for vehicle insurance" class="img-fluid rounded mb-2 document-image">
                                     {% endif %}
-                                    <p class="mb-0 small text-muted">Status: {% if document.vechicle_insurance %}Available{% else %}Not Uploaded{% endif %}</p>
+                                    <p class="mb-0 small text-muted">Status: {% if document.vehicle_insurance %}Available{% else %}Not Uploaded{% endif %}</p>
                                 </div>
                             </div>
                         </div>
@@ -259,7 +238,7 @@
                                 <div class="document-header bg-success-light p-2 rounded-top">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 id="vehicle-permit-header" class="mb-0"><i class="fas fa-file-contract me-2"></i>Vehicle Permit</h6>
-                                        {% if tanker.document.vechicle_permit %}
+                                        {% if tanker.document.vehicle_permit %}
                                             <span class="badge bg-success">Uploaded</span>
                                         {% else %}
                                             <span class="badge bg-danger">Missing</span>
@@ -268,11 +247,11 @@
                                 </div>
                                 <div class="document-body p-3 text-center border">
                                     {% if tanker.document.vehicle_permit %}
-                                        <img src="{{ document.vechicle_permit.url }}" alt="Vehicle permit for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.vehicle_permit.url }}" data-document-title="Vehicle Permit">
+                                        <img src="{{ document.vehicle_permit.url }}" alt="Vehicle permit for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.vehicle_permit.url }}" data-document-title="Vehicle Permit">
                                     {% else %}
                                         <img src="/static/image/document_placeholder.jpg" alt="Placeholder for vehicle permit" class="img-fluid rounded mb-2 document-image">
                                     {% endif %}
-                                    <p class="mb-0 small text-muted">Status: {% if document.vechicle_permit %}Available{% else %}Not Uploaded{% endif %}</p>
+                                    <p class="mb-0 small text-muted">Status: {% if document.vehicle_permit %}Available{% else %}Not Uploaded{% endif %}</p>
                                 </div>
                             </div>
                         </div>
@@ -304,6 +283,44 @@
         </div>
     </div>
 </div>
+<div class="mt-5">
+    {% if not tanker_detail %}
+        <div class="card border-warning shadow-sm mb-3">
+            <div class="card-body d-flex flex-column flex-md-row align-items-center justify-content-between">
+                <div class="d-flex align-items-center mb-3 mb-md-0">
+                    <div class="icon-circle bg-warning text-white me-3">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-warning">No Tanker Registered</h6>
+                        <p class="mb-0 text-muted small">You haven’t registered a tanker yet.</p>
+                    </div>
+                </div>
+                <a href="{% url 'tanker_detail' %}" class="btn btn-warning btn-sm text-white">
+                    <i class="fas fa-plus-circle me-1"></i> Register Now
+                </a>
+            </div>
+        </div>
+    {% elif tanker_detail and tanker_detail.documents_expired %}
+        <div class="card border-danger shadow-sm">
+            <div class="card-body d-flex flex-column flex-md-row align-items-center justify-content-between">
+                <div class="d-flex align-items-center mb-3 mb-md-0">
+                    <div class="icon-circle bg-danger text-white me-3">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-danger">Documents Expired</h6>
+                        <p class="mb-0 text-muted small">Some of your documents have expired and need updating.</p>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-danger btn-sm text-white">
+                    <i class="fas fa-upload me-1"></i> Upload Documents
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
 
 <style>
     /* Custom Styles */

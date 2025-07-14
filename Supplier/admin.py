@@ -35,29 +35,40 @@ class DriverDetailAdmin(admin.ModelAdmin):
 class WaterTankerDocumentAdmin(admin.ModelAdmin):
     list_display = ('water_tanker_name', 'upload_date')
     search_fields = ('water_tanker_name',)
+    list_filter = ('is_approved',)
 
 @admin.action(description="✅ Approve selected tankers")
 def approve_selected(modeladmin, request, queryset):
-    updated = queryset.update(is_approved="Approved")
-    modeladmin.message_user(request, f"{updated} tanker(s) approved.")
-
+    # Update the related WaterTankerDocument instances
+    updated = 0
+    for tanker in queryset:
+        if tanker.document:
+            tanker.document.is_approved = "Approved"
+            tanker.document.save()
+            updated += 1
+    modeladmin.message_user(request, f"{updated} tanker document(s) approved.")
 
 @admin.action(description="❌ Reject selected tankers")
 def reject_selected(modeladmin, request, queryset):
-    updated = queryset.update(is_approved="Rejected")
-    modeladmin.message_user(request, f"{updated} tanker(s) rejected.")
+    # Update the related WaterTankerDocument instances
+    updated = 0
+    for tanker in queryset:
+        if tanker.document:
+            tanker.document.is_approved = "Rejected"
+            tanker.document.save()
+            updated += 1
+    modeladmin.message_user(request, f"{updated} tanker document(s) rejected.")
 
 
 class TankerDetailAdmin(admin.ModelAdmin):
     list_display = (
         'get_water_tanker_name', 'get_is_approved',
-        'view_profile_photo', 'view_driving_license', 'view_aadhar_card',
+        'view_driving_license', 'view_aadhar_card',
         'view_pan_card', 'view_registration_cert', 'view_vehicle_insurance',
         'view_vehicle_permit',
     )
-    list_filter = ('document__is_approved',)
     readonly_fields = (
-        'view_profile_photo', 'view_driving_license', 'view_aadhar_card',
+        'view_driving_license', 'view_aadhar_card',
         'view_pan_card', 'view_registration_cert', 'view_vehicle_insurance',
         'view_vehicle_permit',
     )
@@ -76,12 +87,6 @@ class TankerDetailAdmin(admin.ModelAdmin):
         if file_field:
             return format_html('<a href="{}" target="_blank" style="color:green;">✅ {}</a>', file_field.url, label)
         return format_html('<span style="color:red;">❌ Not uploaded</span>')
-
-    def view_profile_photo(self, obj):
-        if obj.document and obj.document.profile_photo:
-            return format_html('<img src="{}" style="height: 100px; border-radius: 8px;" />', obj.document.profile_photo.url)
-        return format_html('<span style="color:red;">❌ No Photo</span>')
-    view_profile_photo.short_description = "Profile Photo"
 
     def view_driving_license(self, obj):
         return self.render_file_link(obj.document.driving_license, "View License") if obj.document else "N/A"

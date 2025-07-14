@@ -47,7 +47,7 @@
                         <p><strong>Driver Name:</strong> N/A</p> 
                         <p><strong>Phone Number:</strong> N/A</p>
                     {% endif %}
-                    <p><strong>Delivery Date:</strong> {{ order.delivery_date|date:"Y-m-d H:i" }}</p>
+                    
                     <p><strong>Status:</strong> {{ order.order_status }}</p>
 
                     {% if order.order_status != 'Delivered' %}

@@ -52,14 +52,23 @@ AUTHENTICATION_BACKENDS = ['UserManagement.backends.EmailBackend','django.contri
 
 SESSION_COOKIE_SECURE = False
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# Customer-specific session
+CUSTOMER_SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# Supplier-specific session
+SUPPLIER_SESSION_ENGINE = 'django.contrib.sessions.backends.cache' 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'Water_Tanker_Project.middleware.session_override.MultiAppSessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'Water_Tanker_Project.urls'
@@ -147,7 +156,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 
-SESSION_COOKIE_SECURE = False  # for local dev, True if HTTPS
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # default
 
 SESSION_COOKIE_AGE = 3600

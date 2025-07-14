@@ -92,7 +92,7 @@ class UserDetailForm(forms.ModelForm):
 class BookingUserForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'phone_number', 'email']
+        fields = ['first_name', 'last_name', 'phone_number']
 
         widgets = {
             'first_name': forms.TextInput(attrs={
@@ -116,13 +116,6 @@ class BookingUserForm(forms.ModelForm):
                 'required': True,
                 'id': 'id_phone_number'
             }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Email',
-                'pattern': '^[a-zA-Z0-9._%+-]+@gmail\\.com$',
-                'required': True,
-                'id': 'id_email'
-            }),
         }
 
     def clean_first_name(self):
@@ -142,13 +135,6 @@ class BookingUserForm(forms.ModelForm):
         if not re.match(r'^[0-9]{10}$', phone):
             raise forms.ValidationError("Phone number must be exactly 10 digits.")
         return phone
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        if not re.match(r'^[a-zA-Z0-9._%+-]+@gmail\.com$', email):
-            raise forms.ValidationError("Only Gmail addresses are allowed.")
-        return email
-
 # -------------------- TANKER FORM --------------------
 class TankerDetailForm(forms.ModelForm):
     class Meta:

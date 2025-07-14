@@ -7,111 +7,693 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .profile-container,.driver-container,.booking-container{
-            max-width: 720px;
-            margin: auto;
+        :root {
+            --primary-color: #2c7873;
+            --secondary-color: #6fb98f;
+            --accent-color: #004445;
+            --light-color: #f8f9fa;
+            --dark-color: #021c1e;
+            --highlight-color: #ff7d00;
         }
-        .navbar-nav .nav-link {color: #fff;
-        font-weight: bold;
-        padding: 10px 15px;
-        border-radius: 5px;
-        transition: background 0.3s;
-        font-size: medium;
-    }
-    .navbar-nav .nav-link:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
-        
+
+        body {
+            background-color: #f4f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .profile-container, .driver-container, .booking-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 25px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            padding: 0.8rem 0;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: white !important;
+            transition: transform 0.3s;
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+        }
+
+        .navbar-brand i {
+            font-size: 1.8rem;
+            margin-right: 10px;
+            color: var(--highlight-color);
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            margin: 0 3px;
+            position: relative;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 700;
+        }
+
+        .navbar-nav .nav-link i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 2px;
+            right: 5px;
+            font-size: 0.6rem;
+            padding: 3px 6px;
+        }
+
+        .intro-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 70px 0 60px;
+            text-align: center;
+            border-radius: 0 0 25px 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .intro-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
+            opacity: 0.6;
+        }
+
+        .intro-section h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .intro-section p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            position: relative;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            background-color: var(--highlight-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            background-color: #ff6a00;
+            color: white;
+        }
+
+        .hero-bar {
+            padding: 50px 0 40px;
+            background: #fff;
+            position: relative;
+        }
+
+        .hero-bar h2 {
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--dark-color);
+            font-size: 2rem;
+            position: relative;
+        }
+
+        .hero-bar h2::after {
+            content: "";
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--highlight-color);
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+
+        .tanker-btn {
+            transition: all 0.3s ease;
+            border-width: 2px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+        }
+
+        .tanker-btn i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: inherit;
+        }
+
+        .tanker-btn:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tanker-btn .capacity {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+
+        .tanker-btn .price {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .features-section {
+            padding: 70px 0;
+            background: linear-gradient(to bottom, #f8f9fa, #fff);
+        }
+
+        .features-section h2 {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: var(--dark-color);
+            font-size: 2.2rem;
+            position: relative;
+        }
+
+        .features-section h2::after {
+            content: "";
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--highlight-color);
+            margin: 15px auto 30px;
+            border-radius: 2px;
+        }
+
+        .feature-card {
+            background: #fff;
+            padding: 30px 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.4s ease;
+            height: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .stats-section {
+            padding: 70px 0;
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            color: white;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .testimonials-section {
+            padding: 70px 0;
+            background: #f8f9fa;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin: 15px;
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: """;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 4rem;
+            color: rgba(0, 0, 0, 0.05);
+            font-family: serif;
+            line-height: 1;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .testimonial-author {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .testimonial-role {
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--dark-color), var(--accent-color));
+            padding: 50px 0 30px;
+            color: white;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .footer-logo i {
+            color: var(--highlight-color);
+            margin-right: 10px;
+        }
+
+        .footer-links h4 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-links h4::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--highlight-color);
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .footer-links a i {
+            margin-right: 8px;
+            color: var(--highlight-color);
+            width: 20px;
+            text-align: center;
+        }
+
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--highlight-color);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .contact-info {
+            margin-top: 20px;
+        }
+
+        .contact-info p {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-info i {
+            margin-right: 10px;
+            color: var(--highlight-color);
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .intro-section h1 {
+                font-size: 2.4rem;
+            }
+            
+            .intro-section p {
+                font-size: 1.1rem;
+            }
+            
+            .feature-card {
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-container, .driver-container, .booking-container {
+                padding: 20px;
+                margin: 1.5rem auto;
+            }
+
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+
+            .navbar-brand i {
+                font-size: 1.6rem;
+            }
+
+            .navbar-nav .nav-link {
+                font-size: 0.95rem;
+                padding: 8px 12px;
+            }
+
+            .intro-section {
+                padding: 50px 0 40px;
+            }
+
+            .intro-section h1 {
+                font-size: 2rem;
+            }
+
+            .intro-section p {
+                font-size: 1rem;
+            }
+
+            .hero-bar h2 {
+                font-size: 1.8rem;
+            }
+
+            .tanker-btn {
+                font-size: 1rem;
+                padding: 12px;
+            }
+
+            .tanker-btn i {
+                font-size: 2rem;
+            }
+
+            .features-section h2, .testimonials-section h2 {
+                font-size: 1.8rem;
+            }
+
+            .feature-card {
+                margin-bottom: 20px;
+            }
+
+            .footer-links {
+                margin-bottom: 30px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+
+            .navbar-brand i {
+                font-size: 1.4rem;
+            }
+
+            .intro-section h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-bar h2 {
+                font-size: 1.6rem;
+            }
+
+            .tanker-btn .capacity {
+                font-size: 1.1rem;
+            }
+
+            .feature-card h3 {
+                font-size: 1.2rem;
+            }
+
+            .feature-card i {
+                font-size: 2rem;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+
+            .footer-logo {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <i class="fas fa-water fa-lg me-2 text-light"></i> <span class="fw-bold">Water Tanker</span>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-tint"></i>
+                <span>Water Tanker</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-    
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                        <a class="nav-link active" href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
                     </li>
-    
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'booking' %}">Place Order</a>
+                        <a class="nav-link" href="{% url 'booking' %}"><i class="fas fa-truck"></i> Book Tanker</a>
                     </li>
-    
-                    
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'driver_detail' %}">Driver Detail</a>
+                        <a class="nav-link" href="{% url 'driver_detail' %}"><i class="fas fa-id-card"></i> Drivers</a>
                     </li>
-                    
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+                        <a class="nav-link" href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Profile</a>
                     </li>
-    
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'notification' %}">
                             <i class="fas fa-bell"></i> Notifications
                             {% if unread_notifications_count > 0 %}
-                                <span class="badge bg-danger">{{ unread_notifications_count }}</span>
+                                <span class="badge bg-danger notification-badge">{{ unread_notifications_count }}</span>
                             {% endif %}
                         </a>
                     </li>
-    
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">
-                            <i class="fa-solid fa-sign-out-alt"></i> Logout
-                        </a>
+                        <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- Introduction Section -->
+    <section class="intro-section">
+        <div class="container">
+            <h1>Water Delivery Services</h1>
+            <p>Get clean, safe water delivered to your doorstep within hours. Our reliable service ensures you never run dry with our advanced tracking and quality assurance.</p>
+            <a href="{% url 'booking' %}" class="cta-button">
+                <i class="fas fa-truck mr-2"></i> Book Now
+            </a>
+        </div>
+    </section>
+
+    <!-- Hero Bar with Tanker Categories -->
     {% block Hero-bar %}
-        <!-- Tanker Categories -->
-        <div class="container text-center my-4">
-            <h2>Select Tanker Capacity</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <a class="nav-link" href="{%url 'booking' %}">
-                        <button class="btn btn-outline-primary w-100 p-3">
-                            <i class="fa-solid fa-truck"></i> Up to 5000L
-                        </button>
-                    </a>
-                </div>
-                <div class="col-md-4">
-                    <a class="nav-link" href="{%url 'booking' %}">
-                        <button class="btn btn-outline-success w-100 p-3">
-                            <i class="fa-solid fa-truck-moving"></i> 5000 - 10000L
-                        </button>
-                    </a>
-                </div>
-                <div class="col-md-4">
-                    <a class="nav-link" href="{%url 'booking' %}">
-                        <button class="btn btn-outline-danger w-100 p-3">
-                            <i class="fa-solid fa-truck-monster"></i> 10000 - 15000L
-                        </button>
-                    </a>
+        <div class="hero-bar">
+            <div class="container text-center">
+                <h2>Choose Your Tanker Size</h2>
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <a class="nav-link p-0" href="{% url 'booking' %}">
+                            <button class="btn btn-outline-primary tanker-btn w-100">
+                                <i class="fas fa-truck"></i>
+                                <span class="capacity">Up to 5000L</span>
+                                <span class="price">Ideal for homes & small businesses</span>
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <a class="nav-link p-0" href="{% url 'booking' %}">
+                            <button class="btn btn-outline-success tanker-btn w-100">
+                                <i class="fas fa-truck-moving"></i>
+                                <span class="capacity">5000 - 10000L</span>
+                                <span class="price">Perfect for medium establishments</span>
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <a class="nav-link p-0" href="{% url 'booking' %}">
+                            <button class="btn btn-outline-danger tanker-btn w-100">
+                                <i class="fas fa-truck-monster"></i>
+                                <span class="capacity">10000 - 15000L</span>
+                                <span class="price">For large industries & communities</span>
+                            </button>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     {% endblock %}
-    <!-- Live Location Map -->
-    <div class="container">
-        <h2 class="text-center">Live Location</h2>
-        <div class="embed-responsive embed-responsive-16by9">
-            <iframe class="w-100" height="400" src="https://www.google.com/maps/embed" frameborder="0" allowfullscreen></iframe>
-        </div>
-    </div>
+
+
+   
 
     <!-- Footer -->
-    <footer class="bg-primary text-white text-center py-3 mt-4">
-        <p>Water Tanker Booking &copy; 2025</p>
+    <footer>
+                
+        <div class="copyright text-center">
+             <p>&copy; 2025 AquaFlow Water Delivery Services. All Rights Reserved.</p>
+        </div>
     </footer>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add active class to current nav link
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUrl = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentUrl) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Animate elements on scroll
+            const animateOnScroll = function() {
+                const elements = document.querySelectorAll('.feature-card, .testimonial-card');
+                
+                elements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (elementPosition < windowHeight - 100) {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }
+                });
+            };
+            
+            // Set initial state
+            document.querySelectorAll('.feature-card, .testimonial-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s ease';
+            });
+            
+            // Run on load and scroll
+            animateOnScroll();
+            window.addEventListener('scroll', animateOnScroll);
+        });
+    </script>
 </body>
 </html>
