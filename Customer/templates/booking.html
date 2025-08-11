@@ -75,8 +75,8 @@
                                class="form-control {% if user_form.phone_number.errors %}is-invalid{% endif %}"
                                value="{{ user_form.phone_number.value|default_if_none:'' }}"
                                placeholder="Phone Number" required
-                               pattern="[6-9]\d{9}" minlength="10" maxlength="10"
-                               title="Enter a valid 10-digit Indian phone number starting with 6-9">
+                               pattern="^(?!.*(\d)\1{9})[6-9]\d{9}$" minlength="10" maxlength="10"
+                               title="Enter a valid 10-digit Indian phone number starting with 6-9 And No Repeater Characters">
                         <label for="id_phone_number">Phone Number</label>
                         {% if user_form.phone_number.errors %}
                         <div class="invalid-feedback d-block">
@@ -95,12 +95,14 @@
                 <!-- Address Line -->
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <input type="text" name="address_line" id="id_address_line" 
-                               class="form-control {% if location_form.address_line.errors %}is-invalid{% endif %}"
-                               value="{{ location_form.address_line.value|default_if_none:'' }}"
-                               placeholder="Address Line" required
-                               pattern="^[A-Za-z0-9\s,.-]{5,100}$"
-                               title="Address should be 5-100 characters and may include letters, numbers, commas, dots, and hyphens">
+                      <input type="text" name="address_line" id="id_address_line" 
+                        class="form-control {% if location_form.address_line.errors %}is-invalid{% endif %}"
+                        value="{{ location_form.address_line.value|default_if_none:'' }}"
+   
+                        placeholder="Address Line" required
+                        pattern="^(?!([A-Za-z0-9\s,.\-])\1{4,99})[A-Za-z0-9\s,.\-]{5,100}$"
+                        title="Address should be 5-100 characters and may include letters, numbers, commas, dots, and hyphens and No repeated character">
+
                         <label for="id_address_line">Address Line</label>
                         {% if location_form.address_line.errors %}
                         <div class="invalid-feedback d-block">
@@ -119,8 +121,8 @@
                                class="form-control {% if location_form.street.errors %}is-invalid{% endif %}"
                                value="{{ location_form.street.value|default_if_none:'' }}"
                                placeholder="Street" required
-                               pattern="^[A-Za-z\s]{3,50}$"
-                               title="Street name should contain only letters and spaces (3-50 characters)">
+                               pattern="^(?!([A-Za-z\s])\1{2,49})[A-Za-z\s]{3,50}$ "
+                               title="Street name should contain only letters and spaces (3-50 characters) and No repeated character">
                         <label for="id_street">Street</label>
                         {% if location_form.street.errors %}
                         <div class="invalid-feedback d-block">
@@ -139,8 +141,8 @@
                                class="form-control {% if location_form.landmark.errors %}is-invalid{% endif %}"
                                value="{{ location_form.landmark.value|default_if_none:'' }}"
                                placeholder="Landmark"
-                               pattern="^[A-Za-z0-9\s,.-]{0,100}$"
-                               title="Landmark may include letters, numbers, commas, dots, and hyphens">
+                               pattern="^(?!([A-Za-z0-9\s,.\-])\1{0,99})[A-Za-z0-9\s,.\-]{1,100}$"
+                               title="Landmark may include letters, numbers, commas, dots, and hyphens and No repeated character">
                         <label for="id_landmark">Landmark</label>
                         {% if location_form.landmark.errors %}
                         <div class="invalid-feedback d-block">
@@ -157,8 +159,8 @@
                                class="form-control {% if location_form.city.errors %}is-invalid{% endif %}"
                                value="{{ location_form.city.value|default_if_none:'' }}"
                                placeholder="City" required
-                               pattern="^[A-Za-z\s]{2,50}$"
-                               title="City name should contain only letters and spaces (2-50 characters)">
+                               pattern="^(?!([A-Za-z\s])\1{1,49})[A-Za-z\s]{2,50}$"
+                               title="City name should contain only letters and spaces (2-50 characters) and No repeated character">
                         <label for="id_city">City</label>
                         {% if location_form.city.errors %}
                         <div class="invalid-feedback d-block">
@@ -190,25 +192,6 @@
                     </div>
                 </div>
 
-                <!-- Country Dropdown -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <select name="country" class="form-select {% if location_form.country.errors %}is-invalid{% endif %}" id="id_country" required>
-                            <option value="" disabled {% if not location_form.country.value %}selected{% endif %}>Select Country</option>
-                            <option value="India" {% if location_form.country.value == "India" %}selected{% endif %}>India</option>
-                            <option value="USA" {% if location_form.country.value == "USA" %}selected{% endif %}>USA</option>
-                            <option value="UK" {% if location_form.country.value == "UK" %}selected{% endif %}>UK</option>
-                            <option value="Canada" {% if location_form.country.value == "Canada" %}selected{% endif %}>Canada</option>
-                            <option value="Australia" {% if location_form.country.value == "Australia" %}selected{% endif %}>Australia</option>
-                        </select>
-                        <label for="id_country">Country</label>
-                        {% if location_form.country.errors %}
-                        <div class="invalid-feedback d-block">{{ location_form.country.errors.0 }}</div>
-                        {% else %}
-                        <div class="invalid-feedback">Please select a country.</div>
-                        {% endif %}
-                    </div>
-                </div>
                     
                 <!-- Pincode -->
                 <div class="col-md-6">
@@ -230,7 +213,7 @@
                             {{ location_form.pincode.errors.0 }}
                         </div>
                         {% else %}
-                        <div class="invalid-feedback">Enter a valid 6-digit pincode (not all same digits).</div>
+                        <div class="invalid-feedback">Enter a valid 6-digit pincode (not all same digits) and No repeated character</div>
                         {% endif %}
                     </div>
                 </div>

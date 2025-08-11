@@ -9,7 +9,7 @@ class LocationDetail(models.Model):
     landmark = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
+    country = models.CharField(max_length=255,default="India")
     pincode = models.CharField(max_length=6,blank=True, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
@@ -19,11 +19,19 @@ class LocationDetail(models.Model):
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='customer')
+    email = models.EmailField(unique=True)
+    forgot_password_token = models.CharField(max_length=100)
+    create_at = models.DateTimeField(auto_now_add=True)
     location = models.ForeignKey(LocationDetail,on_delete=models.CASCADE)
+    def save(self, *args, **kwargs):
+        # Auto-fill email from CustomUser
+        if self.user:
+            self.email = self.user.email
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
-# -------------------- Orders --------------------
+    # -------------------- Orders --------------------
 class OrderDetail(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -77,6 +85,7 @@ class Notification(models.Model):
     supplier = models.ForeignKey(SupplierProfile, on_delete=models.CASCADE)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
+    initiated_by = models.CharField(max_length=10, choices=(('customer', 'Customer'), ('supplier', 'Supplier')), default='customer')
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

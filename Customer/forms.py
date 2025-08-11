@@ -40,7 +40,7 @@ class UserDetailForm(forms.ModelForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Phone Number',
-            'pattern': '[0-9]{10}',
+            'pattern': '^(?!.*(\d)\1{9})[6-9]\d{9}$',
             'title': 'Enter a 10-digit phone number',
             'id': 'id_phone_number'
         })
@@ -174,7 +174,7 @@ class TankerDetailForm(forms.ModelForm):
 class LocationDetailForm(forms.ModelForm):
     class Meta:
         model = LocationDetail
-        fields = ['address_line', 'street', 'landmark', 'city', 'state', 'country', 'pincode']
+        fields = ['address_line', 'street', 'landmark', 'city', 'state','pincode']
 
         widgets = {
             'address_line': forms.TextInput(attrs={
@@ -208,11 +208,6 @@ class LocationDetailForm(forms.ModelForm):
                 'class': 'form-select',
                 'required': True,
                 'id': 'id_state'
-            }),
-            'country': forms.Select(attrs={
-                'class': 'form-select',
-                'required': True,
-                'id': 'id_country'
             }),
             'pincode': forms.TextInput(attrs={
                 'class': 'form-control',

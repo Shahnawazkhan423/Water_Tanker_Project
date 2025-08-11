@@ -1,5 +1,4 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from Supplier.models import *
 from Customer.models import *
 from Customer.forms import UserDetailForm, TankerDetailForm,LocationDetailForm,BookingUserForm
 from django.contrib import messages
@@ -9,13 +8,21 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from geopy.distance import geodesic
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
+from .helper import send_forgot_password_mail
+import uuid 
 
 @csrf_exempt
 def register_view(request):
     if request.method == "POST":
         user_form = UserDetailForm(request.POST, request.FILES)
         location_form = LocationDetailForm(request.POST)
-        
+        email = request.POST.get("email")
+            # Check if email exists
+        if CustomerProfile.objects.filter(email=email).exists():
+                messages.error(request, "Email ID already exists.")
+                print("Email ID already exists.")
+                return redirect("register")  
         if user_form.is_valid() and location_form.is_valid():
             location = location_form.save()
 
@@ -24,7 +31,7 @@ def register_view(request):
             user.password = make_password(user_form.cleaned_data['password'])
             user.save()
 
-            messages.success(request, 'Registration successful.')
+            messages.success(request, 'Registration successful-----.')
             CustomerProfile.objects.create(user=user, location=location)
             return redirect("login")  
         
@@ -43,7 +50,7 @@ def login_view(request):
         email = request.POST.get('email')
         password = request.POST.get('id_passwords')
         user = authenticate(request, email=email, password=password)
-        if user is not None and isinstance(user, CustomUser):
+        if user is not None and isinstance(user, CustomerProfile):
             login(request, user)
             return redirect('home')
         
@@ -114,12 +121,16 @@ def booking(request):
             except Exception as e:
                 messages.error(request, f"❌ Something went wrong: {str(e)}")
         else:
-            messages.error(request, "⚠️ Please correct the errors in the form.")
+            messages.error(request, "⚠️ Please fill in all required fields correctly before submitting the form.")
     else:
         user_form = BookingUserForm(instance=request.user)
         tanker_form = TankerDetailForm()
-        location_form = LocationDetailForm()
-
+        try:
+            customer_profile = CustomerProfile.objects.get(user=request.user)
+            location_instance = customer_profile.location
+            location_form = LocationDetailForm(instance=location_instance)
+        except CustomerProfile.DoesNotExist:
+            location_form = LocationDetailForm()
     return render(request, 'booking.html', {
         'user_form': user_form,
         'tanker_form': tanker_form,
@@ -128,7 +139,10 @@ def booking(request):
     })
 @login_required(login_url="login")
 def driver_detail(request):
-    orders = OrderDetail.objects.filter(user=request.user,order_status='Accepted')
+    orders = OrderDetail.objects.filter(
+        Q(user=request.user),
+        Q(order_status='Accepted') | Q(order_status='On The Way')
+    )
     return render(request, 'driver_detail.html', {'orders':orders})
 
 @login_required(login_url="login")
@@ -149,21 +163,26 @@ def update_profile_image(request):
     return redirect('profile')  
    
 @login_required(login_url="login")
-def notification_view(request):
-    try:
-        supplier_profile = request.user.supplier 
-    except Exception:
+def notification(request):
+    user = request.user
+
+    if user.user_type != "customer":
         return render(request, 'notification.html', {'notifications': []})
 
-    notifications = Notification.objects.filter(supplier=supplier_profile).order_by('-timestamp')
-    return render(request, 'notification.html', {'notifications': notifications})
-
+    notifications = Notification.objects.filter(
+        customer=user,
+        initiated_by='supplier'
+    ).order_by('-timestamp')
+    context = {
+        'notifications': notifications
+    }
+    return render(request, 'notification.html', context)
 def cancel_order(request, order_id):
     order = get_object_or_404(OrderDetail, id=order_id, user=request.user)
 
     if order.order_status in ['On the Way', 'Delivered']:
         messages.warning(request, "This order cannot be cancelled.")
-        return redirect("driver_detail", order_id=order.id)  
+        return redirect("driver_detail")  
 
     if request.method == "POST":
         order.order_status = 'Canceled'
@@ -175,7 +194,8 @@ def cancel_order(request, order_id):
         Notification.objects.create(
             customer=request.user,
             supplier=supplier,  
-            message=f"Order ID {order.id} has been cancelled by the customer."
+            message=f"Order ID {order.id} has been cancelled by the customer.",
+            initiated_by='customer'
         )
         messages.success(request, "Order has been cancelled successfully.")
         context = {
@@ -188,5 +208,59 @@ def cancel_order(request, order_id):
 @login_required
 def delete_notification(request, id):
     if request.method == 'POST':
-        notification = get_object_or_404(Notification, id=id, supplier__user=request.user)
-        notification.delete()
+        notif = get_object_or_404(Notification, id=id)
+        notif.delete()
+        return redirect('notification')
+
+def forgot_password(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        print("Email entered:", email)
+
+        user_obj = CustomUser.objects.filter(email=email).first()
+        if not user_obj:
+            messages.error(request, "No user found with this email.")
+            return redirect("forgot_password")
+
+        # Generate and save token
+        token = str(uuid.uuid4())
+        profile, created = CustomerProfile.objects.get_or_create(user=user_obj)
+        profile.forgot_password_token = token
+        profile.save()
+
+        if send_forgot_password_mail(request, user_obj.email, token):
+            messages.success(request, "An email has been sent with password reset instructions.")
+        else:
+            messages.error(request, "We couldn't send the reset email. Please try again later.")
+
+        return redirect("forgot_password")
+
+    return render(request, "forgot_password.html")
+
+
+def reset_password(request, token):
+    profile_obj = CustomerProfile.objects.filter(forgot_password_token=token).first()
+    if not profile_obj:
+        messages.error(request, "Invalid or expired reset link.")
+        return redirect("forgot_password")
+
+    if request.method == "POST":
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if new_password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect(f"/Customer/reset-password/{token}/")
+
+        user_obj = profile_obj.user
+        user_obj.set_password(new_password)
+        user_obj.save()
+
+        # Clear the token after reset
+        profile_obj.forgot_password_token = None
+        profile_obj.save()
+
+        messages.success(request, "Password reset successfully. Please log in.")
+        return redirect("login")
+
+    return render(request, "reset_passwords.html", {'user_id': profile_obj.user.id})
