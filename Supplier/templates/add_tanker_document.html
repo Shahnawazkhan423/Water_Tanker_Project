@@ -1,19 +1,18 @@
-<!-- add_tanker_document.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Tanker Document</title>
-</head>
-<body>
-    <h1>Add Tanker Document</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ document_form.as_p }}
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
+    <div class="form-group">
+        {{ tanker_detail_form.capacity.label_tag }}
+        {{ tanker_detail_form.capacity }}
+        {{ tanker_detail_form.capacity.errors }}
+    </div>
 
-        <button type="submit">Submit</button>
-    </form>
-</body>
-</html>
+    <div class="form-group">
+        {{ tanker_detail_form.category.label_tag }}
+        {{ tanker_detail_form.category }}
+        {{ tanker_detail_form.category.errors }}
+    </div>
+
+    <button type="submit">Submit</button>
+</form>

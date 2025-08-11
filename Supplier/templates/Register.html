@@ -167,7 +167,7 @@
                   class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
                   value="{{ form.first_name.value|default_if_none:'' }}"
                   placeholder="First Name" required 
-                  pattern="^(?!.*(.)\1{2})[A-Za-z\s]{2,30}$"
+                  pattern="^(?!.*([A-Za-z])\1{2})[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,30}$"
                   title="First name (2-30 letters) with no 3 same consecutive characters">
             <label for="id_first_name">First Name</label>
             {% if form.first_name.errors %}
@@ -184,7 +184,7 @@
                   class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
                   value="{{ form.last_name.value|default_if_none:'' }}"
                   placeholder="Last Name" required 
-                  pattern="^(?!.*(.)\1{2})[A-Za-z\s]{2,30}$"
+                  pattern="^(?!.*([A-Za-z])\1{2})[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,30}$"
                   title="Last name (2-30 letters) with no 3 same consecutive characters">
             <label for="id_last_name">Last Name</label>
             {% if form.last_name.errors %}
@@ -196,21 +196,25 @@
           </div>
 
           <!-- Phone Number -->
-            <div class="form-floating col-md-6">
-                <input type="tel" name="phone_number" id="id_phone_number"
-                      class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
-                      value="{{ form.phone_number.value|default_if_none:'' }}"
-                      placeholder="Phone Number" required pattern="[0-9]{10}" minlength="10" maxlength="10"
-                      title="Enter a valid 10-digit phone number">
-                <label for="id_phone_number">Phone Number</label>
-                {% if form.phone_number.errors %}
-                  <div class="invalid-feedback d-block">{{ form.phone_number.errors.0 }}</div>
-                {% else %}
-                  <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
-                  <div class="valid-feedback">Valid phone number.</div>
-                {% endif %}
+           <div class="form-floating col-md-6">
+            <input type="tel" name="phone_number" id="id_phone_number"
+                  class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
+                  value="{{ form.phone_number.value|default_if_none:'' }}"
+                  placeholder="Phone Number" required 
+                  pattern="^(?!.*(\d)\1{9})[6-9]\d{9}$"
+                  minlength="10" maxlength="10"
+                  title="Enter a valid 10-digit phone number (digits only)">
+            <label for="id_phone_number">Phone Number</label>
+            <div class="invalid-feedback" id="phone_number_error">
+              {% if form.phone_number.errors %}
+                {{ form.phone_number.errors.0 }}
+              {% else %}
+                
+                <div class="invalid-feedback">Valid 10-digit number, start 6–9, no repeats.</div>
+              {% endif %}
             </div>
-
+            <div class="valid-feedback">Valid phone number.</div>
+          </div>
 
         <!-- Email -->
           <div class="form-floating col-md-6">
@@ -218,8 +222,8 @@
                   class="form-control {% if form.email.errors %}is-invalid{% endif %}"
                   value="{{ form.email.value|default_if_none:'' }}"
                   placeholder="Email" required
-                  pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
-                  title="Only Gmail addresses are allowed">
+                  pattern="^(?!.*([a-zA-Z0-9._%+-])\1{2})[a-zA-Z][a-zA-Z0-9._%+-]{2,63}@gmail\.com$"
+                  title="Must be a Gmail address, start with a letter, 3–64 characters before @, no three identical characters in a row.">
             <label for="id_email">Email</label>
             {% if form.email.errors %}
               <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
@@ -252,8 +256,8 @@
           <div class="col-md-6">
             <div class="form-floating mb-3">
               <input type="text" class="form-control" id="id_address_line" name="address_line"
-                    placeholder="Address Line" required pattern="^[A-Za-z0-9\s,.-]{5,100}$"
-                    title="Address should be 5-100 characters and may include letters, numbers, commas, dots, and hyphens.">
+                    placeholder="Address Line" required pattern="^(?!.*(.)\1{4})[A-Za-z0-9\s,.\-\/]{5,100}$"
+                    title="Address should be 5-100 characters and may include letters, numbers, commas, dots, and hyphens and No repeated character.">
               <label for="id_address_line">Address Line</label>
               <div class="invalid-feedback">Please enter a valid address (min 5 characters).</div>
               <div class="valid-feedback">Valid address.</div>
@@ -264,8 +268,8 @@
           <div class="col-md-6">
             <div class="form-floating mb-3">
               <input type="text" class="form-control" id="id_street" name="street"
-                    placeholder="Street" required pattern="^[A-Za-z\s]{3,50}$"
-                    title="Street name should contain only letters and spaces, min 3 characters.">
+                    placeholder="Street" required pattern="^(?!.*([A-Za-z])\1{2})[A-Za-z\s]{3,50}$"
+                    title="Street name should contain only letters and spaces, min 3 characters. and No repeated character">
               <label for="id_street">Street</label>
               <div class="invalid-feedback">Enter a valid street name (min 3 letters).</div>
               <div class="valid-feedback">Valid street name.</div>
@@ -276,8 +280,8 @@
           <div class="col-md-6">
             <div class="form-floating mb-3">
               <input type="text" class="form-control" id="id_landmark" name="landmark"
-                    placeholder="Landmark" pattern="^[A-Za-z0-9\s,.-]{0,100}$"
-                    title="Optional: letters, numbers, commas, dots, or hyphens allowed.">
+                    placeholder="Landmark" pattern="^$|^(?!.*(.)\1{4})[A-Za-z0-9\s,.\-]{1,100}$"
+                    title="Optional: letters, numbers, commas, dots, or hyphens allowed and No repeated character">
               <label for="id_landmark">Landmark</label>
               <div class="valid-feedback">Optional field.</div>
             </div>
@@ -287,8 +291,8 @@
           <div class="col-md-6">
             <div class="form-floating mb-3">
               <input type="text" class="form-control" id="id_city" name="city"
-                    placeholder="City" required pattern="^[A-Za-z\s]{2,50}$"
-                    title="City name must contain only letters and spaces (min 2 characters).">
+                    placeholder="City" required pattern="^(?!.*([A-Za-z])\1{1})[A-Za-z\s]{2,50}$"
+                    title="City name must contain only letters and spaces (min 2 characters)No repeated character">
               <label for="id_city">City</label>
               <div class="invalid-feedback">Enter a valid city name (letters only).</div>
               <div class="valid-feedback">Valid city name.</div>
@@ -314,22 +318,6 @@
           </div>
 
 
-          <div class="col-md-6">
-            <div class="form-floating mb-3">
-              <select class="form-select" id="id_country" name="country" required>
-                <option value="" selected disabled>Select Country</option>
-                <option value="India">India</option>
-                <option value="USA">USA</option>
-                <option value="UK">UK</option>
-                <option value="Canada">Canada</option>
-                <option value="Australia">Australia</option>
-                <!-- Add more countries as needed -->
-              </select>
-              <label for="id_country">Country</label>
-              <div class="invalid-feedback">Please select a country.</div>
-              <div class="valid-feedback">Country selected.</div>
-            </div>
-          </div>
 
 
          <div class="col-md-6">
@@ -359,142 +347,184 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const form = document.querySelector('.needs-validation');
-      const profileImageInput = document.getElementById('id_profile_image');
-      const previewImage = document.getElementById('preview-image');
-      const profileImageErrorDiv = document.getElementById('profile_image_error');
-      
-      // Password strength indicator
-      const passwordInput = document.getElementById('id_passwords');
-      const passwordStrengthSpan = document.getElementById('password-strength');
-      
-      // Real-time validation for all fields
-      const inputs = form.querySelectorAll('input, select');
-      
-      // Add input event listeners for real-time validation
-      inputs.forEach(input => {
-        // Skip the profile image input as it has its own handler
-        if (input.id !== 'id_profile_image') {
-          input.addEventListener('input', function() {
-            validateField(this);
-            
-            // Special handling for password field
-            if (this.id === 'id_passwords') {
-              updatePasswordStrength(this.value);
-            }
-          });
-          
-          // For select elements, validate on change
-          if (input.tagName === 'SELECT') {
-            input.addEventListener('change', function() {
-              validateField(this);
-            });
-          }
-        }
-      });
-      
-      function validateField(field) {
-        const isValid = field.checkValidity();
-        const formGroup = field.closest('.form-floating') || field.closest('.col-md-6');
-        
-        if (formGroup) {
-          if (field.value.trim() === '' && !field.hasAttribute('required')) {
-            // Optional field - remove validation classes
-            field.classList.remove('is-valid', 'is-invalid');
-          } else {
-            if (isValid) {
-              field.classList.remove('is-invalid');
-              field.classList.add('is-valid');
-              
-              // Additional check for repeated characters in text fields
-              if (field.type === 'text' && field.id !== 'id_pincode' && field.id !== 'id_phone_number') {
-                if (/(.)\1{2}/.test(field.value)) {
-                  field.classList.remove('is-valid');
-                  field.classList.add('is-invalid');
-                  const errorDiv = formGroup.querySelector('.invalid-feedback');
-                  if (errorDiv) errorDiv.textContent = 'Too many repeating characters';
+        document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.needs-validation');
+        const profileImageInput = document.getElementById('id_profile_image');
+        const previewImage = document.getElementById('preview-image');
+        const profileImageErrorDiv = document.getElementById('profile_image_error');
+        const passwordInput = document.getElementById('id_passwords');
+        const passwordStrengthSpan = document.getElementById('password-strength');
+        const inputs = form.querySelectorAll('input, select');
+
+        // Validate individual field and return true if valid, false otherwise
+        function validateField(field) {
+          const isValid = field.checkValidity();
+          const formGroup = field.closest('.form-floating') || field.closest('.col-md-6');
+          let customError = '';
+
+          if (!formGroup) return true; // Skip if no parent container
+
+          // Handle empty required fields
+          if (field.hasAttribute('required') && !field.value.trim()) {
+            customError = field.dataset.error || field.title || 'This field is required.';
+          } else if (field.value.trim()) {
+            // Custom validations for specific fields
+            if (field.type === 'text' || field.type === 'tel' || field.type === 'email' || field.type === 'password') {
+              if (field.pattern) {
+                const regex = new RegExp(`^${field.pattern}$`);
+                if (!regex.test(field.value)) {
+                  customError = field.title || 'Invalid format.';
                 }
               }
-            } else {
-              field.classList.remove('is-valid');
-              field.classList.add('is-invalid');
+              // Specific validation for phone number
+              if (field.id === 'id_phone_number') {
+                if (!/^[6-9][0-9]{9}$/.test(field.value)) {
+                  customError = 'Please enter a valid 10-digit phone number starting with 6-9.';
+                }
+              }
+              // Check for repeating characters
+              if (field.id === 'id_first_name' || field.id === 'id_last_name') {
+                if (/(.)\1{2}/.test(field.value)) {
+                  customError = 'No 3 same consecutive characters allowed.';
+                }
+              } else if (field.id === 'id_passwords') {
+                if (/(.)\1{3}/.test(field.value)) {
+                  customError = 'No 4 same consecutive characters allowed.';
+                }
+              } else if (field.id === 'id_pincode') {
+                if (/([0-9])\1{5}/.test(field.value)) {
+                  customError = 'Pincode cannot have all identical digits.';
+                }
+              }
+            }
+            // Handle select fields
+            if (field.tagName === 'SELECT' && field.value === '') {
+              customError = 'Please select a state.';
             }
           }
+
+          // Update validation classes and error messages
+          const errorDiv = formGroup.querySelector('.invalid-feedback');
+          const validDiv = formGroup.querySelector('.valid-feedback');
+
+          if (customError || !isValid) {
+            field.classList.remove('is-valid');
+            field.classList.add('is-invalid');
+            if (errorDiv) errorDiv.textContent = customError || field.title || 'Invalid input.';
+            if (validDiv) validDiv.style.display = 'none';
+            return false;
+          } else {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+            if (errorDiv) errorDiv.textContent = '';
+            if (validDiv) validDiv.style.display = 'block';
+            return true;
+          }
         }
-      }
-      
-      function updatePasswordStrength(password) {
-        let strength = 'Weak';
-        let strengthClass = 'text-danger';
-        
-        // Check for repeated characters
-        const hasRepeatingChars = /(.)\1{3,}/.test(password);
-        
-        if (hasRepeatingChars) {
-          strength = 'Weak - Repeated characters';
-          strengthClass = 'text-danger';
-        } 
-        else if (password.length >= 12) {
-          strength = 'Very Strong';
-          strengthClass = 'text-success';
-        } 
-        else if (password.length >= 10) {
-          strength = 'Strong';
-          strengthClass = 'text-success';
-        } 
-        else if (password.length >= 8) {
-          strength = 'Good';
-          strengthClass = 'text-warning';
-        }
-        
-        passwordStrengthSpan.textContent = strength;
-        passwordStrengthSpan.className = strengthClass;
-      }
 
-      profileImageInput.addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        profileImageErrorDiv.textContent = '';
+        // Update password strength indicator
+        function updatePasswordStrength(password) {
+          let strength = 'Weak';
+          let strengthClass = 'text-danger';
 
-        if (file) {
-          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-          const maxSize = 2 * 1024 * 1024;
-
-          if (!allowedTypes.includes(file.type)) {
-            profileImageErrorDiv.textContent = 'Allowed: JPG, PNG, GIF.';
-            previewImage.src = "/static/image/Profile_Default_Image.jpg";
-            profileImageInput.value = '';
-            return;
+          if (/(.)\1{3}/.test(password)) {
+            strength = 'Weak - Repeated characters';
+            strengthClass = 'text-danger';
+          } else if (password.length >= 12 && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) {
+            strength = 'Very Strong';
+            strengthClass = 'text-success';
+          } else if (password.length >= 10 && (/[A-Z]/.test(password) || /[0-9]/.test(password))) {
+            strength = 'Strong';
+            strengthClass = 'text-success';
+          } else if (password.length >= 8) {
+            strength = 'Good';
+            strengthClass = 'text-warning';
           }
 
-          if (file.size > maxSize) {
-            profileImageErrorDiv.textContent = 'Max size 2MB.';
-            previewImage.src = "/static/image/Profile_Default_Image.jpg";
+          passwordStrengthSpan.textContent = strength;
+          passwordStrengthSpan.className = strengthClass;
+        }
+
+        // Validate profile image
+        function validateProfileImage(file) {
+          profileImageErrorDiv.textContent = '';
+          if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            const maxSize = 2 * 1024 * 1024; // 2MB
+            if (!allowedTypes.includes(file.type)) {
+              profileImageErrorDiv.textContent = 'Allowed: JPG, PNG, GIF.';
+              return false;
+            }
+            if (file.size > maxSize) {
+              profileImageErrorDiv.textContent = 'Max size 2MB.';
+              return false;
+            }
+            return true;
+          }
+          return true; // Optional field
+        }
+
+        // Real-time validation for all inputs
+        inputs.forEach(input => {
+          if (input.id !== 'id_profile_image') {
+            input.addEventListener('input', function () {
+              validateField(this);
+              if (this.id === 'id_passwords') {
+                updatePasswordStrength(this.value);
+              }
+            });
+            if (input.tagName === 'SELECT') {
+              input.addEventListener('change', function () {
+                validateField(this);
+              });
+            }
+          }
+        });
+
+        // Profile image change handler
+        profileImageInput.addEventListener('change', function (event) {
+          const file = event.target.files[0];
+          if (file && validateProfileImage(file)) {
+            const reader = new FileReader();
+            reader.onload = e => previewImage.src = e.target.result;
+            reader.readAsDataURL(file);
+          } else {
+            previewImage.src = '/static/image/Profile_Default_Image.jpg';
             profileImageInput.value = '';
-            return;
+          }
+        });
+
+        // Form submission handler
+        form.addEventListener('submit', function (event) {
+          let isFormValid = true;
+          inputs.forEach(input => {
+            if (!validateField(input)) {
+              isFormValid = false;
+            }
+          });
+
+          // Validate profile image separately
+          if (profileImageInput.files[0] && !validateProfileImage(profileImageInput.files[0])) {
+            isFormValid = false;
           }
 
-          const reader = new FileReader();
-          reader.onload = e => previewImage.src = e.target.result;
-          reader.readAsDataURL(file);
-        }
-      });
+          if (!isFormValid) {
+            event.preventDefault();
+            event.stopPropagation();
+            form.classList.add('was-validated');
+          }
+        });
 
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
+        // Initial validation for pre-filled fields
+        inputs.forEach(input => {
+          if (input.value) {
+            validateField(input);
+            if (input.id === 'id_passwords') {
+              updatePasswordStrength(input.value);
+            }
+          }
+        });
       });
-      
-      // Initial validation for pre-filled fields
-      inputs.forEach(input => {
-        if (input.value) {
-          validateField(input);
-        }
-      });
-    });
   </script>
 </body>
 </html>

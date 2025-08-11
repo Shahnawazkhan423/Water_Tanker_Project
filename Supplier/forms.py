@@ -1,5 +1,5 @@
 from django import forms
-from Supplier.models import LocationDetail,TankerDetail,WaterTankerDocument
+from Supplier.models import LocationDetail,TankerDetail,WaterTankerDocument,SupplierProfile
 from UserManagement.models import CustomUser
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
@@ -42,7 +42,7 @@ class SupplierRegistrationForm(forms.ModelForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Phone Number',
-            'pattern': '[0-9]{10}',
+            'pattern': '^(?!.*(\d)\1{9})[6-9]\d{9}$',
             'title': 'Enter a 10-digit phone number',
             'id': 'id_phone_number'
         })
@@ -71,6 +71,7 @@ class SupplierRegistrationForm(forms.ModelForm):
         if not re.match(r'^[a-zA-Z0-9._%+-]+@gmail\.com$', email):
             raise forms.ValidationError("Only Gmail addresses are allowed.")
         return email
+   
     
     def clean_first_name(self):
         data = self.cleaned_data['first_name']
@@ -92,18 +93,21 @@ class SupplierRegistrationForm(forms.ModelForm):
         return user
 
 class SupplierTankerDetailForm(forms.ModelForm):
+    category = forms.ChoiceField(
+            choices=[('', 'Select Category')] + TankerDetail.CATEGORY_CHOICES,
+            widget=forms.Select(attrs={'class': 'form-control'}),
+            label='Category'
+        )
+
     class Meta:
         model = TankerDetail
         fields = ['capacity', 'category']
         widgets = {
             'capacity': forms.NumberInput(attrs={'class': 'form-control'}),
-            'category': forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
             'capacity': 'Capacity',
-            'category': 'Category',
         }
-
 class SupplierLocationDetailForm(forms.ModelForm):
     pincode = forms.CharField(
         max_length=6,
@@ -111,7 +115,7 @@ class SupplierLocationDetailForm(forms.ModelForm):
     )
     class Meta:
         model = LocationDetail
-        fields = ['address_line', 'street', 'landmark', 'city', 'state', 'country','pincode']
+        fields = ['address_line', 'street', 'landmark', 'city', 'state','pincode']
 
 
 ALLOWED_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.png']  

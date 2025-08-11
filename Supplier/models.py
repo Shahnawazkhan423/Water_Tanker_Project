@@ -8,23 +8,29 @@ class LocationDetail(models.Model):
     landmark = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
+    country = models.CharField(max_length=255,default="India")
     pincode = models.CharField(max_length=10)
     latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
-                                    
+    longitude = models.FloatField(blank=True, null=True)                             
     def __str__(self):
         return f"{self.address_line}, {self.city}"
 
 class SupplierProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='supplier')
+    email = models.EmailField(unique=True)
     is_available = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     location = models.ForeignKey(LocationDetail,on_delete=models.CASCADE)
+    def save(self, *args, **kwargs):
+        # Auto-fill email from CustomUser
+        if self.user:
+            self.email = self.user.email
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name},{self.user.email}.{self.user.password}"
-# -------------------- Driver --------------------
+        return f"{self.user.first_name} {self.user.last_name}"
+
+   # -------------------- Driver --------------------
 class DriverAvailability(models.Model):
     STATUS_CHOICES = [
         ('available', 'Available'),

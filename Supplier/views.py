@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from Supplier.models import *
-from Customer.models import *
+from Customer.models import Notification,OrderDetail
 from Supplier.forms import SupplierRegistrationForm,SupplierLocationDetailForm,SupplierTankerDetailForm,WaterTankerForm
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
@@ -16,12 +16,16 @@ from datetime import time
 from django.utils.timezone import now
 from .utils import human_readable_joined_date
 from django.views.decorators.csrf import csrf_exempt
-
 @csrf_exempt
 def register_view(request):
     if request.method == "POST":
         user_form = SupplierRegistrationForm(request.POST, request.FILES)
         location_form = SupplierLocationDetailForm(request.POST)
+
+        email = request.POST.get("email")  # Directly fetch from POST
+        if email and SupplierProfile.objects.filter(email=email).exists():
+            messages.error(request, "Email ID already exists.")
+            return redirect("Register_page")
 
         if user_form.is_valid() and location_form.is_valid():
             location = location_form.save()
@@ -48,13 +52,13 @@ def register_view(request):
                 user=user,  
                 availability=driver_availability
             )
-
-            request.session['supplier_email'] = user.email
-
+            request.session['supplier_id'] = user.id
+            request.session.set_expiry(3600)
+            user = authenticate(request, email=user.email, password=user_form.cleaned_data['password'])
+            if user is not None:
+                login(request, user) 
             messages.success(request, 'Registration successful.')
-            return redirect('tanker_detail')
-        else:
-            messages.error(request, 'Please correct the form errors.')
+            return redirect("tanker_detail")
     else:
         user_form = SupplierRegistrationForm()
         location_form = SupplierLocationDetailForm()
@@ -65,22 +69,22 @@ def register_view(request):
     })
 
 @csrf_exempt
+@login_required(login_url="Login_page")
 def tanker_detail_view(request):
     if request.method == "POST":
         document_form = WaterTankerForm(request.POST, request.FILES)
         tanker_detail_form = SupplierTankerDetailForm(request.POST)
-
+    
         if document_form.is_valid() and tanker_detail_form.is_valid():
             water_tanker_name = document_form.cleaned_data.get('water_tanker_name')
             document_instance = document_form.save(commit=False)
             document_instance.water_tanker_name = water_tanker_name
             document_instance.save()
-            email = request.session.get('supplier_email')
-            if not email:
+            supplier_id = request.session.get('supplier_id')
+            if not supplier_id:
                 messages.error(request, "Session expired. Please register again.")
                 return redirect('Register_page')
-
-            supplier_profile = SupplierProfile.objects.filter(user__email=email).first()
+            supplier_profile = SupplierProfile.objects.filter(user__id=supplier_id).first()
             if not supplier_profile:
                 messages.error(request, "Supplier profile not found.")
                 return redirect("Register_page")
@@ -106,6 +110,7 @@ def tanker_detail_view(request):
                 available=availability_status
             )
             messages.success(request, 'Tanker registration successful.')
+            del request.session['supplier_id']
             return redirect('Login_page')
         else:
             messages.error(request, 'Please correct the form errors.')
@@ -125,7 +130,7 @@ def login_view(request):
         password = request.POST.get("password")
 
         user = authenticate(request, email=email, password=password)
-        if user is not None :
+        if user is not None and isinstance(user,CustomUser):
             login(request, user)
             return redirect('Home')
         else:
@@ -406,10 +411,11 @@ def order_list(request, order_id=None):
 @login_required(login_url="Login_page")
 def notifications(request):
     try:
-        supplier_profile = request.user.supplier 
+        user = request.user.supplier
     except Exception:
         return render(request, 'Notification.html', {'notifications': []})
-    notifications = Notification.objects.filter(supplier=supplier_profile).order_by('-timestamp')
+    notifications = Notification.objects.filter(supplier=user, initiated_by='customer').order_by('-timestamp')
+    print("Notification Supplier Side :--",notifications)
     context = get_supplier_dashboard_data(request)
     context['notifications'] = notifications  
     return render(request, 'Notification.html',context)
@@ -478,10 +484,10 @@ def update_order_status(request):
             if action == 'accept':
                 order.order_status = 'Accepted'
                 order.driver = driver_detail
-                notif_message = f"Your order #{order.id} has been accepted by {request.user.first_name}."
+                notif_message = f"Your order has been accepted by { request.user.first_name }."
             else:  # cancel
                 order.order_status = 'Canceled'
-                notif_message = f"Your order #{order.id} has been canceled by {request.user.first_name}."
+                notif_message = f"Your order has been canceled by {request.user.first_name}."
             
             order.save()
             
@@ -489,7 +495,8 @@ def update_order_status(request):
             Notification.objects.create(
                 customer=order.user,
                 supplier=driver_detail.user.supplier,
-                message=notif_message
+                message=notif_message,
+                initiated_by='supplier'
             )
             messages.success(request, f"Order {order.id} {action}ed.")
         
@@ -508,7 +515,16 @@ def update_order_status(request):
                     Notification.objects.create(
                         customer=order.user,
                         supplier=driver_detail.user.supplier,
-                        message=f"Order ID {order.id} is now on the way."
+                        message=f"Your order is now on the way.",
+                        initiated_by='supplier'
+                    )
+                    messages.success(request, f"Order status updated to {order.get_order_status_display()}")
+                elif status_update == "Delivery":
+                    Notification.objects.create(
+                        customer=order.user,
+                        supplier=driver_detail.user.supplier,
+                        message=f"Your order has been successfully delivered.",
+                        initiated_by='supplier'
                     )
                     messages.success(request, f"Order status updated to {order.get_order_status_display()}")
             else:
