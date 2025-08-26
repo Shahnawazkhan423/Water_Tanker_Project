@@ -1,15 +1,36 @@
 {% extends "Home.html" %}
 {% block title %}Driver Profile{% endblock %}
+{% load static %}
+
 {% block sup-hero %}
 <div class="container mt-5">
     <h4 class="text-center mb-4">🚚 Driver Profile</h4>
     <div class="card shadow-lg rounded-4 p-4">
-        <div class="text-center mb-4">
+        <div class="text-center mb-4 position-relative" style="display: inline-block;">
             {% if user.profile_image %}
-                <img src="{{ user.profile_image.url }}" alt="Profile photo of {{ user.first_name }} {{ user.last_name }}" class="rounded-circle mb-3 d-block mx-auto" width="150">
+                <img id="profilePreview" src="{{ user.profile_image.url }}" 
+                    alt="Profile photo of {{ user.first_name }}" 
+                    class="rounded-circle border border-secondary" 
+                    width="120" height="120" style="object-fit: cover; cursor: pointer;">
             {% else %}
-                <img src="/static/image/Profile_Default_Image.jpg" alt="Default profile photo" class="rounded-circle mb-3 d-block mx-auto" width="150">
+                <img id="profilePreview" src="{% static 'images/default-profile.png' %}" 
+                    alt="Default profile" 
+                    class="rounded-circle border border-secondary" 
+                    width="120" height="120" style="object-fit: cover; cursor: pointer;">
             {% endif %}
+            
+            <!-- Camera icon -->
+           <label for="profileImageInput" class="btn btn-sm btn-dark position-absolute"
+                               style="bottom: 0; right: 0; border-radius: 50%;">
+                            <i class="fa fa-camera"></i>
+                        </label>
+
+            <!-- Form -->
+            <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile_image' %}" class="mt-2">
+                {% csrf_token %}
+                <input type="file" name="profile_image" id="profileImageInput" class="d-none" accept="image/*">
+                <button type="submit" class="btn btn-primary btn-sm mt-2 d-none" id="saveImageBtn">Save Image</button>
+            </form>
             <h5 class="fw-bold mb-1">{{ user.first_name }} {{ user.last_name }}</h5>
         </div>
 
@@ -323,6 +344,22 @@
 
 
 <style>
+.camera-icon {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.camera-icon:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
     /* Custom Styles */
     .icon-circle {
         width: 40px;
@@ -365,33 +402,60 @@
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const modal = document.getElementById('documentModal');
-        modal.addEventListener('show.bs.modal', function (event) {
-            const image = event.relatedTarget;
-            const documentUrl = image.getAttribute('data-document-url');
-            const documentTitle = image.getAttribute('data-document-title');
-            
-            const modalTitle = modal.querySelector('#documentModalLabel');
-            const previewContainer = modal.querySelector('#documentPreviewContainer');
-            const downloadLink = modal.querySelector('#documentDownload');
-            
-            modalTitle.textContent = documentTitle;
-            downloadLink.href = documentUrl;
-            
-            // Check if the file is a PDF
-            if (documentUrl.toLowerCase().endsWith('.pdf')) {
-                previewContainer.innerHTML = `<iframe src="${documentUrl}" style="width: 100%; height: 500px;" title="${documentTitle}"></iframe>`;
-            } else {
-                previewContainer.innerHTML = `<img src="${documentUrl}" alt="${documentTitle}" class="img-fluid">`;
-            }
-        });
-        
-        // Reset modal content when closed to prevent stale content
-        modal.addEventListener('hidden.bs.modal', function () {
-            const previewContainer = modal.querySelector('#documentPreviewContainer');
-            previewContainer.innerHTML = '';
-        });
+document.addEventListener('DOMContentLoaded', function () {
+    const profilePreview = document.getElementById('profilePreview');
+    const fileInput = document.getElementById('profileImageInput');
+    const saveBtn = document.getElementById('saveImageBtn');
+    const modal = document.getElementById('documentModal');
+
+    // Click profile image to choose file
+    profilePreview.addEventListener('click', function () {
+        fileInput.click();
     });
+
+    // Show preview & save button after choosing file
+    fileInput.addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                profilePreview.src = e.target.result;
+                saveBtn.classList.remove('d-none');
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    // Handle Bootstrap modal for document preview
+    modal.addEventListener('show.bs.modal', function (event) {
+        const image = event.relatedTarget;
+        const documentUrl = image.getAttribute('data-document-url');
+        const documentTitle = image.getAttribute('data-document-title');
+
+        const modalTitle = modal.querySelector('#documentModalLabel');
+        const previewContainer = modal.querySelector('#documentPreviewContainer');
+        const downloadLink = modal.querySelector('#documentDownload');
+
+        modalTitle.textContent = documentTitle;
+        downloadLink.href = documentUrl;
+
+        // Show PDF in iframe, otherwise image
+        if (documentUrl.toLowerCase().endsWith('.pdf')) {
+            previewContainer.innerHTML = `<iframe src="${documentUrl}" style="width: 100%; height: 500px;" title="${documentTitle}"></iframe>`;
+        } else {
+            previewContainer.innerHTML = `<img src="${documentUrl}" alt="${documentTitle}" class="img-fluid">`;
+        }
+    });
+
+    // Clear modal preview on close
+    modal.addEventListener('hidden.bs.modal', function () {
+        const previewContainer = modal.querySelector('#documentPreviewContainer');
+        previewContainer.innerHTML = '';
+    });
+    // Click camera icon to choose file
+    document.getElementById('cameraIcon').addEventListener('click', function () {
+        document.getElementById('profileImageInput').click();
+    });
+
+});
 </script>
 {% endblock %}

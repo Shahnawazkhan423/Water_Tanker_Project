@@ -132,7 +132,12 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'email'
+EMAIL_HOST_PASSWORD = 'password'
 USE_TZ = True
 
 
@@ -159,3 +164,13 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # default
 
 SESSION_COOKIE_AGE = 3600
+
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'shahnawazkhan96850@gmail.com'
+EMAIL_HOST_PASSWORD = 'mrkhan@gmail1234'

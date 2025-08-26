@@ -52,7 +52,7 @@ def register_view(request):
                 user=user,  
                 availability=driver_availability
             )
-            request.session['supplier_id'] = user.id
+            request.session['supplier_email'] = user.email
             request.session.set_expiry(3600)
             user = authenticate(request, email=user.email, password=user_form.cleaned_data['password'])
             if user is not None:
@@ -80,11 +80,11 @@ def tanker_detail_view(request):
             document_instance = document_form.save(commit=False)
             document_instance.water_tanker_name = water_tanker_name
             document_instance.save()
-            supplier_id = request.session.get('supplier_id')
+            supplier_id = request.session.get('supplier_email')
             if not supplier_id:
                 messages.error(request, "Session expired. Please register again.")
                 return redirect('Register_page')
-            supplier_profile = SupplierProfile.objects.filter(user__id=supplier_id).first()
+            supplier_profile = SupplierProfile.objects.filter(email=supplier_id).first()
             if not supplier_profile:
                 messages.error(request, "Supplier profile not found.")
                 return redirect("Register_page")
@@ -109,9 +109,9 @@ def tanker_detail_view(request):
                 category=tanker_detail_form.cleaned_data['category'],
                 available=availability_status
             )
-            messages.success(request, 'Tanker registration successful.')
-            del request.session['supplier_id']
-            return redirect('Login_page')
+            messages.success(request,  "Tanker registration successful. Please wait 24 hours for document verification before starting duty.")
+            del request.session['supplier_email']
+            return redirect('Home')
         else:
             messages.error(request, 'Please correct the form errors.')
     else:
@@ -316,15 +316,17 @@ def earning(request):
             'total_earnings': 0,
             'is_available': supplier_profile.is_available
         })
-
-    now = timezone.now()
+    now = timezone.localtime(timezone.now())
+    today = now.date()  # e.g., 2025-08-12
     last_7_earnings = []
     total_earnings = 0
     earnings_today = None
 
-    for i in range(8):
-        end_time = now - timedelta(hours=24 * i)
-        start_time = now - timedelta(hours=24 * (i + 1))
+    for i in range(7):
+        day = today - timedelta(days=i)
+        start_time = timezone.make_aware(datetime.combine(day, time.min))  # 00:00:00
+        end_time = timezone.make_aware(datetime.combine(day, time.max))    # 23:59:59.999999
+
 
         orders = OrderDetail.objects.filter(
             driver=driver,
@@ -472,6 +474,7 @@ def update_order_status(request):
             messages.error(request, "Order not found.")
             return redirect('Order_List')
         except DriverDetail.DoesNotExist:
+
             messages.error(request, "Driver profile not found.")
             return redirect('Order_List')
 
@@ -519,7 +522,7 @@ def update_order_status(request):
                         initiated_by='supplier'
                     )
                     messages.success(request, f"Order status updated to {order.get_order_status_display()}")
-                elif status_update == "Delivery":
+                elif status_update == "Delivered":
                     Notification.objects.create(
                         customer=order.user,
                         supplier=driver_detail.user.supplier,
@@ -540,3 +543,12 @@ def delete_notification(request, id):
     notif = get_object_or_404(Notification, id=id)
     notif.delete()
     return redirect('Notification')
+
+@login_required
+def update_profile_image(request):
+    if request.method == 'POST' and 'profile_image' in request.FILES:
+        profile_image = request.FILES['profile_image']
+        user = request.user
+        user.profile_image = profile_image
+        user.save()
+    return redirect('Profile')  

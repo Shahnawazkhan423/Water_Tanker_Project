@@ -31,7 +31,7 @@ def register_view(request):
             user.password = make_password(user_form.cleaned_data['password'])
             user.save()
 
-            messages.success(request, 'Registration successful-----.')
+            messages.success(request, 'Registration successful.')
             CustomerProfile.objects.create(user=user, location=location)
             return redirect("login")  
         
@@ -49,16 +49,19 @@ def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('id_passwords')
+
         user = authenticate(request, email=email, password=password)
-        if user is not None and isinstance(user, CustomerProfile):
+        print("User---", user)
+
+        if user is not None and getattr(user, 'user_type', None) == 'customer':
             login(request, user)
             return redirect('home')
-        
         else:
             messages.error(request, 'Invalid email or password.')
             return redirect('login')
 
     return render(request, 'login.html')
+
 
 @csrf_exempt
 @login_required(login_url="login")

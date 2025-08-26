@@ -9,6 +9,7 @@ urlpatterns=[
     path('orders/update-status/', views.update_order_status, name='update_order_status'),
     path('Notifications/',views.notifications,name='Notification'),
     path('Profile/',views.profile,name='Profile'),
+    path('Profile/Profile_Image/',views.update_profile_image,name='update_profile_image'),
     path('Registers/',views.register_view,name="Register_page"),
     path('Tanker_Detail/',views.tanker_detail_view,name="tanker_detail"),
     path('Login/',views.login_view,name="Login_page"),
