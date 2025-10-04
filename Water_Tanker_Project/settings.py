@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'Water_Tanker_Project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+"""DATABASES = {
     'default': {
         'NAME': config("DB_NAME"),
         'USER': config("DB_USER"),
@@ -106,9 +106,10 @@ DATABASES = {
         'HOST': config("DB_HOST", default="localhost"),
         'PORT': config("DB_PORT", default="5432"),
     }
+}"""
+DATABASES = {
+    'default': dj_database_url.parse(config("DATABASE_URL"))
 }
-DATABASES["default"] = dj_database_url.parse(config("DATABASE_URL"))   
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
