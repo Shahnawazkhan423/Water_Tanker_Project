@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,11 +23,13 @@ AUTH_USER_MODEL = 'UserManagement.CustomUser'
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&-!df1u3%1hltb53gnq3yx_s2@xxt*oyg(wm+i&6p(lmkp2l8z'
+SECRET_KEY = config("SECRET_KEY", default="unsafe-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = ["*"]
+DEBUG = config("DEBUG", default=False, cast=bool)
+
+# SECURITY WARNING: don't run with debug turned on in production!
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost").split(",")
 
 
 # Application definition
@@ -97,10 +100,11 @@ WSGI_APPLICATION = 'Water_Tanker_Project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Water_Tanker_Project_DB',
-        'USER':'MRKHAN',
-        'PASSWORD':'root',
+        'NAME': config("DB_NAME"),
+        'USER': config("DB_USER"),
+        'PASSWORD': config("DB_PASSWORD"),
+        'HOST': config("DB_HOST", default="localhost"),
+        'PORT': config("DB_PORT", default="5432"),
     }
 }   
 
@@ -173,4 +177,4 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'shahnawazkhan96850@gmail.com'
-EMAIL_HOST_PASSWORD = 'mrkhan@gmail1234'
+EMAIL_HOST_PASSWORD = 'xxxxxxs'
