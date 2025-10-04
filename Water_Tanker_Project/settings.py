@@ -107,7 +107,7 @@ DATABASES = {
         'PORT': config("DB_PORT", default="5432"),
     }
 }
-DATABASES["default"] = dj_database_url.parse("postgresql://water_tanker_service_db_user:TAWsByYNrX1upJBNkiCwpMI9XC19Jt3Y@dpg-d3ges8r3fgac738uorig-a.oregon-postgres.render.com/water_tanker_service_db")   
+DATABASES["default"] = dj_database_url.parse(config("database_url"))   
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
