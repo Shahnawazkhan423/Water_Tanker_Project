@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from .helper import send_forgot_password_mail
 import uuid 
-
+from  .signals import order_canceled_by_customer
 @csrf_exempt
 def register_view(request):
     if request.method == "POST":
@@ -194,18 +194,16 @@ def cancel_order(request, order_id):
         driver_detail = order.driver  
         supplier = driver_detail.user.supplier  
 
-        Notification.objects.create(
-            customer=request.user,
-            supplier=supplier,  
-            message=f"Order ID {order.id} has been cancelled by the customer.",
-            initiated_by='customer'
+        order_canceled_by_customer.send(
+            sender=OrderDetail,              
+            order_instance=order,             
+            customer_user=request.user,       
+            supplier_instance=supplier,       
         )
+        print("detail:---",order_canceled_by_customer)
         messages.success(request, "Order has been cancelled successfully.")
-        context = {
-            'order': order,
-            'driver': supplier
-        }
-    return render(request, "driver_detail.html", context)
+
+    return render(request, "driver_detail.html")
 
     
 @login_required

@@ -117,10 +117,9 @@
   <h3>Notifications</h3>
   <ul class="notification-list">
     {% for notif in notifications %}
-        {% if notif.initiated_by == 'customer' %}  
       <li class="notification-item {% if not notif.is_read %}new{% endif %}">
         <div class="notification-content">
-          {{ notif.message }}
+          {{ notif.message }}<br>
           <span class="timestamp">{{ notif.timestamp|date:"Y-m-d H:i" }}</span>
         </div>
         <form method="post" action="{% url 'delete_notification' notif.id %}">
@@ -128,7 +127,6 @@
           <button type="submit" class="delete-btn">Delete</button>
         </form>
       </li>
-      {% endif %}
     {% empty %}
       <li class="notification-empty">No notifications.</li>
     {% endfor %}

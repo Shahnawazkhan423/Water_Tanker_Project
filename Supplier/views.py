@@ -416,8 +416,8 @@ def notifications(request):
         user = request.user.supplier
     except Exception:
         return render(request, 'Notification.html', {'notifications': []})
-    notifications = Notification.objects.filter(supplier=user, initiated_by='customer').order_by('-timestamp')
-    print("Notification Supplier Side :--",notifications)
+    notifications = Notification.objects.filter(supplier=user).order_by('-timestamp')
+    print(notifications)
     context = get_supplier_dashboard_data(request)
     context['notifications'] = notifications  
     return render(request, 'Notification.html',context)
