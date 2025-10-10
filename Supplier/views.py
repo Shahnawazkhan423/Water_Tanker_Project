@@ -16,6 +16,7 @@ from datetime import time
 from django.utils.timezone import now
 from .utils import human_readable_joined_date
 from django.views.decorators.csrf import csrf_exempt
+from .signals import order_accepted_by_supplier,order_canceled_by_supplier,order_delievery_by_supplier,order_on_the_way_by_supplier
 @csrf_exempt
 def register_view(request):
     if request.method == "POST":
@@ -151,7 +152,7 @@ def toggle_availability(request):
             'message': 'Unauthorized access. Only suppliers can perform this action.'
         })
 
-    # ✅ Step 2: Check method
+    # Step 2: Check method
     if request.method != 'POST':
         return JsonResponse({
             'status': 'error',
@@ -487,22 +488,27 @@ def update_order_status(request):
             if action == 'accept':
                 order.order_status = 'Accepted'
                 order.driver = driver_detail
-                notif_message = f"Your order has been accepted by { request.user.first_name }."
-            else:  # cancel
+                order.save()
+                order_accepted_by_supplier.send(
+                    sender=OrderDetail,
+                    order_instance=order,
+                    supplier_user=driver_detail.user.supplier,
+                    customer_instance=order.user  
+                )
+            else: 
                 order.order_status = 'Canceled'
-                notif_message = f"Your order has been canceled by {request.user.first_name}."
-            
-            order.save()
-            
-            # Create notification
-            Notification.objects.create(
-                customer=order.user,
-                supplier=driver_detail.user.supplier,
-                message=notif_message,
-                initiated_by='supplier'
-            )
-            messages.success(request, f"Order {order.id} {action}ed.")
+                order.driver = driver_detail
+                order.save()
+                order_canceled_by_supplier.send(
+                    sender=OrderDetail,
+                    order_instance=order,
+                    supplier_user=driver_detail.user.supplier,
+                    customer_instance=order.user  
+                )
+                messages.success(request, f"Order {order.id} {action}ed.")
         
+            
+           
         elif action == 'update_status':
             status_update = request.POST.get('supplier_update_order_status')
             status_map = {
@@ -513,21 +519,22 @@ def update_order_status(request):
 
             if status_update in status_map:
                 order.order_status = status_map[status_update]
+                order.driver = driver_detail
                 order.save()
                 if status_update == 'On the Way':
-                    Notification.objects.create(
-                        customer=order.user,
-                        supplier=driver_detail.user.supplier,
-                        message=f"Your order is now on the way.",
-                        initiated_by='supplier'
+                    order_on_the_way_by_supplier.send(
+                        sender=OrderDetail,
+                        order_instance=order,
+                        supplier_user=driver_detail.user.supplier,
+                        customer_instance=order.user  
                     )
                     messages.success(request, f"Order status updated to {order.get_order_status_display()}")
                 elif status_update == "Delivered":
-                    Notification.objects.create(
-                        customer=order.user,
-                        supplier=driver_detail.user.supplier,
-                        message=f"Your order has been successfully delivered.",
-                        initiated_by='supplier'
+                    order_delievery_by_supplier.send(
+                        sender=OrderDetail,
+                        order_instance=order,
+                        supplier_user=driver_detail.user.supplier,
+                        customer_instance=order.user  
                     )
                     messages.success(request, f"Order status updated to {order.get_order_status_display()}")
             else:
@@ -536,7 +543,6 @@ def update_order_status(request):
         else:
             messages.error(request, "Invalid action.")
         
-        # FIX: Redirect back to order list
         return redirect('Order_List')
     
 def delete_notification(request, id):
