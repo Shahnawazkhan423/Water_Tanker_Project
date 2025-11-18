@@ -8,33 +8,61 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from geopy.distance import geodesic
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
 from .helper import send_forgot_password_mail
 import uuid 
 from  .signals import order_canceled_by_customer
-@csrf_exempt
+from .tasks import send_email_task
+
+@csrf_protect 
 def register_view(request):
     if request.method == "POST":
         user_form = UserDetailForm(request.POST, request.FILES)
         location_form = LocationDetailForm(request.POST)
-        email = request.POST.get("email")
-            # Check if email exists
-        if CustomerProfile.objects.filter(email=email).exists():
-                messages.error(request, "Email ID already exists.")
-                print("Email ID already exists.")
-                return redirect("register")  
+
         if user_form.is_valid() and location_form.is_valid():
+            # Email always from cleaned_data
+            email = user_form.cleaned_data["email"]
+
+            # Email already registered in User table?
+            if CustomerProfile.objects.filter(email=email).exists():
+                messages.error(request, "Email ID already exists.")
+                
+                return render(request, 'register.html', {
+                    'user_form': user_form,
+                    'location_form': location_form
+                })
+
+            # Save location
             location = location_form.save()
 
+            # Save user
             user = user_form.save(commit=False)
             user.location = location
             user.password = make_password(user_form.cleaned_data['password'])
             user.save()
 
-            messages.success(request, 'Registration successful.')
+            # Create profile
             CustomerProfile.objects.create(user=user, location=location)
-            return redirect("login")  
-        
+
+            # Success message
+            messages.success(request, 'Registration successful.')
+
+            # Call Celery Email Task
+            subject = "Registration Successful"
+            message = f"Welcome {user.first_name}, your registration is completed successfully."
+            send_email_task.delay(email, subject, message)
+
+            return redirect("login")
+
+        # Agar form invalid hai to yahan aayega
+        # Form errors template me show ho sakte hain
+        return render(request, 'register.html', {
+            'user_form': user_form,
+            'location_form': location_form
+        })
+
     else:
         user_form = UserDetailForm()
         location_form = LocationDetailForm()
@@ -51,7 +79,6 @@ def login_view(request):
         password = request.POST.get('id_passwords')
 
         user = authenticate(request, email=email, password=password)
-        print("User---", user)
 
         if user is not None and getattr(user, 'user_type', None) == 'customer':
             login(request, user)
@@ -73,6 +100,10 @@ def logout_view(request):
 @login_required(login_url="login")
 def home(request):
     user = request.user
+    subject = "Registration Successful"
+    message = f"Welcome {user.first_name}, your registration is completed successfully."
+    send_email_tas.delay(email, subject, message)
+
     if user.is_authenticated and hasattr(user, 'customer') and user.user_type == 'customer':
         return render(request,'home.html')
     else:

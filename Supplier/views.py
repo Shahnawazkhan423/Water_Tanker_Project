@@ -17,6 +17,7 @@ from django.utils.timezone import now
 from .utils import human_readable_joined_date
 from django.views.decorators.csrf import csrf_exempt
 from .signals import order_accepted_by_supplier,order_canceled_by_supplier,order_delievery_by_supplier,order_on_the_way_by_supplier
+from .tasks import send_email_task
 @csrf_exempt
 def register_view(request):
     if request.method == "POST":
@@ -73,6 +74,7 @@ def register_view(request):
 @login_required(login_url="Login_page")
 def tanker_detail_view(request):
     if request.method == "POST":
+        user = request.user
         document_form = WaterTankerForm(request.POST, request.FILES)
         tanker_detail_form = SupplierTankerDetailForm(request.POST)
     
@@ -111,6 +113,11 @@ def tanker_detail_view(request):
                 available=availability_status
             )
             messages.success(request,  "Tanker registration successful. Please wait 24 hours for document verification before starting duty.")
+            # Call Celery Email Task
+            subject = "Registration Successful"
+            message = f"Welcome {user.first_name}, your registration is completed successfully."
+            send_email_task.delay(user.email, subject, message)
+
             del request.session['supplier_email']
             return redirect('Home')
         else:

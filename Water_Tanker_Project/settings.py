@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'Water_Tanker_Project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-"""DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': config('DB_ENGINE'),
         'NAME': config("DB_NAME"),
@@ -107,9 +107,6 @@ WSGI_APPLICATION = 'Water_Tanker_Project.wsgi.application'
         'HOST': config("DB_HOST", default="localhost"),
         'PORT': config("DB_PORT", default="5432"),
     }
-}"""
-DATABASES = {
-    'default': dj_database_url.parse(config("DATABASE_URL"))
 }
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -133,18 +130,8 @@ AUTH_USER_MODE = "Water_Tanker_Project.UserDetail"
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Kolkata'
 
-USE_I18N = True
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -171,3 +158,27 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # default
 
 SESSION_COOKIE_AGE = 3600
 
+#Celery Setting 
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'Asia/Kolkata'
+
+USE_I18N = True
+USE_TZ = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
