@@ -45,13 +45,14 @@ RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 # Install only essential *runtime* system dependencies
 # The 'build-essential' group and *-dev packages are no longer needed here.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    default-libmysqlclient21 \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    libmysqlclient-dev \
     libpq5 \
     libjpeg62-turbo \
     zlib1g \
     libmagic1 \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy wheels from builder and install them (this is correct)
 COPY --from=builder /wheels /wheels
