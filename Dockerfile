@@ -9,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install system build dependencies required for some Python packages (psycopg2, Pillow, mysqlclient, etc.)
+# Install system build dependencies required for compiling Python packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
@@ -43,7 +43,8 @@ WORKDIR /app
 # Create a non-root user
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
-# Install runtime system dependencies (lighter)
+# Install only essential *runtime* system dependencies
+# The 'build-essential' group and *-dev packages are no longer needed here.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     default-libmysqlclient21 \
     libpq5 \
@@ -52,9 +53,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libmagic1 \
  && rm -rf /var/lib/apt/lists/*
 
-# Copy wheels from builder and install wheels
+# Copy wheels from builder and install them (this is correct)
 COPY --from=builder /wheels /wheels
-RUN pip install --no-cache /wheels/* || (echo "pip install from wheels failed" && exit 1)
+RUN pip install --no-cache /wheels/*
 
 # Copy project code
 COPY . /app
@@ -67,7 +68,8 @@ USER appuser
 # Expose port
 EXPOSE 8000
 
-CMD bash -c "\
+# Use the shell form for the CMD for easier command chaining
+CMD ["bash", "-c", "\
     python manage.py migrate --noinput && \
     python manage.py collectstatic --noinput --clear && \
     exec gunicorn Water_Tanker_Project.wsgi:application \
@@ -76,4 +78,4 @@ CMD bash -c "\
       --timeout 120 \
       --access-logfile '-' \
       --error-logfile '-' \
-      "
+      "]
