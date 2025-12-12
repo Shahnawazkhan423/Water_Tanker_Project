@@ -24,15 +24,18 @@ def register_view(request):
         user_form = SupplierRegistrationForm(request.POST, request.FILES)
         location_form = SupplierLocationDetailForm(request.POST)
 
-        email = request.POST.get("email")  # Directly fetch from POST
+        email = request.POST.get("email").lower()  # Directly fetch from POST
         if email and SupplierProfile.objects.filter(email=email).exists():
             messages.error(request, "Email ID already exists.")
             return redirect("Register_page")
 
         if user_form.is_valid() and location_form.is_valid():
+            email = user_form.cleaned_data["email"].lower()
+
             location = location_form.save()
             user = user_form.save(commit=False)
             user.location = location
+            user.email  =  email
             user.password = make_password(user_form.cleaned_data['password'])
             user.save()
 

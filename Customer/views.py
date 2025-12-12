@@ -23,7 +23,7 @@ def register_view(request):
 
         if user_form.is_valid() and location_form.is_valid():
             # Email always from cleaned_data
-            email = user_form.cleaned_data["email"]
+            email = user_form.cleaned_data["email"].lower()
 
             # Email already registered in User table?
             if CustomerProfile.objects.filter(email=email).exists():
@@ -41,6 +41,7 @@ def register_view(request):
             user = user_form.save(commit=False)
             user.location = location
             user.password = make_password(user_form.cleaned_data['password'])
+            user.email = email
             user.save()
 
             # Create profile
@@ -100,10 +101,6 @@ def logout_view(request):
 @login_required(login_url="login")
 def home(request):
     user = request.user
-    subject = "Registration Successful"
-    message = f"Welcome {user.first_name}, your registration is completed successfully."
-    send_email_tas.delay(email, subject, message)
-
     if user.is_authenticated and hasattr(user, 'customer') and user.user_type == 'customer':
         return render(request,'home.html')
     else:
