@@ -9,10 +9,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install system build dependencies required for some Python packages (psycopg2, Pillow, etc.)
+# Install system build dependencies required for some Python packages (psycopg2, Pillow, mysqlclient, etc.)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
+    pkg-config \
+    default-libmysqlclient-dev \
     libpq-dev \
     libjpeg-dev \
     zlib1g-dev \
@@ -24,8 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # copy requirements.txt first to leverage docker cache
 COPY requirements.txt /app/requirements.txt
 
-# Install pip packages into a virtual environment location (site-packages)
-RUN pip install --upgrade pip
+# Install pip and build wheels into /wheels
+RUN pip install --upgrade pip setuptools wheel
 RUN pip wheel --no-cache-dir --wheel-dir /wheels -r /app/requirements.txt
 
 # ---------- STAGE 2: final runtime image ----------
@@ -33,7 +35,6 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    # recommended to set your Django settings module via env when running
     DJANGO_SETTINGS_MODULE=Water_Tanker_Project.settings \
     PORT=8000
 
@@ -44,15 +45,16 @@ RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 # Install runtime system dependencies (lighter)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    default-libmysqlclient21 \
     libpq5 \
     libjpeg62-turbo \
     zlib1g \
     libmagic1 \
  && rm -rf /var/lib/apt/lists/*
 
-# Copy wheels from builder and install
+# Copy wheels from builder and install wheels
 COPY --from=builder /wheels /wheels
-RUN pip install --no-cache /wheels/* || (echo "pip install failed" && exit 1)
+RUN pip install --no-cache /wheels/* || (echo "pip install from wheels failed" && exit 1)
 
 # Copy project code
 COPY . /app
@@ -65,13 +67,6 @@ USER appuser
 # Expose port
 EXPOSE 8000
 
-# Default command:
-#  - run migrations
-#  - collectstatic (no input)
-#  - start gunicorn with 3 workers and binding to 0.0.0.0:8000
-#
-# NOTE: we run migrate + collectstatic at container start so containers boot ready.
-# If you prefer running migrations outside containers, remove the first part.
 CMD bash -c "\
     python manage.py migrate --noinput && \
     python manage.py collectstatic --noinput --clear && \
