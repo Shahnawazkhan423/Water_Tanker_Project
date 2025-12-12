@@ -1,7 +1,6 @@
-# ---------- STAGE 1: build dependencies and install python packages ----------
+# ---------- STAGE 1: build dependencies and build wheels ----------
 FROM python:3.11-slim AS builder
 
-# Set environment
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=off \
@@ -9,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install system build dependencies required for compiling Python packages
+# Build-time packages (dev headers & tools) required to compile wheels
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
@@ -23,14 +22,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
-# copy requirements.txt first to leverage docker cache
+# Copy requirements and build wheels
 COPY requirements.txt /app/requirements.txt
-
-# Install pip and build wheels into /wheels
 RUN pip install --upgrade pip setuptools wheel
 RUN pip wheel --no-cache-dir --wheel-dir /wheels -r /app/requirements.txt
 
-# ---------- STAGE 2: final runtime image ----------
+# ---------- STAGE 2: runtime ----------
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -40,36 +37,30 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Create a non-root user
+# Create non-root user
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
-# Install only essential *runtime* system dependencies
-# The 'build-essential' group and *-dev packages are no longer needed here.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    libmysqlclient-dev \
+# Runtime packages (smaller) — do NOT install dev packages here
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    default-libmysqlclient21 \
     libpq5 \
     libjpeg62-turbo \
     zlib1g \
     libmagic1 \
-    && rm -rf /var/lib/apt/lists/*
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
-# Copy wheels from builder and install them (this is correct)
+# Install wheels built earlier
 COPY --from=builder /wheels /wheels
 RUN pip install --no-cache /wheels/*
 
-# Copy project code
+# Copy project files
 COPY . /app
-
-# Ensure ownership for the non-root user
 RUN chown -R appuser:appgroup /app
 
 USER appuser
-
-# Expose port
 EXPOSE 8000
 
-# Use the shell form for the CMD for easier command chaining
 CMD ["bash", "-c", "\
     python manage.py migrate --noinput && \
     python manage.py collectstatic --noinput --clear && \
@@ -79,4 +70,4 @@ CMD ["bash", "-c", "\
       --timeout 120 \
       --access-logfile '-' \
       --error-logfile '-' \
-      "]
+"]
