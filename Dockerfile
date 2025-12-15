@@ -42,7 +42,8 @@ RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 # Runtime packages (smaller) — do NOT install dev packages here
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    default-libmysqlclient21 \
+    default-mysql-client \
+    libmariadb3 \
     libpq5 \
     libjpeg62-turbo \
     zlib1g \
