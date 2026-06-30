@@ -1,530 +1,250 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Customer Registration</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+{% extends "_auth.html" %}
 
-  <style>
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      box-sizing: border-box;
-    }
+{% block title %}Register — Customer{% endblock %}
+{% block auth_wrap_class %}auth-wrap-full{% endblock %}
+{% block auth_back_url %}#{% endblock %}
+{% block auth_title %}Create your account{% endblock %}
+{% block auth_subtitle %}Get started with WaterTanker in seconds{% endblock %}
 
-    .container {
-      max-width: 950px;
-      width: 100%;
-    }
+{% block auth_content %}
+<form method="POST" action="{% url 'register' %}" enctype="multipart/form-data"
+      class="needs-validation" novalidate>
+  {% csrf_token %}
 
-    .registration-card {
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 0.6s ease-out forwards;
-    }
-
-    .card-header-gradient {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .gradient-btn {
-      background: linear-gradient(135deg, #2bde8c 0%, #1dc8cd 100%);
-      border: none;
-      border-radius: 50px;
-      transition: all 0.3s ease;
-    }
-
-    .gradient-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(43, 222, 140, 0.4);
-    }
-
-    .form-floating > label {
-      color: #6c757d;
-      left: 1rem;
-    }
-
-    .form-control {
-      border-radius: 8px;
-      padding: 1rem 1.2rem;
-      border: 1px solid #e0e0e0;
-      height: calc(3.5rem + 2px);
-    }
-
-    .form-control:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
-    }
-
-    .invalid-feedback {
-      font-size: 0.875em;
-      color: #dc3545;
-    }
-
-    .valid-feedback {
-      font-size: 0.875em;
-      color: #198754;
-    }
-
-    #preview-image {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      cursor: pointer;
-      display: block;
-      margin: 0 auto 1rem auto;
-    }
-
-    input[type="file"] {
-      display: none;
-    }
-
-    .section-title {
-      font-weight: 600;
-      color: #4a6baf;
-      border-bottom: 2px solid #e0e0e0;
-      margin-bottom: 1rem;
-      padding-bottom: 0.25rem;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 768px) {
-      .form-control {
-        padding: 0.8rem 1rem;
-      }
-
-      .section-title {
-        font-size: 1rem;
-      }
-
-      .gradient-btn {
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="card registration-card">
-      <div class="card-header card-header-gradient text-white text-center py-3">
-        <h3 class="fw-semibold mb-0"><i class="bi bi-person-plus-fill me-2"></i>Customer Registration</h3>
-      </div>
-
-      <div class="card-body bg-light p-4 p-lg-5">
-        <form method="post" class="row g-3 needs-validation" enctype="multipart/form-data" novalidate action="{% url 'register' %}">
-          {% csrf_token %}
-
-          {% if messages %}
-            <div class="alert alert-primary">
-              {% for message in messages %}
-                {{ message }}
-              {% endfor %}
-            </div>
-          {% endif %}
-
-          <!-- Profile Image -->
-         <div class="col-12 text-center mb-4">
-              <!-- Profile Preview Image -->
-              <label for="id_profile_image" class="d-inline-block" style="cursor: pointer;">
-                <img id="preview-image" 
-                    src="/static/image/Profile_Default_Image.jpg" 
-                    alt="Profile Preview"
-                    class="rounded-circle shadow border"
-                    style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #007bff;">
-              </label>
-
-              <!-- File Upload Input -->
-              <div class="mt-3">
-                <input type="file" id="id_profile_image" name="profile_image" accept="image/*" class="form-control">
-                <small class="form-text text-muted">Click the image or browse to upload. JPG, PNG only.</small>
-
-                <!-- Validation Feedback -->
-                <div class="invalid-feedback d-block" id="profile_image_error">
-                  <!-- Django or client-side error message here -->
-                </div>
-              </div>
-          </div>
-
-        
-          <!-- Section -->
-          <div class="col-12">
-            <h5 class="section-title"><i class="bi bi-person-circle me-2"></i>User Information</h5>
-          </div>
-
-          <!-- First Name -->
-          <div class="form-floating col-md-6">
-            <input type="text" name="first_name" id="id_first_name"
-                  class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
-                  value="{{ form.first_name.value|default_if_none:'' }}"
-                  placeholder="First Name" required 
-                  pattern="^(?!.*([A-Za-z])\1{2})[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,30}$"
-                  title="First name (2-30 letters) with no 3 same consecutive characters">
-            <label for="id_first_name">First Name</label>
-            {% if form.first_name.errors %}
-              <div class="invalid-feedback d-block">{{ form.first_name.errors.0 }}</div>
-            {% else %}
-              <div class="invalid-feedback">Please enter a valid first name (2-30 letters, no 3 same consecutive characters).</div>
-              <div class="valid-feedback">Looks good!</div>
-            {% endif %}
-          </div>
-
-          <!-- Last Name -->
-          <div class="form-floating col-md-6">
-            <input type="text" name="last_name" id="id_last_name"
-                  class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
-                  value="{{ form.last_name.value|default_if_none:'' }}"
-                  placeholder="Last Name" required 
-                  pattern="^(?!.*([A-Za-z])\1{2})[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,30}$"
-                  title="Last name (2-30 letters) with no 3 same consecutive characters">
-            <label for="id_last_name">Last Name</label>
-            {% if form.last_name.errors %}
-              <div class="invalid-feedback d-block">{{ form.last_name.errors.0 }}</div>
-            {% else %}
-              <div class="invalid-feedback">Please enter a valid last name (2-30 letters, no 3 same consecutive characters).</div>
-              <div class="valid-feedback">Looks good!</div>
-            {% endif %}
-          </div>
-
-          <!-- Phone Number -->
-           <div class="form-floating col-md-6">
-            <input type="tel" name="phone_number" id="id_phone_number"
-                  class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
-                  value="{{ form.phone_number.value|default_if_none:'' }}"
-                  placeholder="Phone Number" required 
-                  pattern="^(?!.*(\d)\1{9})[6-9]\d{9}$"
-                  minlength="10" maxlength="10"
-                  title="Enter a valid 10-digit phone number (digits only)">
-            <label for="id_phone_number">Phone Number</label>
-            <div class="invalid-feedback" id="phone_number_error">
-              {% if form.phone_number.errors %}
-                {{ form.phone_number.errors.0 }}
-              {% else %}
-                
-                <div class="invalid-feedback">Valid 10-digit number, start 6–9, no repeats.</div>
-              {% endif %}
-            </div>
-            <div class="valid-feedback">Valid phone number.</div>
-          </div>
-
-        <!-- Email -->
-          <div class="form-floating col-md-6">
-            <input type="email" name="email" id="id_email"
-                  class="form-control {% if form.email.errors %}is-invalid{% endif %}"
-                  value="{{ form.email.value|default_if_none:'' }}"
-                  placeholder="Email" required
-                  pattern="^(?!.*([a-zA-Z0-9._%+-])\1{2})[a-zA-Z][a-zA-Z0-9._%+-]{2,63}@gmail\.com$"
-                  title="Must be a Gmail address, start with a letter, 3–64 characters before @, no three identical characters in a row.">
-            <label for="id_email">Email</label>
-            {% if form.email.errors %}
-              <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
-            {% else %}
-              <div class="invalid-feedback">Please enter a valid Gmail address (e.g. yourname@gmail.com).</div>
-              <div class="valid-feedback">Valid email address.</div>
-            {% endif %}
-          </div>
-
-
-          <!-- Password -->
-          <div class="col-12">
-            <div class="form-floating mb-3">
-              <input type="password" class="form-control" id="id_passwords" name="password" 
-                    placeholder="Password" required minlength="8"
-                    pattern="^(?!.*(.)\1{3}).{8,}$"
-                    title="Password must be at least 8 characters with no 4 same consecutive characters">
-              <label for="id_passwords">Password</label>
-              <div class="invalid-feedback">Minimum 8 characters required with no 4 same consecutive characters.</div>
-              <div class="valid-feedback">Password strength: <span id="password-strength">Weak</span></div>
-            </div>
-          </div>
-
-          <!-- Section -->
-          <div class="col-12">
-            <h5 class="section-title"><i class="bi bi-geo-alt-fill me-2"></i>Address Information</h5>
-          </div>
-
-         <!-- Address Line -->
-          <div class="col-md-6">
-            <div class="form-floating mb-3">
-              <input type="text" class="form-control" id="id_address_line" name="address_line"
-                    placeholder="Address Line" required pattern="^(?!.*(.)\1{4})[A-Za-z0-9\s,.\-\/]{5,100}$"
-                    title="Address should be 5-100 characters and may include letters, numbers, commas, dots, and hyphens and No repeated character.">
-              <label for="id_address_line">Address Line</label>
-              <div class="invalid-feedback">Please enter a valid address (min 5 characters).</div>
-              <div class="valid-feedback">Valid address.</div>
-            </div>
-          </div>
-
-          <!-- Street -->
-          <div class="col-md-6">
-            <div class="form-floating mb-3">
-              <input type="text" class="form-control" id="id_street" name="street"
-                    placeholder="Street" required pattern="^(?!.*([A-Za-z])\1{2})[A-Za-z\s]{3,50}$"
-                    title="Street name should contain only letters and spaces, min 3 characters. and No repeated character">
-              <label for="id_street">Street</label>
-              <div class="invalid-feedback">Enter a valid street name (min 3 letters).</div>
-              <div class="valid-feedback">Valid street name.</div>
-            </div>
-          </div>
-
-          <!-- Landmark (Optional) -->
-          <div class="col-md-6">
-            <div class="form-floating mb-3">
-              <input type="text" class="form-control" id="id_landmark" name="landmark"
-                    placeholder="Landmark" pattern="^$|^(?!.*(.)\1{4})[A-Za-z0-9\s,.\-]{1,100}$"
-                    title="Optional: letters, numbers, commas, dots, or hyphens allowed and No repeated character">
-              <label for="id_landmark">Landmark</label>
-              <div class="valid-feedback">Optional field.</div>
-            </div>
-          </div>
-
-          <!-- City -->
-          <div class="col-md-6">
-            <div class="form-floating mb-3">
-              <input type="text" class="form-control" id="id_city" name="city"
-                    placeholder="City" required pattern="^(?!.*([A-Za-z])\1{1})[A-Za-z\s]{2,50}$"
-                    title="City name must contain only letters and spaces (min 2 characters)No repeated character">
-              <label for="id_city">City</label>
-              <div class="invalid-feedback">Enter a valid city name (letters only).</div>
-              <div class="valid-feedback">Valid city name.</div>
-            </div>
-          </div>
-
-
-          <div class="col-md-6">
-            <div class="form-floating mb-3">
-              <select class="form-select" id="id_state" name="state" required>
-                <option value="" selected disabled>Select State</option>
-                <option value="Madhya Pradesh">Madhya Pradesh</option>
-                <option value="Maharashtra">Maharashtra</option>
-                <option value="Rajasthan">Rajasthan</option>
-                <option value="Uttar Pradesh">Uttar Pradesh</option>
-                <option value="Gujarat">Gujarat</option>
-                <!-- Add more states as needed -->
-              </select>
-              <label for="id_state">State</label>
-              <div class="invalid-feedback">Please select a state.</div>
-              <div class="valid-feedback">State selected.</div>
-            </div>
-          </div>
-
-
-
-
-         <div class="col-md-6">
-            <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="id_pincode" name="pincode"
-                placeholder="Pincode" required
-                pattern="^(?!([0-9])\1{5})[0-9]{6}$">
-          <label for="id_pincode">Pincode</label>
-          <div class="invalid-feedback">Enter a valid 6-digit pincode (not all same digits).</div>
-          <div class="valid-feedback">Valid pincode.</div>
-            </div>
-          </div>
-
-          <div class="col-12 text-center mt-3">
-            <button type="submit" class="btn gradient-btn text-white px-5 py-2 fw-semibold">
-              <i class="bi bi-check-circle me-2"></i>Register Now
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="card-footer bg-transparent text-center py-3">
-        Already have an account?
-        <a href="{% url 'login' %}" class="text-decoration-none fw-semibold text-primary">Login here</a>
-      </div>
-    </div>
+  <!-- Profile picture -->
+  <div class="text-center mb-4">
+    <label for="id_profile_image" style="cursor:pointer;display:inline-block">
+      <img id="preview-image"
+           src="/static/image/Profile_Default_Image.jpg"
+           alt="Profile preview"
+           style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--border);transition:border-color .15s"
+           title="Click to upload photo">
+    </label>
+    <input type="file" id="id_profile_image" name="profile_image" accept="image/*"
+           class="form-control mt-2" style="font-size:12px">
+    <div class="form-text">Optional — JPG or PNG, max 2MB</div>
+    <div id="profile_image_error" class="text-danger" style="font-size:12px"></div>
   </div>
 
-  <script>
-        document.addEventListener('DOMContentLoaded', function () {
-        const form = document.querySelector('.needs-validation');
-        const profileImageInput = document.getElementById('id_profile_image');
-        const previewImage = document.getElementById('preview-image');
-        const profileImageErrorDiv = document.getElementById('profile_image_error');
-        const passwordInput = document.getElementById('id_passwords');
-        const passwordStrengthSpan = document.getElementById('password-strength');
-        const inputs = form.querySelectorAll('input, select');
+  <div class="row g-3">
+    <!-- User Information -->
+    <div class="col-12">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px">
+        <i class="bi bi-person-circle me-1"></i>Personal Information
+      </div>
+    </div>
 
-        // Validate individual field and return true if valid, false otherwise
-        function validateField(field) {
-          const isValid = field.checkValidity();
-          const formGroup = field.closest('.form-floating') || field.closest('.col-md-6');
-          let customError = '';
+    <div class="col-md-6">
+      <label for="id_first_name" class="form-label">First Name</label>
+      <input type="text" name="first_name" id="id_first_name"
+             class="form-control {% if user_form.first_name.errors %}is-invalid{% endif %}"
+             value="{{ user_form.first_name.value|default_if_none:'' }}"
+             placeholder="First name" required
+             pattern="^(?!.*([A-Za-z])\1{2})[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,30}$">
+      {% if user_form.first_name.errors %}
+        <div class="invalid-feedback">{{ user_form.first_name.errors.0 }}</div>
+      {% else %}
+        <div class="invalid-feedback">2–30 letters, no 3 identical consecutive characters.</div>
+      {% endif %}
+    </div>
 
-          if (!formGroup) return true; // Skip if no parent container
+    <div class="col-md-6">
+      <label for="id_last_name" class="form-label">Last Name</label>
+      <input type="text" name="last_name" id="id_last_name"
+             class="form-control {% if user_form.last_name.errors %}is-invalid{% endif %}"
+             value="{{ user_form.last_name.value|default_if_none:'' }}"
+             placeholder="Last name" required
+             pattern="^(?!.*([A-Za-z])\1{2})[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,30}$">
+      {% if user_form.last_name.errors %}
+        <div class="invalid-feedback">{{ user_form.last_name.errors.0 }}</div>
+      {% else %}
+        <div class="invalid-feedback">2–30 letters, no 3 identical consecutive characters.</div>
+      {% endif %}
+    </div>
 
-          // Handle empty required fields
-          if (field.hasAttribute('required') && !field.value.trim()) {
-            customError = field.dataset.error || field.title || 'This field is required.';
-          } else if (field.value.trim()) {
-            // Custom validations for specific fields
-            if (field.type === 'text' || field.type === 'tel' || field.type === 'email' || field.type === 'password') {
-              if (field.pattern) {
-                const regex = new RegExp(`^${field.pattern}$`);
-                if (!regex.test(field.value)) {
-                  customError = field.title || 'Invalid format.';
-                }
-              }
-              // Specific validation for phone number
-              if (field.id === 'id_phone_number') {
-                if (!/^[6-9][0-9]{9}$/.test(field.value)) {
-                  customError = 'Please enter a valid 10-digit phone number starting with 6-9.';
-                }
-              }
-              // Check for repeating characters
-              if (field.id === 'id_first_name' || field.id === 'id_last_name') {
-                if (/(.)\1{2}/.test(field.value)) {
-                  customError = 'No 3 same consecutive characters allowed.';
-                }
-              } else if (field.id === 'id_passwords') {
-                if (/(.)\1{3}/.test(field.value)) {
-                  customError = 'No 4 same consecutive characters allowed.';
-                }
-              } else if (field.id === 'id_pincode') {
-                if (/([0-9])\1{5}/.test(field.value)) {
-                  customError = 'Pincode cannot have all identical digits.';
-                }
-              }
-            }
-            // Handle select fields
-            if (field.tagName === 'SELECT' && field.value === '') {
-              customError = 'Please select a state.';
-            }
-          }
+    <div class="col-md-6">
+      <label for="id_phone_number" class="form-label">Phone Number</label>
+      <input type="tel" name="phone_number" id="id_phone_number"
+             class="form-control {% if user_form.phone_number.errors %}is-invalid{% endif %}"
+             value="{{ user_form.phone_number.value|default_if_none:'' }}"
+             placeholder="10-digit mobile number" required
+             pattern="^(?!.*(\d)\1{9})[6-9]\d{9}$"
+             minlength="10" maxlength="10">
+      {% if user_form.phone_number.errors %}
+        <div class="invalid-feedback">{{ user_form.phone_number.errors.0 }}</div>
+      {% else %}
+        <div class="invalid-feedback">Valid 10-digit number starting with 6–9.</div>
+      {% endif %}
+    </div>
 
-          // Update validation classes and error messages
-          const errorDiv = formGroup.querySelector('.invalid-feedback');
-          const validDiv = formGroup.querySelector('.valid-feedback');
+    <div class="col-md-6">
+      <label for="id_email" class="form-label">Email address</label>
+      <input type="email" name="email" id="id_email"
+             class="form-control {% if user_form.email.errors %}is-invalid{% endif %}"
+             value="{{ user_form.email.value|default_if_none:'' }}"
+             placeholder="you@gmail.com" required
+             pattern="^(?!.*([a-zA-Z0-9._%+-])\1{2})[a-zA-Z][a-zA-Z0-9._%+-]{2,63}@gmail\.com$">
+      {% if user_form.email.errors %}
+        <div class="invalid-feedback">{{ user_form.email.errors.0 }}</div>
+      {% else %}
+        <div class="invalid-feedback">Please enter a valid Gmail address.</div>
+      {% endif %}
+    </div>
 
-          if (customError || !isValid) {
-            field.classList.remove('is-valid');
-            field.classList.add('is-invalid');
-            if (errorDiv) errorDiv.textContent = customError || field.title || 'Invalid input.';
-            if (validDiv) validDiv.style.display = 'none';
-            return false;
-          } else {
-            field.classList.remove('is-invalid');
-            field.classList.add('is-valid');
-            if (errorDiv) errorDiv.textContent = '';
-            if (validDiv) validDiv.style.display = 'block';
-            return true;
-          }
-        }
+    <div class="col-12">
+      <label for="id_password" class="form-label">Password</label>
+      <input type="password" name="password" id="id_password"
+             class="form-control" placeholder="Min 8 characters" required
+             minlength="8" pattern="^(?!.*(.)\1{3}).{8,}$">
+      <div class="form-text">
+        Strength: <span id="password-strength" style="font-weight:600">—</span>
+      </div>
+      <div class="invalid-feedback">Minimum 8 characters, no 4 identical consecutive characters.</div>
+    </div>
 
-        // Update password strength indicator
-        function updatePasswordStrength(password) {
-          let strength = 'Weak';
-          let strengthClass = 'text-danger';
+    <!-- Address Information -->
+    <div class="col-12 mt-2">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px">
+        <i class="bi bi-geo-alt-fill me-1"></i>Address Information
+      </div>
+    </div>
 
-          if (/(.)\1{3}/.test(password)) {
-            strength = 'Weak - Repeated characters';
-            strengthClass = 'text-danger';
-          } else if (password.length >= 12 && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) {
-            strength = 'Very Strong';
-            strengthClass = 'text-success';
-          } else if (password.length >= 10 && (/[A-Z]/.test(password) || /[0-9]/.test(password))) {
-            strength = 'Strong';
-            strengthClass = 'text-success';
-          } else if (password.length >= 8) {
-            strength = 'Good';
-            strengthClass = 'text-warning';
-          }
+    <div class="col-md-6">
+      <label for="id_address_line" class="form-label">Address Line</label>
+      <input type="text" name="address_line" id="id_address_line"
+             class="form-control {% if location_form.address_line.errors %}is-invalid{% endif %}"
+             value="{{ location_form.address_line.value|default_if_none:'' }}"
+             placeholder="House no., building, etc." required
+             pattern="^(?!.*(.)\1{4})[A-Za-z0-9\s,.\-\/]{5,100}$">
+      {% if location_form.address_line.errors %}
+        <div class="invalid-feedback">{{ location_form.address_line.errors.0 }}</div>
+      {% else %}
+        <div class="invalid-feedback">5–100 characters, letters/numbers/commas/dots allowed.</div>
+      {% endif %}
+    </div>
 
-          passwordStrengthSpan.textContent = strength;
-          passwordStrengthSpan.className = strengthClass;
-        }
+    <div class="col-md-6">
+      <label for="id_street" class="form-label">Street</label>
+      <input type="text" name="street" id="id_street"
+             class="form-control {% if location_form.street.errors %}is-invalid{% endif %}"
+             value="{{ location_form.street.value|default_if_none:'' }}"
+             placeholder="Street name" required
+             pattern="^(?!.*([A-Za-z])\1{2})[A-Za-z\s]{3,50}$">
+      {% if location_form.street.errors %}
+        <div class="invalid-feedback">{{ location_form.street.errors.0 }}</div>
+      {% else %}
+        <div class="invalid-feedback">Letters and spaces only, min 3 characters.</div>
+      {% endif %}
+    </div>
 
-        // Validate profile image
-        function validateProfileImage(file) {
-          profileImageErrorDiv.textContent = '';
-          if (file) {
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            const maxSize = 2 * 1024 * 1024; // 2MB
-            if (!allowedTypes.includes(file.type)) {
-              profileImageErrorDiv.textContent = 'Allowed: JPG, PNG, GIF.';
-              return false;
-            }
-            if (file.size > maxSize) {
-              profileImageErrorDiv.textContent = 'Max size 2MB.';
-              return false;
-            }
-            return true;
-          }
-          return true; // Optional field
-        }
+    <div class="col-md-6">
+      <label for="id_landmark" class="form-label">Landmark <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+      <input type="text" name="landmark" id="id_landmark"
+             class="form-control {% if location_form.landmark.errors %}is-invalid{% endif %}"
+             value="{{ location_form.landmark.value|default_if_none:'' }}"
+             placeholder="Near landmark">
+    </div>
 
-        // Real-time validation for all inputs
-        inputs.forEach(input => {
-          if (input.id !== 'id_profile_image') {
-            input.addEventListener('input', function () {
-              validateField(this);
-              if (this.id === 'id_passwords') {
-                updatePasswordStrength(this.value);
-              }
-            });
-            if (input.tagName === 'SELECT') {
-              input.addEventListener('change', function () {
-                validateField(this);
-              });
-            }
-          }
-        });
+    <div class="col-md-6">
+      <label for="id_city" class="form-label">City</label>
+      <input type="text" name="city" id="id_city"
+             class="form-control {% if location_form.city.errors %}is-invalid{% endif %}"
+             value="{{ location_form.city.value|default_if_none:'' }}"
+             placeholder="City" required
+             pattern="^(?!.*([A-Za-z])\1{1})[A-Za-z\s]{2,50}$">
+      {% if location_form.city.errors %}
+        <div class="invalid-feedback">{{ location_form.city.errors.0 }}</div>
+      {% else %}
+        <div class="invalid-feedback">Letters only, min 2 characters.</div>
+      {% endif %}
+    </div>
 
-        // Profile image change handler
-        profileImageInput.addEventListener('change', function (event) {
-          const file = event.target.files[0];
-          if (file && validateProfileImage(file)) {
-            const reader = new FileReader();
-            reader.onload = e => previewImage.src = e.target.result;
-            reader.readAsDataURL(file);
-          } else {
-            previewImage.src = '/static/image/Profile_Default_Image.jpg';
-            profileImageInput.value = '';
-          }
-        });
+    <div class="col-md-6">
+      <label for="id_state" class="form-label">State</label>
+      <select name="state" id="id_state"
+              class="form-select {% if location_form.state.errors %}is-invalid{% endif %}" required>
+        <option value="" disabled selected>Select state</option>
+        <option value="Madhya Pradesh">Madhya Pradesh</option>
+        <option value="Maharashtra">Maharashtra</option>
+        <option value="Rajasthan">Rajasthan</option>
+        <option value="Uttar Pradesh">Uttar Pradesh</option>
+        <option value="Gujarat">Gujarat</option>
+      </select>
+      {% if location_form.state.errors %}
+        <div class="invalid-feedback">{{ location_form.state.errors.0 }}</div>
+      {% else %}
+        <div class="invalid-feedback">Please select your state.</div>
+      {% endif %}
+    </div>
 
-        // Form submission handler
-        form.addEventListener('submit', function (event) {
-          let isFormValid = true;
-          inputs.forEach(input => {
-            if (!validateField(input)) {
-              isFormValid = false;
-            }
-          });
+    <div class="col-md-6">
+      <label for="id_pincode" class="form-label">Pincode</label>
+      <input type="text" name="pincode" id="id_pincode"
+             class="form-control {% if location_form.pincode.errors %}is-invalid{% endif %}"
+             value="{{ location_form.pincode.value|default_if_none:'' }}"
+             placeholder="6-digit pincode" required
+             pattern="^(?!([0-9])\1{5})[0-9]{6}$"
+             maxlength="6">
+      {% if location_form.pincode.errors %}
+        <div class="invalid-feedback">{{ location_form.pincode.errors.0 }}</div>
+      {% else %}
+        <div class="invalid-feedback">Valid 6-digit pincode required.</div>
+      {% endif %}
+    </div>
 
-          // Validate profile image separately
-          if (profileImageInput.files[0] && !validateProfileImage(profileImageInput.files[0])) {
-            isFormValid = false;
-          }
+    <div class="col-12 mt-2">
+      <button type="submit" class="btn btn-primary w-100" style="padding:10px">
+        <i class="bi bi-check-circle me-2"></i>Create Account
+      </button>
+    </div>
+  </div>
+</form>
+{% endblock %}
 
-          if (!isFormValid) {
-            event.preventDefault();
-            event.stopPropagation();
-            form.classList.add('was-validated');
-          }
-        });
+{% block auth_footer %}
+<div class="auth-footer">
+  Already have an account? <a href="{% url 'login' %}">Sign in</a>
+</div>
+{% endblock %}
 
-        // Initial validation for pre-filled fields
-        inputs.forEach(input => {
-          if (input.value) {
-            validateField(input);
-            if (input.id === 'id_passwords') {
-              updatePasswordStrength(input.value);
-            }
-          }
-        });
-      });
-  </script>
-</body>
-</html>
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const profileImageInput = document.getElementById('id_profile_image');
+  const previewImage      = document.getElementById('preview-image');
+  const profileImageError = document.getElementById('profile_image_error');
+  const passwordInput     = document.getElementById('id_password');
+  const strengthSpan      = document.getElementById('password-strength');
+
+  profileImageInput.addEventListener('change', function () {
+    const file = this.files[0];
+    profileImageError.textContent = '';
+    if (!file) return;
+    if (!['image/jpeg','image/png','image/gif'].includes(file.type)) {
+      profileImageError.textContent = 'Allowed: JPG, PNG, GIF.';
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      profileImageError.textContent = 'Max file size: 2MB.';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => previewImage.src = e.target.result;
+    reader.readAsDataURL(file);
+  });
+
+  passwordInput.addEventListener('input', function () {
+    const v = this.value;
+    let strength = '—', color = 'var(--text-muted)';
+    if (v.length === 0) { strength = '—'; }
+    else if (/(.)\1{3}/.test(v)) { strength = 'Weak'; color = 'var(--danger)'; }
+    else if (v.length >= 12 && /[A-Z]/.test(v) && /[0-9]/.test(v) && /[^A-Za-z0-9]/.test(v)) { strength = 'Strong'; color = 'var(--success)'; }
+    else if (v.length >= 10 && (/[A-Z]/.test(v) || /[0-9]/.test(v))) { strength = 'Good'; color = 'var(--accent)'; }
+    else if (v.length >= 8) { strength = 'Fair'; color = 'var(--warning)'; }
+    else { strength = 'Too short'; color = 'var(--danger)'; }
+    strengthSpan.textContent = strength;
+    strengthSpan.style.color = color;
+  });
+});
+</script>
+{% endblock %}

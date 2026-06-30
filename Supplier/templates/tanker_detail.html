@@ -1,290 +1,160 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Water Tanker Registration</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"/>
-  <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Inter', sans-serif;
-    }
-    .form-container {
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 30px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    .form-container h2 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #007bff;
-      font-weight: bold;
-    }
-    .form-group label {
-      font-weight: 600;
-      color: #343a40;
-    }
-    .btn-primary {
-      background-color: #007bff;
-      border-color: #007bff;
-      font-weight: bold;
-      padding: 10px 0;
-      margin-top: 20px;
-      border-radius: 5px;
-    }
-    .btn-primary:hover {
-      background-color: #0056b3;
-      border-color: #0056b3;
-    }
-    .alert {
-      margin-bottom: 20px;
-      text-align: center;
-      border-radius: 5px;
-    }
-    .is-invalid {
-      border-color: #dc3545 !important;
-    }
-    .invalid-feedback {
-      display: none;
-      width: 100%;
-      margin-top: .25rem;
-      font-size: 80%;
-      color: #dc3545;
-    }
-    .is-invalid + .invalid-feedback,
-    .form-control-file.is-invalid ~ .invalid-feedback {
-      display: block;
-    }
-    @media (max-width: 768px) {
-      .form-container {
-        margin: 20px auto;
-        padding: 15px;
-      }
-      .form-container h2 {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-      }
-      .btn-primary {
-        padding: 8px 0;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="form-container">
-    <h2>Water Tanker Registration Form</h2>
-    <form method="POST" enctype="multipart/form-data" novalidate>
-      {% csrf_token %}
+{% extends "_auth.html" %}
+{% load static %}
 
-      {% if messages %}
-        <div class="alert alert-primary" role="alert">
-          {% for message in messages %}
-            {{ message }}
-          {% endfor %}
-        </div>
-      {% endif %}
+{% block title %}Tanker Registration{% endblock %}
+{% block auth_wrap_class %}auth-wrap-wide{% endblock %}
+{% block auth_back_url %}{% url 'Home' %}{% endblock %}
+{% block auth_title %}Register Your Tanker{% endblock %}
+{% block auth_subtitle %}Upload your vehicle documents to start delivering{% endblock %}
 
-      <!-- Tanker Name -->
-      <div class="form-group">
-        <label for="id_water_tanker_name">Tanker Name</label>
-        <input type="text" class="form-control {% if document.water_tanker_name.errors %}is-invalid{% endif %}"
-               id="id_water_tanker_name" name="water_tanker_name"
-               value="{{ document.water_tanker_name.value|default:'' }}"
-               placeholder="Enter tanker name" required />
-        {% if document.water_tanker_name.errors %}
-          <div class="invalid-feedback">
-            {% for error in document.water_tanker_name.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
+{% block auth_content %}
+<form method="POST" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{% if 'success' in message.tags %}success{% else %}primary{% endif %} mb-3" data-auto-dismiss>
+        {{ message }}
       </div>
+    {% endfor %}
+  {% endif %}
 
-      {% comment "Repeat for each document" %}
-      {% for field in ['driving_license', 'aadhar_card', 'pan_card', 'registration_cert', 'vehicle_insurance', 'vehicle_permit'] %}
-        <div class="form-group">
-          <label for="id_{{ field }}">
-            {{ field|title|replace:"_" " " }} <small class="text-muted">(Allowed: JPG, JPEG, PNG)</small>
-          </label>
-          <input type="file" class="form-control-file {% if document[field].errors %}is-invalid{% endif %}"
-                 id="id_{{ field }}" name="{{ field }}" accept=".jpg,.jpeg,.png" required />
-          {% if document[field].errors %}
-            <div class="invalid-feedback">
-              {% for error in document[field].errors %}
-                {{ error }}
-              {% endfor %}
-            </div>
-          {% endif %}
-        </div>
-      {% endfor %}
-      {% endcomment %}
-
-      <!-- Driving License -->
-      <div class="form-group">
-        <label for="id_driving_license">Driving License <small class="text-muted">(Allowed: JPG, JPEG, PNG)</small></label>
-        <input type="file" class="form-control-file {% if document.driving_license.errors %}is-invalid{% endif %}"
-               id="id_driving_license" name="driving_license" accept=".jpg,.jpeg,.png" required />
-        {% if document.driving_license.errors %}
-          <div class="invalid-feedback">
-            {% for error in document.driving_license.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
+  <!-- Tanker Name -->
+  <div class="mb-3">
+    <label for="id_water_tanker_name" class="form-label">Tanker Name</label>
+    <input type="text" class="form-control {% if document.water_tanker_name.errors %}is-invalid{% endif %}"
+           id="id_water_tanker_name" name="water_tanker_name"
+           value="{{ document.water_tanker_name.value|default:'' }}"
+           placeholder="e.g. Ram Water Tanker" required>
+    {% if document.water_tanker_name.errors %}
+      <div class="invalid-feedback">
+        {% for error in document.water_tanker_name.errors %}{{ error }}{% endfor %}
       </div>
-
-      <!-- Aadhar Card -->
-      <div class="form-group">
-        <label for="id_aadhar_card">Aadhar Card <small class="text-muted">(Allowed: JPG, JPEG, PNG)</small></label>
-        <input type="file" class="form-control-file {% if document.aadhar_card.errors %}is-invalid{% endif %}"
-               id="id_aadhar_card" name="aadhar_card" accept=".jpg,.jpeg,.png" required />
-        {% if document.aadhar_card.errors %}
-          <div class="invalid-feedback">
-            {% for error in document.aadhar_card.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- PAN Card -->
-      <div class="form-group">
-        <label for="id_pan_card">PAN Card <small class="text-muted">(Allowed: JPG, JPEG, PNG)</small></label>
-        <input type="file" class="form-control-file {% if document.pan_card.errors %}is-invalid{% endif %}"
-               id="id_pan_card" name="pan_card" accept=".jpg,.jpeg,.png" required />
-        {% if document.pan_card.errors %}
-          <div class="invalid-feedback">
-            {% for error in document.pan_card.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Registration Certificate -->
-      <div class="form-group">
-        <label for="id_registration_cert">Registration Certificate <small class="text-muted">(Allowed: JPG, JPEG, PNG)</small></label>
-        <input type="file" class="form-control-file {% if document.registration_cert.errors %}is-invalid{% endif %}"
-               id="id_registration_cert" name="registration_cert" accept=".jpg,.jpeg,.png" required />
-        {% if document.registration_cert.errors %}
-          <div class="invalid-feedback">
-            {% for error in document.registration_cert.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Vehicle Insurance -->
-      <div class="form-group">
-        <label for="id_vehicle_insurance">Vehicle Insurance <small class="text-muted">(Allowed: JPG, JPEG, PNG)</small></label>
-        <input type="file" class="form-control-file {% if document.vehicle_insurance.errors %}is-invalid{% endif %}"
-               id="id_vehicle_insurance" name="vehicle_insurance" accept=".jpg,.jpeg,.png" required />
-        {% if document.vehicle_insurance.errors %}
-          <div class="invalid-feedback">
-            {% for error in document.vehicle_insurance.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Vehicle Permit -->
-      <div class="form-group">
-        <label for="id_vehicle_permit">Vehicle Permit <small class="text-muted">(Allowed: JPG, JPEG, PNG)</small></label>
-        <input type="file" class="form-control-file {% if document.vehicle_permit.errors %}is-invalid{% endif %}"
-               id="id_vehicle_permit" name="vehicle_permit" accept=".jpg,.jpeg,.png" required />
-        {% if document.vehicle_permit.errors %}
-          <div class="invalid-feedback">
-            {% for error in document.vehicle_permit.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Capacity -->
-      <div class="form-group">
-        <label for="id_capacity">Capacity (in Liters)</label>
-        <select class="form-control {% if tanker_detail.capacity.errors %}is-invalid{% endif %}"
-                id="id_capacity" name="capacity" required>
-          <option value="">Select Capacity</option>
-          <option value="1000" {% if tanker_detail.capacity.value == 1000 %}selected{% endif %}>1000 Liters</option>
-          <option value="2000" {% if tanker_detail.capacity.value == 2000 %}selected{% endif %}>2000 Liters</option>
-          <option value="5000" {% if tanker_detail.capacity.value == 5000 %}selected{% endif %}>5000 Liters</option>
-          <option value="10000" {% if tanker_detail.capacity.value == 10000 %}selected{% endif %}>10000 Liters</option>
-        </select>
-        {% if tanker_detail.capacity.errors %}
-          <div class="invalid-feedback">
-            {% for error in tanker_detail.capacity.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Category -->
-      <div class="form-group">
-        <label for="id_category">Water Category</label>
-        <select class="form-control {% if tanker_detail.category.errors %}is-invalid{% endif %}"
-                id="id_category" name="category" required>
-          <option value="">Select Category</option>
-          {% for value, text in tanker_detail.category.field.choices %}
-            <option value="{{ value }}" {% if tanker_detail.category.value == value %}selected{% endif %}>{{ text }}</option>
-          {% endfor %}
-        </select>
-        {% if tanker_detail.category.errors %}
-          <div class="invalid-feedback">
-            {% for error in tanker_detail.category.errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-block">Register Tanker</button>
-    </form>
+    {% endif %}
   </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  <script>
-    document.querySelector("form").addEventListener("submit", function (e) {
-      const allowedExtensions = ['jpg', 'jpeg', 'png'];
-      let isValid = true;
+  <div class="row g-3 mb-3">
+    <!-- Capacity -->
+    <div class="col-sm-6">
+      <label for="id_capacity" class="form-label">Capacity (Liters)</label>
+      <select class="form-select {% if tanker_detail.capacity.errors %}is-invalid{% endif %}"
+              id="id_capacity" name="capacity" required>
+        <option value="">Select capacity</option>
+        <option value="1000" {% if tanker_detail.capacity.value == 1000 %}selected{% endif %}>1,000 Liters</option>
+        <option value="2000" {% if tanker_detail.capacity.value == 2000 %}selected{% endif %}>2,000 Liters</option>
+        <option value="5000" {% if tanker_detail.capacity.value == 5000 %}selected{% endif %}>5,000 Liters</option>
+        <option value="10000" {% if tanker_detail.capacity.value == 10000 %}selected{% endif %}>10,000 Liters</option>
+      </select>
+      {% if tanker_detail.capacity.errors %}
+        <div class="invalid-feedback">{% for e in tanker_detail.capacity.errors %}{{ e }}{% endfor %}</div>
+      {% endif %}
+    </div>
 
-      document.querySelectorAll('.form-control-file').forEach(function (input) {
-        const file = input.files[0];
-        if (file) {
-          const extension = file.name.split('.').pop().toLowerCase();
-          if (!allowedExtensions.includes(extension)) {
-            isValid = false;
-            input.classList.add('is-invalid');
+    <!-- Category -->
+    <div class="col-sm-6">
+      <label for="id_category" class="form-label">Water Category</label>
+      <select class="form-select {% if tanker_detail.category.errors %}is-invalid{% endif %}"
+              id="id_category" name="category" required>
+        <option value="">Select category</option>
+        {% for value, text in tanker_detail.category.field.choices %}
+          <option value="{{ value }}" {% if tanker_detail.category.value == value %}selected{% endif %}>{{ text }}</option>
+        {% endfor %}
+      </select>
+      {% if tanker_detail.category.errors %}
+        <div class="invalid-feedback">{% for e in tanker_detail.category.errors %}{{ e }}{% endfor %}</div>
+      {% endif %}
+    </div>
+  </div>
 
-            let feedback = input.parentElement.querySelector('.invalid-feedback');
-            if (!feedback) {
-              feedback = document.createElement('div');
-              feedback.classList.add('invalid-feedback');
-              feedback.innerText = "Only JPG, JPEG, or PNG files are allowed.";
-              input.parentElement.appendChild(feedback);
-            }
-            feedback.style.display = "block";
-          } else {
-            input.classList.remove('is-invalid');
-            let feedback = input.parentElement.querySelector('.invalid-feedback');
-            if (feedback) feedback.style.display = "none";
+  <!-- Document Uploads -->
+  <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:12px">
+    <i class="bi bi-file-earmark-text me-1"></i>Required Documents (JPG, JPEG, PNG)
+  </div>
+
+  <div class="row g-3 mb-4">
+    {% for field_name, label in doc_fields_list %}
+      <div class="col-sm-6">
+        <label class="form-label" style="font-size:13px">{{ label }}</label>
+        <input type="file" class="form-control form-control-sm" name="{{ field_name }}" accept=".jpg,.jpeg,.png" required>
+      </div>
+    {% empty %}
+      {% with doc_list="driving_license,Driving License|aadhar_card,Aadhar Card|pan_card,PAN Card|registration_cert,Registration Cert|vehicle_insurance,Vehicle Insurance|vehicle_permit,Vehicle Permit" %}
+        <div class="col-sm-6">
+          <label class="form-label" style="font-size:13px">Driving License</label>
+          <input type="file" class="form-control form-control-sm" name="driving_license" accept=".jpg,.jpeg,.png" required>
+          {% if document.driving_license.errors %}<div class="text-danger" style="font-size:12px">{% for e in document.driving_license.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" style="font-size:13px">Aadhar Card</label>
+          <input type="file" class="form-control form-control-sm" name="aadhar_card" accept=".jpg,.jpeg,.png" required>
+          {% if document.aadhar_card.errors %}<div class="text-danger" style="font-size:12px">{% for e in document.aadhar_card.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" style="font-size:13px">PAN Card</label>
+          <input type="file" class="form-control form-control-sm" name="pan_card" accept=".jpg,.jpeg,.png" required>
+          {% if document.pan_card.errors %}<div class="text-danger" style="font-size:12px">{% for e in document.pan_card.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" style="font-size:13px">Registration Certificate</label>
+          <input type="file" class="form-control form-control-sm" name="registration_cert" accept=".jpg,.jpeg,.png" required>
+          {% if document.registration_cert.errors %}<div class="text-danger" style="font-size:12px">{% for e in document.registration_cert.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" style="font-size:13px">Vehicle Insurance</label>
+          <input type="file" class="form-control form-control-sm" name="vehicle_insurance" accept=".jpg,.jpeg,.png" required>
+          {% if document.vehicle_insurance.errors %}<div class="text-danger" style="font-size:12px">{% for e in document.vehicle_insurance.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label" style="font-size:13px">Vehicle Permit</label>
+          <input type="file" class="form-control form-control-sm" name="vehicle_permit" accept=".jpg,.jpeg,.png" required>
+          {% if document.vehicle_permit.errors %}<div class="text-danger" style="font-size:12px">{% for e in document.vehicle_permit.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+      {% endwith %}
+    {% endfor %}
+  </div>
+
+  <div class="alert alert-info" style="font-size:12.5px;padding:10px 14px">
+    <i class="bi bi-info-circle me-1"></i>
+    Please wait 24 hours for document verification before going online.
+  </div>
+
+  <button type="submit" class="btn btn-primary w-100 mt-3" style="padding:10px">
+    <i class="bi bi-truck me-2"></i>Register Tanker
+  </button>
+</form>
+{% endblock %}
+
+{% block auth_footer %}
+<div class="auth-footer">
+  <a href="{% url 'Home' %}">Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.querySelector('form').addEventListener('submit', function (e) {
+    const allowed = ['jpg','jpeg','png'];
+    let isValid = true;
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+      const file = input.files[0];
+      if (file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!allowed.includes(ext)) {
+          isValid = false;
+          input.classList.add('is-invalid');
+          let fb = input.nextElementSibling;
+          if (!fb || !fb.classList.contains('invalid-feedback')) {
+            fb = document.createElement('div');
+            fb.className = 'invalid-feedback';
+            input.after(fb);
           }
+          fb.textContent = 'Only JPG, JPEG, or PNG allowed.';
+        } else {
+          input.classList.remove('is-invalid');
         }
-      });
-
-      if (!isValid) {
-        e.preventDefault();
       }
     });
-  </script>
-</body>
-</html>
+    if (!isValid) e.preventDefault();
+  });
+</script>
+{% endblock %}

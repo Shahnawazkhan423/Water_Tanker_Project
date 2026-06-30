@@ -1,135 +1,63 @@
 {% extends "Home.html" %}
-{% block content %}
-<style>
-  .notifications-container {
-    max-width: 700px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #f9fafb;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
 
-  .notifications-container h3 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 20px;
-    font-size: 24px;
-    font-weight: 600;
-  }
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
 
-  .notification-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+{% block sup-hero %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h1 class="page-title">Notifications</h1>
+    <p class="page-subtitle">Updates from customers and the platform.</p>
+  </div>
+  {% if notifications %}
+    <span class="badge bg-primary rounded-pill" style="font-size:12px">{{ notifications|length }}</span>
+  {% endif %}
+</div>
 
-  .notification-item {
-    background: #fff;
-    margin-bottom: 15px;
-    padding: 15px 20px;
-    border-left: 6px solid #3498db;
-    border-radius: 8px;
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-start;
-    transition: background 0.3s ease;
-  }
+<div class="card">
+  <div class="card-body p-0">
+    {% if notifications %}
+      <ul class="list-unstyled mb-0">
+        {% for notif in notifications %}
+          <li style="padding:16px 20px;border-bottom:1px solid var(--border-light);display:flex;align-items:flex-start;gap:14px">
+            <div class="icon-box {% if not notif.is_read %}icon-box-primary{% else %}icon-box-sm{% endif %}"
+                 style="flex-shrink:0;{% if notif.is_read %}background:var(--border-light);color:var(--text-muted){% endif %}">
+              <i class="bi bi-bell-fill"></i>
+            </div>
 
-  .notification-item:hover {
-    background: #eef6fb;
-  }
+            <div style="flex:1;min-width:0">
+              <p style="margin:0 0 4px;font-size:13.5px;color:var(--text-primary);{% if not notif.is_read %}font-weight:600{% endif %}">
+                {{ notif.message }}
+              </p>
+              <span style="font-size:12px;color:var(--text-muted)">
+                <i class="bi bi-clock me-1"></i>{{ notif.timestamp|date:"M d, Y H:i" }}
+              </span>
+              {% if not notif.is_read %}
+                <span class="status-badge status-accepted ms-2">New</span>
+              {% endif %}
+            </div>
 
-  .notification-content {
-    flex-grow: 1;
-    margin-right: 10px;
-    min-width: 220px;
-    word-wrap: break-word;
-  }
-
-  .timestamp {
-    display: block;
-    color: #7f8c8d;
-    font-size: 14px;
-    margin-top: 5px;
-  }
-
-  .notification-item.new {
-    border-left-color: #27ae60;
-    font-weight: 600;
-  }
-
-  .notification-item.new::after {
-    content: "New";
-    color: #fff;
-    background: #27ae60;
-    font-size: 12px;
-    padding: 4px 8px;
-    border-radius: 10px;
-    position: absolute;
-    top: 15px;
-    left: -45px;
-  }
-
-  .delete-btn {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    white-space: nowrap;
-  }
-
-  .delete-btn:hover {
-    background-color: #c0392b;
-  }
-
-  .notification-empty {
-    text-align: center;
-    color: #7f8c8d;
-    font-style: italic;
-    padding: 20px 0;
-  }
-
-  @media (max-width: 576px) {
-    .notification-item {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .notification-item.new::after {
-      position: static;
-      margin-bottom: 10px;
-    }
-
-    .delete-btn {
-      margin-top: 10px;
-    }
-  }
-</style>
-<div class="container notifications-container">
-  <h3>Notifications</h3>
-  <ul class="notification-list">
-    {% for notif in notifications %}
-      <li class="notification-item {% if not notif.is_read %}new{% endif %}">
-        <div class="notification-content">
-          {{ notif.message }}<br>
-          <span class="timestamp">{{ notif.timestamp|date:"Y-m-d H:i" }}</span>
-        </div>
-        <form method="post" action="{% url 'delete_notification' notif.id %}">
-          {% csrf_token %}
-          <button type="submit" class="delete-btn">Delete</button>
-        </form>
-      </li>
-    {% empty %}
-      <li class="notification-empty">No notifications.</li>
-    {% endfor %}
-  </ul>
+            <form method="POST" action="{% url 'delete_notification' notif.id %}" style="flex-shrink:0">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-ghost"
+                      style="color:var(--danger);border-color:transparent"
+                      title="Delete"
+                      onclick="return confirm('Delete this notification?')">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon"><i class="bi bi-bell-slash"></i></div>
+        <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px">No notifications yet.</p>
+        <a href="{% url 'Home' %}" class="btn btn-outline-primary btn-sm">Go to Dashboard</a>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
+
+{% block content %}{% endblock %}

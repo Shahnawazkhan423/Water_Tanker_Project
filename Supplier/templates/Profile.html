@@ -1,461 +1,221 @@
 {% extends "Home.html" %}
-{% block title %}Driver Profile{% endblock %}
 {% load static %}
 
+{% block title %}Driver Profile{% endblock %}
+{% block page_title %}Driver Profile{% endblock %}
+
 {% block sup-hero %}
-<div class="container mt-5">
-    <h4 class="text-center mb-4">🚚 Driver Profile</h4>
-    <div class="card shadow-lg rounded-4 p-4">
-        <div class="text-center mb-4 position-relative" style="display: inline-block;">
-            {% if user.profile_image %}
-                <img id="profilePreview" src="{{ user.profile_image.url }}" 
-                    alt="Profile photo of {{ user.first_name }}" 
-                    class="rounded-circle border border-secondary" 
-                    width="120" height="120" style="object-fit: cover; cursor: pointer;">
-            {% else %}
-                <img id="profilePreview" src="{% static 'images/default-profile.png' %}" 
-                    alt="Default profile" 
-                    class="rounded-circle border border-secondary" 
-                    width="120" height="120" style="object-fit: cover; cursor: pointer;">
-            {% endif %}
-            
-            <!-- Camera icon -->
-           <label for="profileImageInput" class="btn btn-sm btn-dark position-absolute"
-                               style="bottom: 0; right: 0; border-radius: 50%;">
-                            <i class="fa fa-camera"></i>
-                        </label>
+<div class="page-header">
+  <h1 class="page-title">Driver Profile</h1>
+  <p class="page-subtitle">Your personal and vehicle information.</p>
+</div>
 
-            <!-- Form -->
-            <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile_image' %}" class="mt-2">
-                {% csrf_token %}
-                <input type="file" name="profile_image" id="profileImageInput" class="d-none" accept="image/*">
-                <button type="submit" class="btn btn-primary btn-sm mt-2 d-none" id="saveImageBtn">Save Image</button>
-            </form>
-            <h5 class="fw-bold mb-1">{{ user.first_name }} {{ user.last_name }}</h5>
+<div class="row g-4">
+  <!-- Profile Card -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div style="position:relative;display:inline-block;margin-bottom:16px">
+          {% if user.profile_image %}
+            <img id="profilePreview" src="{{ user.profile_image.url }}" alt="{{ user.first_name }}"
+                 style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--border);cursor:pointer">
+          {% else %}
+            <img id="profilePreview" src="{% static 'images/default-profile.png' %}" alt="Profile"
+                 style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--border);cursor:pointer">
+          {% endif %}
+          <label for="profileImageInput"
+                 style="position:absolute;bottom:0;right:0;width:28px;height:28px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff"
+                 title="Change photo">
+            <i class="bi bi-camera-fill" style="color:#fff;font-size:12px"></i>
+          </label>
         </div>
 
-        <hr>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile_image' %}">
+          {% csrf_token %}
+          <input type="file" name="profile_image" id="profileImageInput" accept="image/*" class="d-none">
+          <button type="submit" class="btn btn-primary btn-sm d-none" id="saveImageBtn">
+            <i class="bi bi-check2 me-1"></i>Save Photo
+          </button>
+        </form>
 
-        <div class="row text-center mb-3">
-            <div class="col-12 col-md-6 mb-2">
-                <div class="bg-light rounded-3 p-3">
-                    <strong>Orders Completed:</strong>
-                    <div class="text-primary fs-5 fw-semibold">{{ orders_completed|default:0 }}</div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 mb-2">
-                <div class="bg-light rounded-3 p-3">
-                    <strong>Year Joined:</strong>
-                    <div class="text-primary fs-5 fw-semibold">{{ supplier.created_at|timesince |default:"N/A"}} ago</div>
-                </div>
-            </div>
+        <h5 style="font-weight:700;margin-top:8px">{{ user.first_name }} {{ user.last_name }}</h5>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">{{ user.email }}</p>
+        <span class="status-badge status-accepted">Supplier / Driver</span>
+      </div>
+
+      <div class="divider" style="margin:0"></div>
+
+      <div class="card-body">
+        <div class="d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-center" style="font-size:13px">
+            <span style="color:var(--text-muted)"><i class="bi bi-telephone me-2"></i>Phone</span>
+            <span style="font-weight:500">{{ user.phone_number|default:"—" }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center" style="font-size:13px">
+            <span style="color:var(--text-muted)"><i class="bi bi-geo-alt me-2"></i>City</span>
+            <span style="font-weight:500">{{ location.city|default:"—" }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center" style="font-size:13px">
+            <span style="color:var(--text-muted)"><i class="bi bi-check2-circle me-2"></i>Deliveries</span>
+            <span style="font-weight:700;color:var(--success)">{{ orders_completed|default:0 }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center" style="font-size:13px">
+            <span style="color:var(--text-muted)"><i class="bi bi-calendar3 me-2"></i>Joined</span>
+            <span style="font-weight:500">{{ joined_since|default:"—" }}</span>
+          </div>
         </div>
-
-        <div class="row text-center mb-3">
-            <div class="col-12 col-md-6 mb-2">
-                <div class="bg-light rounded-3 p-3">
-                    <strong>From Location:</strong>
-                    <div class="text-dark">{{ location.city|default:"N/A" }}</div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 mb-2">
-                <div class="bg-light rounded-3 p-3">
-                    <strong>Phone Number:</strong>
-                    <div class="text-dark">{{ user.phone_number|default:"N/A" }}</div>
-                </div>
-            </div>
-        </div>
-
-        <hr>
-
-        <h6 class="fw-bold mb-3">🚛 Vehicle Information & Documents</h6>
-        
-        <div class="card mb-4 border-primary">
-            <div class="card-header bg-primary text-white py-2">
-                <h6 class="mb-0">Vehicle Details</h6>
-            </div>
-            <div class="card-body">
-                {% if tanker_detail %}
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="info-item mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-circle bg-primary-light me-3">
-                                        <i class="fas fa-truck text-primary"></i>
-                                    </div>
-                                    <div>
-                                        <p class="mb-0 text-muted small">Vehicle Type</p>
-                                        <p class="mb-0 fw-bold">{{ tanker_detail.get_capacity_display|default:"N/A" }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="info-item mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-circle bg-primary-light me-3">
-                                        <i class="fas fa-id-card text-primary"></i>
-                                    </div>
-                                    {% if tankers %}
-                                        {% for tanker in tankers %}
-                                            <div>
-                                                <p class="mb-0 text-muted small">Tanker Name</p>
-                                                <p class="mb-0 fw-bold">{{ tanker.document.water_tanker_name|default:"N/A"   }}</p>
-                                            </div>
-                                            {% endfor %}
-                                    {%endif%}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="info-item mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class=" PD: 48 4f 53 54 20 2f 20 48 54 54 50 2f 31 2e 31 0d 0a 48 6f 73 74 3a 20 31 39 32 2e 31 36 38 2e 31 2e 31 30 30 3a 38 30 38 30 0d 0a 55 73 65 72 2d 41 67 65 6e 74 3a 20 63 75 72 6c 2f 37 2e 36 38 2e 30 0d 0a 41 63 63 65 70 74 3a 20 2a 2f 2a 0d 0a 0d 0a icon-circle bg-primary-light me-3">
-                                        <i class="fas fa-tint text-primary"></i>
-                                    </div>
-                                    <div>
-                                        <p class="mb-0 text-muted small">Water Category</p>
-                                        <p class="mb-0 fw-bold">{{ tanker_detail.get_category_display|default:"N/A" }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <p class="text-muted">No tanker assigned to this driver.</p>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="card border-success">
-            <div class="card-header bg-success text-white py-2">
-                <h6 class="mb-0">Documents</h6>
-            </div>
-            <div class="card-body">
-                {% if tankers %}
-                    {% for tanker in tankers%}
-                    <div class="row">
-            
-
-                        <div class="col-12 col-md-4 mb-4">
-                            <div class="document-card h-100" role="region" aria-labelledby="driving-license-header">
-                                <div class="document-header bg-success-light p-2 rounded-top">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 id="driving-license-header" class="mb-0"><i class="fas fa-id-card me-2"></i>Driving License</h6>
-                                        {% if tanker.document.driving_license %}
-                                            <span class="badge bg-success">Uploaded</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Missing</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="document-body p-3 text-center border">
-                                    {% if tanker.document.driving_license %}
-                                        <img src="{{ document.driving_license.url }}" alt="Driving license for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.driving_license.url }}" data-document-title="Driving License">
-                                    {% else %}
-                                        <img src="/static/image/document_placeholder.jpg" alt="Placeholder for driving license" class="img-fluid rounded mb-2 document-image">
-                                    {% endif %}
-                                    <p class="mb-0 small text-muted">Status: {% if document.driving_license %}Available{% else %}Not Uploaded{% endif %}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-4 mb-4">
-                            <div class="document-card h-100" role="region" aria-labelledby="aadhar-card-header">
-                                <div class="document-header bg-success-light p-2 rounded-top">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 id="aadhar-card-header" class="mb-0"><i class="fas fa-id-badge me-2"></i>Aadhar Card</h6>
-                                        {% if tanker.document.aadhar_card %}
-                                            <span class="badge bg-success">Uploaded</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Missing</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="document-body p-3 text-center border">
-                                    {% if tanker.document.aadhar_card %}
-                                        <img src="{{ document.aadhar_card.url }}" alt="Aadhar card for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.aadhar_card.url }}" data-document-title="Aadhar Card">
-                                    {% else %}
-                                        <img src="/static/image/document_placeholder.jpg" alt="Placeholder for Aadhar card" class="img-fluid rounded mb-2 document-image">
-                                    {% endif %}
-                                    <p class="mb-0 small text-muted">Status: {% if document.aadhar_card %}Available{% else %}Not Uploaded{% endif %}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-4 mb-4">
-                            <div class="document-card h-100" role="region" aria-labelledby="pan-card-header">
-                                <div class="document-header bg-success-light p-2 rounded-top">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 id="pan-card-header" class="mb-0"><i class="fas fa-address-card me-2"></i>PAN Card</h6>
-                                        {% if tanker.document.pan_card %}
-                                            <span class="badge bg-success">Uploaded</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Missing</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="document-body p-3 text-center border">
-                                    {% if document.pan_card %}
-                                        <img src="{{ tanker.document.pan_card.url }}" alt="PAN card for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.pan_card.url }}" data-document-title="PAN Card">
-                                    {% else %}
-                                        <img src="/static/image/document_placeholder.jpg" alt="Placeholder for PAN card" class="img-fluid rounded mb-2 document-image">
-                                    {% endif %}
-                                    <p class="mb-0 small text-muted">Status: {% if document.pan_card %}Available{% else %}Not Uploaded{% endif %}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-4 mb-4">
-                            <div class="document-card h-100" role="region" aria-labelledby="registration-cert-header">
-                                <div class="document-header bg-success-light p-2 rounded-top">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 id="registration-cert-header" class="mb-0"><i class="fas fa-file-alt me-2"></i>Registration Certificate</h6>
-                                        {% if tanker.document.registration_cert %}
-                                            <span class="badge bg-success">Uploaded</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Missing</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="document-body p-3 text-center border">
-                                    {% if tanker.document.registration_cert %}
-                                        <img src="{{ document.registration_cert.url }}" alt="Registration certificate for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.registration_cert.url }}" data-document-title="Registration Certificate">
-                                    {% else %}
-                                        <img src="/static/image/document_placeholder.jpg" alt="Placeholder for registration certificate" class="img-fluid rounded mb-2 document-image">
-                                    {% endif %}
-                                    <p class="mb-0 small text-muted">Status: {% if document.registration_cert %}Available{% else %}Not Uploaded{% endif %}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-4 mb-4">
-                            <div class="document-card h-100" role="region" aria-labelledby="vehicle-insurance-header">
-                                <div class="document-header bg-success-light p-2 rounded-top">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 id="vehicle-insurance-header" class="mb-0"><i class="fas fa-shield-alt me-2"></i>Vehicle Insurance</h6>
-                                        {% if tanker.document.vehicle_insurance %}
-                                            <span class="badge bg-success">Uploaded</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Missing</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="document-body p-3 text-center border">
-                                    {% if tanker.document.vehicle_insurance %}
-                                        <img src="{{ document.vehicle_insurance.url }}" alt="Vehicle insurance for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.vehicle_insurance.url }}" data-document-title="Vehicle Insurance">
-                                    {% else %}
-                                        <img src="/static/image/document_placeholder.jpg" alt="Placeholder for vehicle insurance" class="img-fluid rounded mb-2 document-image">
-                                    {% endif %}
-                                    <p class="mb-0 small text-muted">Status: {% if document.vehicle_insurance %}Available{% else %}Not Uploaded{% endif %}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-4 mb-4">
-                            <div class="document-card h-100" role="region" aria-labelledby="vehicle-permit-header">
-                                <div class="document-header bg-success-light p-2 rounded-top">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 id="vehicle-permit-header" class="mb-0"><i class="fas fa-file-contract me-2"></i>Vehicle Permit</h6>
-                                        {% if tanker.document.vehicle_permit %}
-                                            <span class="badge bg-success">Uploaded</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Missing</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="document-body p-3 text-center border">
-                                    {% if tanker.document.vehicle_permit %}
-                                        <img src="{{ document.vehicle_permit.url }}" alt="Vehicle permit for {{ document.water_tanker_name }}" class="img-fluid rounded mb-2 document-image" data-bs-toggle="modal" data-bs-target="#documentModal" data-document-url="{{ document.vehicle_permit.url }}" data-document-title="Vehicle Permit">
-                                    {% else %}
-                                        <img src="/static/image/document_placeholder.jpg" alt="Placeholder for vehicle permit" class="img-fluid rounded mb-2 document-image">
-                                    {% endif %}
-                                    <p class="mb-0 small text-muted">Status: {% if document.vehicle_permit %}Available{% else %}Not Uploaded{% endif %}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-muted">No documents available for this tanker.</p>
-                {% endif %}
-            </div>
-        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- Bootstrap Modal for Document Preview -->
-<div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="documentModalLabel">Document Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <!-- Vehicle & Documents -->
+  <div class="col-lg-8">
+    <!-- Vehicle Details -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-truck me-2" style="color:var(--primary)"></i>Vehicle Information
+      </div>
+      <div class="card-body">
+        {% if tanker_detail %}
+          <div class="row g-3">
+            <div class="col-sm-4">
+              <div style="background:var(--bg);border-radius:var(--r);padding:12px 14px">
+                <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:600;margin-bottom:6px">Capacity</div>
+                <div style="font-weight:700;font-size:15px">{{ tanker_detail.get_capacity_display|default:"—" }}</div>
+              </div>
             </div>
-            <div class="modal-body text-center">
-                <div id="documentPreviewContainer"></div>
+            <div class="col-sm-4">
+              <div style="background:var(--bg);border-radius:var(--r);padding:12px 14px">
+                <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:600;margin-bottom:6px">Category</div>
+                <div style="font-weight:700;font-size:15px">{{ tanker_detail.get_category_display|default:"—" }}</div>
+              </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a id="documentDownload" href="" class="btn btn-primary" target="_blank">Open</a>
+            <div class="col-sm-4">
+              <div style="background:var(--bg);border-radius:var(--r);padding:12px 14px">
+                <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:600;margin-bottom:6px">Tanker Name</div>
+                <div style="font-weight:700;font-size:14px">
+                  {% for tanker in tankers %}{{ tanker.document.water_tanker_name|default:"—" }}{% endfor %}
+                </div>
+              </div>
             </div>
-        </div>
+          </div>
+        {% else %}
+          <div class="d-flex align-items-center justify-content-between p-3" style="background:var(--warning-50);border-radius:var(--r-lg);border:1px solid var(--warning-100)">
+            <div class="d-flex align-items-center gap-3">
+              <div class="icon-box icon-box-warning"><i class="bi bi-exclamation-triangle-fill"></i></div>
+              <div>
+                <div style="font-weight:600;font-size:13.5px;color:var(--warning)">No Tanker Registered</div>
+                <div style="font-size:12px;color:var(--text-muted)">Register your tanker to start delivering.</div>
+              </div>
+            </div>
+            <a href="{% url 'tanker_detail' %}" class="btn btn-warning btn-sm text-white">Register Now</a>
+          </div>
+        {% endif %}
+      </div>
     </div>
-</div>
-<div class="mt-5">
-    {% if not tanker_detail %}
-        <div class="card border-warning shadow-sm mb-3">
-            <div class="card-body d-flex flex-column flex-md-row align-items-center justify-content-between">
-                <div class="d-flex align-items-center mb-3 mb-md-0">
-                    <div class="icon-circle bg-warning text-white me-3">
-                        <i class="fas fa-exclamation-triangle"></i>
+
+    <!-- Documents -->
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-file-earmark-text me-2" style="color:var(--success)"></i>Documents
+      </div>
+      <div class="card-body">
+        {% if tankers %}
+          {% for tanker in tankers %}
+            <div class="row g-3">
+              {% with doc=tanker.document %}
+                  <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+                    <div style="background:var(--bg);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                      <span style="font-size:12.5px;font-weight:600">Driving License</span>
+                      <span class="badge {% if doc.driving_license %}bg-success{% else %}bg-danger{% endif %}" style="font-size:10px">
+                        {% if doc.driving_license %}Uploaded{% else %}Missing{% endif %}
+                      </span>
                     </div>
-                    <div>
-                        <h6 class="mb-1 text-warning">No Tanker Registered</h6>
-                        <p class="mb-0 text-muted small">You haven’t registered a tanker yet.</p>
-                    </div>
+                  </div>
                 </div>
-                <a href="{% url 'tanker_detail' %}" class="btn btn-warning btn-sm text-white">
-                    <i class="fas fa-plus-circle me-1"></i> Register Now
-                </a>
-            </div>
-        </div>
-    {% elif tanker_detail and tanker_detail.documents_expired %}
-        <div class="card border-danger shadow-sm">
-            <div class="card-body d-flex flex-column flex-md-row align-items-center justify-content-between">
-                <div class="d-flex align-items-center mb-3 mb-md-0">
-                    <div class="icon-circle bg-danger text-white me-3">
-                        <i class="fas fa-file-excel"></i>
+                <div class="col-sm-6 col-md-4">
+                  <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+                    <div style="background:var(--bg);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                      <span style="font-size:12.5px;font-weight:600">Aadhar Card</span>
+                      <span class="badge {% if doc.aadhar_card %}bg-success{% else %}bg-danger{% endif %}" style="font-size:10px">
+                        {% if doc.aadhar_card %}Uploaded{% else %}Missing{% endif %}
+                      </span>
                     </div>
-                    <div>
-                        <h6 class="mb-1 text-danger">Documents Expired</h6>
-                        <p class="mb-0 text-muted small">Some of your documents have expired and need updating.</p>
-                    </div>
+                  </div>
                 </div>
-                <a href="#" class="btn btn-danger btn-sm text-white">
-                    <i class="fas fa-upload me-1"></i> Upload Documents
-                </a>
+                <div class="col-sm-6 col-md-4">
+                  <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+                    <div style="background:var(--bg);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                      <span style="font-size:12.5px;font-weight:600">PAN Card</span>
+                      <span class="badge {% if doc.pan_card %}bg-success{% else %}bg-danger{% endif %}" style="font-size:10px">
+                        {% if doc.pan_card %}Uploaded{% else %}Missing{% endif %}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                  <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+                    <div style="background:var(--bg);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                      <span style="font-size:12.5px;font-weight:600">Registration Cert</span>
+                      <span class="badge {% if doc.registration_cert %}bg-success{% else %}bg-danger{% endif %}" style="font-size:10px">
+                        {% if doc.registration_cert %}Uploaded{% else %}Missing{% endif %}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                  <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+                    <div style="background:var(--bg);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                      <span style="font-size:12.5px;font-weight:600">Vehicle Insurance</span>
+                      <span class="badge {% if doc.vehicle_insurance %}bg-success{% else %}bg-danger{% endif %}" style="font-size:10px">
+                        {% if doc.vehicle_insurance %}Uploaded{% else %}Missing{% endif %}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                  <div style="border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+                    <div style="background:var(--bg);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                      <span style="font-size:12.5px;font-weight:600">Vehicle Permit</span>
+                      <span class="badge {% if doc.vehicle_permit %}bg-success{% else %}bg-danger{% endif %}" style="font-size:10px">
+                        {% if doc.vehicle_permit %}Uploaded{% else %}Missing{% endif %}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              {% endwith %}
             </div>
-        </div>
-    {% endif %}
+          {% endfor %}
+        {% else %}
+          <div class="empty-state" style="padding:32px">
+            <div class="empty-state-icon" style="font-size:36px"><i class="bi bi-folder-x"></i></div>
+            <p style="color:var(--text-muted);font-size:13.5px">No documents uploaded yet.</p>
+            <a href="{% url 'tanker_detail' %}" class="btn btn-primary btn-sm">
+              <i class="bi bi-upload me-1"></i>Upload Documents
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
-
-
-<style>
-.camera-icon {
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    border-radius: 50%;
-    padding: 8px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.camera-icon:hover {
-    background: rgba(0, 0, 0, 0.8);
-}
-
-    /* Custom Styles */
-    .icon-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .bg-primary-light {
-        background-color: rgba(13, 110, 253, 0.1);
-    }
-    
-    .bg-success-light {
-        background-color: rgba(25, 135, 84, 0.1);
-    }
-    
-    .document-image {
-        max-height: 150px;
-        width: auto;
-        border: 1px solid #dee2e6;
-        cursor: pointer;
-    }
-    
-    .document-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .document-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    
-    #documentPreviewContainer img, #documentPreviewContainer iframe {
-        max-height: 500px;
-        width: auto;
-        max-width: 100%;
-    }
-</style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const profilePreview = document.getElementById('profilePreview');
-    const fileInput = document.getElementById('profileImageInput');
-    const saveBtn = document.getElementById('saveImageBtn');
-    const modal = document.getElementById('documentModal');
+  const profilePreview    = document.getElementById('profilePreview');
+  const profileImageInput = document.getElementById('profileImageInput');
+  const saveImageBtn      = document.getElementById('saveImageBtn');
 
-    // Click profile image to choose file
-    profilePreview.addEventListener('click', function () {
-        fileInput.click();
-    });
+  if (profilePreview) profilePreview.addEventListener('click', () => profileImageInput.click());
 
-    // Show preview & save button after choosing file
-    fileInput.addEventListener('change', function () {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                profilePreview.src = e.target.result;
-                saveBtn.classList.remove('d-none');
-            };
-            reader.readAsDataURL(this.files[0]);
-        }
-    });
-
-    // Handle Bootstrap modal for document preview
-    modal.addEventListener('show.bs.modal', function (event) {
-        const image = event.relatedTarget;
-        const documentUrl = image.getAttribute('data-document-url');
-        const documentTitle = image.getAttribute('data-document-title');
-
-        const modalTitle = modal.querySelector('#documentModalLabel');
-        const previewContainer = modal.querySelector('#documentPreviewContainer');
-        const downloadLink = modal.querySelector('#documentDownload');
-
-        modalTitle.textContent = documentTitle;
-        downloadLink.href = documentUrl;
-
-        // Show PDF in iframe, otherwise image
-        if (documentUrl.toLowerCase().endsWith('.pdf')) {
-            previewContainer.innerHTML = `<iframe src="${documentUrl}" style="width: 100%; height: 500px;" title="${documentTitle}"></iframe>`;
-        } else {
-            previewContainer.innerHTML = `<img src="${documentUrl}" alt="${documentTitle}" class="img-fluid">`;
-        }
-    });
-
-    // Clear modal preview on close
-    modal.addEventListener('hidden.bs.modal', function () {
-        const previewContainer = modal.querySelector('#documentPreviewContainer');
-        previewContainer.innerHTML = '';
-    });
-    // Click camera icon to choose file
-    document.getElementById('cameraIcon').addEventListener('click', function () {
-        document.getElementById('profileImageInput').click();
-    });
-
-});
+  if (profileImageInput) profileImageInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        profilePreview.src = e.target.result;
+        saveImageBtn.classList.remove('d-none');
+      };
+      reader.readAsDataURL(this.files[0]);
+    }
+  });
 </script>
 {% endblock %}

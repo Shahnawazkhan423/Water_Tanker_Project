@@ -1,68 +1,109 @@
 {% extends 'home.html' %}
+
+{% block title %}My Orders{% endblock %}
+{% block page_title %}My Orders{% endblock %}
+
 {% block Hero-bar %}
-<div class="container my-4 driver-container">
-    <h2 class="text-center">Driver Details</h2>
-    <div class="p-4 border rounded">
-
-        {% if messages %}
-        <div class="container mt-3">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} d-flex align-items-center" role="alert">
-                {% if message.tags == "success" %}
-                    <i class="fas fa-check-circle me-2 text-success"></i>
-                {% elif message.tags == "warning" %}
-                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
-                {% else %}
-                    <i class="fas fa-info-circle me-2 text-info"></i>
-                {% endif %}
-                <div>
-                    {{ message }}
-                    <div class="text-muted" style="font-size: 0.8em;">just now</div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if orders %}
-            {% for order in orders %}
-                <hr>
-                {% if order.order_status == 'Canceled' %}
-                    <p><strong>Driver Name:</strong> N/A</p> 
-                    <p><strong>Phone Number:</strong> N/A</p>
-                    <p><strong>Delivery Date:</strong> N/A</p>
-                    <p><strong>Status:</strong> Canceled</p>
-                    <div class="alert alert-info">This order has been canceled.</div>
-                {% else %}
-                    {% if order.driver %}
-                         <div class="mb-3 text-center ">
-                            <img src="{{ order.driver.user.profile_image.url }}" 
-                                alt="Driver Photo" 
-                                class="img-thumbnail rounded-circle img-fluid" 
-                                style="max-width: 150px;">
-                        </div>
-                        <p><strong>Driver Name:</strong> {{ order.driver.user.first_name }} {{ order.driver.user.last_name }}</p> 
-                        <p><strong>Phone Number:</strong> {{ order.driver.user.phone_number }}</p>
-                    {% else %}
-                        <p><strong>Driver Name:</strong> N/A</p> 
-                        <p><strong>Phone Number:</strong> N/A</p>
-                    {% endif %}
-                    
-                    <p><strong>Status:</strong> {{ order.order_status }}</p>
-
-                    {% if order.order_status != 'Delivered' %}
-                        <form method="post" action="{% url 'customer_cancel_order' order.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger mt-2">
-                                <i class="fa-solid fa-times-circle"></i> Cancel Order
-                            </button>
-                        </form>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-        {% else %}
-            <div class="alert alert-info">No active orders found.</div>
-        {% endif %}
-    </div>
+<div class="page-header">
+  <h1 class="page-title">My Active Orders</h1>
+  <p class="page-subtitle">Track your accepted and in-transit deliveries.</p>
 </div>
+
+{% if orders %}
+  <div class="d-flex flex-column gap-4">
+    {% for order in orders %}
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-2">
+            <span style="font-weight:700;font-size:15px">#{{ order.id }}</span>
+            <span class="status-badge {% if order.order_status == 'Accepted' %}status-accepted{% elif order.order_status == 'On The Way' %}status-on_the_way{% else %}status-pending{% endif %}">
+              {{ order.order_status }}
+            </span>
+          </div>
+          <span style="font-size:12px;color:var(--text-muted)">
+            <i class="bi bi-clock me-1"></i>{{ order.order_date|date:"M d, Y H:i" }}
+          </span>
+        </div>
+
+        <div class="card-body">
+          <div class="row g-4">
+            <!-- Order details -->
+            <div class="col-md-5">
+              <div style="font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:12px">
+                Order Details
+              </div>
+              <div class="d-flex flex-column gap-2">
+                <div class="d-flex justify-content-between" style="font-size:13.5px">
+                  <span style="color:var(--text-muted)">Quantity</span>
+                  <span style="font-weight:600">{{ order.quantity }}L</span>
+                </div>
+                <div class="d-flex justify-content-between" style="font-size:13.5px">
+                  <span style="color:var(--text-muted)">Total Price</span>
+                  <span style="font-weight:700;color:var(--success)">₹{{ order.price }}</span>
+                </div>
+                {% if order.tanker %}
+                  <div class="d-flex justify-content-between" style="font-size:13.5px">
+                    <span style="color:var(--text-muted)">Tanker Type</span>
+                    <span style="font-weight:500">{{ order.tanker.get_category_display|default:"—" }}</span>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Delivery location -->
+            <div class="col-md-4">
+              <div style="font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:12px">
+                Delivery Location
+              </div>
+              {% if order.location %}
+                <div class="d-flex flex-column gap-1" style="font-size:13.5px">
+                  <div>{{ order.location.address_line|default:"" }}</div>
+                  <div style="color:var(--text-muted)">{{ order.location.city|default:"" }}, {{ order.location.state|default:"" }}</div>
+                  {% if order.location.pincode %}<div style="color:var(--text-muted)">{{ order.location.pincode }}</div>{% endif %}
+                </div>
+              {% else %}
+                <span style="color:var(--text-muted);font-size:13px">Not available</span>
+              {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="col-md-3 d-flex flex-column justify-content-between">
+              <div></div>
+              {% if order.order_status not in 'On The Way,Delivered' %}
+                <form method="POST" action="{% url 'customer_cancel_order' order.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger w-100"
+                          onclick="return confirm('Cancel this order?')">
+                    <i class="bi bi-x-circle me-2"></i>Cancel Order
+                  </button>
+                </form>
+              {% else %}
+                <div class="alert alert-info" style="font-size:12.5px;margin:0;padding:10px 14px">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Order is in transit and cannot be cancelled.
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+{% else %}
+  <div class="card">
+    <div class="card-body">
+      <div class="empty-state">
+        <div class="empty-state-icon"><i class="bi bi-clipboard2-x"></i></div>
+        <h5 style="font-weight:600;margin-bottom:8px">No active orders</h5>
+        <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px">
+          You have no accepted or in-transit orders right now.
+        </p>
+        <a href="{% url 'booking' %}" class="btn btn-primary">
+          <i class="bi bi-truck me-2"></i>Book a Tanker
+        </a>
+      </div>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}

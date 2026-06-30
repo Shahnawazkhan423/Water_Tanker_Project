@@ -1,429 +1,104 @@
 {% extends 'home.html' %}
-{% load custom_filters %}
+{% load static %}
 
-{% block title %}Bookings - Water Tanker Service{% endblock %}
+{% block title %}Book Tanker{% endblock %}
+{% block page_title %}Book a Tanker{% endblock %}
 
 {% block Hero-bar %}
-<div class="container my-5">
-    {% if messages %}
-        {% for message in messages %}
-        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    {% endif %}
-
-    <div class="card shadow-lg border-0 rounded-4">
-        <div class="card-header bg-primary text-white rounded-top-4 text-center py-3">
-            <h3 class="mb-0">🚚 Book Water Tanker</h3>
-        </div>
-
-        <div class="card-body p-4">
-            <form method="post" class="row g-4 needs-validation" novalidate action="{% url 'booking' %}">
-                {% csrf_token %}
-                
-                <!-- User Details Section -->
-                <div class="col-12">
-                    <h5 class="text-secondary"><i class="bi bi-person-circle me-2"></i>User Details</h5>
-                </div>
-
-                <!-- First Name -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input type="text" name="first_name" id="id_first_name" 
-                               class="form-control {% if user_form.first_name.errors %}is-invalid{% endif %}"
-                               value="{{ user_form.first_name.value|default_if_none:'' }}"
-                               placeholder="First Name" required
-                               pattern="^(?!.*(.)\1{2})[A-Za-z\s]{2,30}$"
-                               title="First name (2-30 letters) with no 3 same consecutive characters">
-                        <label for="id_first_name">First Name</label>
-                        {% if user_form.first_name.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ user_form.first_name.errors.0 }}
-                        </div>
-                        {% else %}
-                        <div class="invalid-feedback">Please enter a valid first name (2-30 letters, no 3 same consecutive characters).</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Last Name -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input type="text" name="last_name" id="id_last_name" 
-                               class="form-control {% if user_form.last_name.errors %}is-invalid{% endif %}"
-                               value="{{ user_form.last_name.value|default_if_none:'' }}"
-                               placeholder="Last Name" required
-                               pattern="^(?!.*(.)\1{2})[A-Za-z\s]{2,30}$"
-                               title="Last name (2-30 letters) with no 3 same consecutive characters">
-                        <label for="id_last_name">Last Name</label>
-                        {% if user_form.last_name.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ user_form.last_name.errors.0 }}
-                        </div>
-                        {% else %}
-                        <div class="invalid-feedback">Please enter a valid last name (2-30 letters, no 3 same consecutive characters).</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Phone Number -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input type="tel" name="phone_number" id="id_phone_number" 
-                               class="form-control {% if user_form.phone_number.errors %}is-invalid{% endif %}"
-                               value="{{ user_form.phone_number.value|default_if_none:'' }}"
-                               placeholder="Phone Number" required
-                               pattern="^(?!.*(\d)\1{9})[6-9]\d{9}$" minlength="10" maxlength="10"
-                               title="Enter a valid 10-digit Indian phone number starting with 6-9 And No Repeater Characters">
-                        <label for="id_phone_number">Phone Number</label>
-                        {% if user_form.phone_number.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ user_form.phone_number.errors.0 }}
-                        </div>
-                        {% else %}
-                        <div class="invalid-feedback">Please enter a valid 10-digit Indian phone number starting with 6-9.</div>
-                        {% endif %}
-                    </div>
-                </div>
-                <!-- Location Details Section -->
-                <div class="col-12 mt-4">
-                    <h5 class="text-secondary"><i class="bi bi-geo-alt-fill me-2"></i>Location Details</h5>
-                </div>
-
-                <!-- Address Line -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                      <input type="text" name="address_line" id="id_address_line" 
-                        class="form-control {% if location_form.address_line.errors %}is-invalid{% endif %}"
-                        value="{{ location_form.address_line.value|default_if_none:'' }}"
-   
-                        placeholder="Address Line" required
-                        pattern="^(?!([A-Za-z0-9\s,.\-])\1{4,99})[A-Za-z0-9\s,.\-]{5,100}$"
-                        title="Address should be 5-100 characters and may include letters, numbers, commas, dots, and hyphens and No repeated character">
-
-                        <label for="id_address_line">Address Line</label>
-                        {% if location_form.address_line.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ location_form.address_line.errors.0 }}
-                        </div>
-                        {% else %}
-                        <div class="invalid-feedback">Please enter a valid address (5-100 characters).</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Street -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input type="text" name="street" id="id_street" 
-                               class="form-control {% if location_form.street.errors %}is-invalid{% endif %}"
-                               value="{{ location_form.street.value|default_if_none:'' }}"
-                               placeholder="Street" required
-                               pattern="^(?!([A-Za-z\s])\1{2,49})[A-Za-z\s]{3,50}$ "
-                               title="Street name should contain only letters and spaces (3-50 characters) and No repeated character">
-                        <label for="id_street">Street</label>
-                        {% if location_form.street.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ location_form.street.errors.0 }}
-                        </div>
-                        {% else %}
-                        <div class="invalid-feedback">Please enter a valid street name (3-50 letters).</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Landmark -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input type="text" name="landmark" id="id_landmark" 
-                               class="form-control {% if location_form.landmark.errors %}is-invalid{% endif %}"
-                               value="{{ location_form.landmark.value|default_if_none:'' }}"
-                               placeholder="Landmark"
-                               pattern="^(?!([A-Za-z0-9\s,.\-])\1{0,99})[A-Za-z0-9\s,.\-]{1,100}$"
-                               title="Landmark may include letters, numbers, commas, dots, and hyphens and No repeated character">
-                        <label for="id_landmark">Landmark</label>
-                        {% if location_form.landmark.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ location_form.landmark.errors.0 }}
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- City -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <input type="text" name="city" id="id_city" 
-                               class="form-control {% if location_form.city.errors %}is-invalid{% endif %}"
-                               value="{{ location_form.city.value|default_if_none:'' }}"
-                               placeholder="City" required
-                               pattern="^(?!([A-Za-z\s])\1{1,49})[A-Za-z\s]{2,50}$"
-                               title="City name should contain only letters and spaces (2-50 characters) and No repeated character">
-                        <label for="id_city">City</label>
-                        {% if location_form.city.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ location_form.city.errors.0 }}
-                        </div>
-                        {% else %}
-                        <div class="invalid-feedback">Please enter a valid city name (2-50 letters).</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- State Dropdown -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <select name="state" class="form-select {% if location_form.state.errors %}is-invalid{% endif %}" id="id_state" required>
-                            <option value="" disabled {% if not location_form.state.value %}selected{% endif %}>Select State</option>
-                            <option value="Madhya Pradesh" {% if location_form.state.value == "Madhya Pradesh" %}selected{% endif %}>Madhya Pradesh</option>
-                            <option value="Maharashtra" {% if location_form.state.value == "Maharashtra" %}selected{% endif %}>Maharashtra</option>
-                            <option value="Rajasthan" {% if location_form.state.value == "Rajasthan" %}selected{% endif %}>Rajasthan</option>
-                            <option value="Uttar Pradesh" {% if location_form.state.value == "Uttar Pradesh" %}selected{% endif %}>Uttar Pradesh</option>
-                            <option value="Gujarat" {% if location_form.state.value == "Gujarat" %}selected{% endif %}>Gujarat</option>
-                        </select>
-                        <label for="id_state">State</label>
-                        {% if location_form.state.errors %}
-                        <div class="invalid-feedback d-block">{{ location_form.state.errors.0 }}</div>
-                        {% else %}
-                        <div class="invalid-feedback">Please select a state.</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                    
-                <!-- Pincode -->
-                <div class="col-md-6">
-                    <div class="form-floating mb-3">
-                        <input type="text" 
-                            name="pincode" 
-                            id="id_pincode" 
-                            class="form-control {% if location_form.pincode.errors %}is-invalid{% endif %}"
-                            value="{{ location_form.pincode.value|default_if_none:'' }}"
-                            placeholder="Pincode"
-                            required
-                            pattern="^(?!([0-9])\1{5})[0-9]{6}$"
-                            maxlength="6"
-                            title="Enter a valid 6-digit Indian pincode (not all same digits)">
-                        <label for="id_pincode">Pincode</label>
-                        
-                        {% if location_form.pincode.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ location_form.pincode.errors.0 }}
-                        </div>
-                        {% else %}
-                        <div class="invalid-feedback">Enter a valid 6-digit pincode (not all same digits) and No repeated character</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Tanker Details Section -->
-                <div class="col-12 mt-4">
-                    <h5 class="text-secondary"><i class="bi bi-truck me-2"></i>Tanker Details</h5>
-                </div>
-
-                <!-- Capacity -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        {{ tanker_form.capacity }}
-                        <label for="{{ tanker_form.capacity.id_for_label }}">Capacity</label>
-                        {% if tanker_form.capacity.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ tanker_form.capacity.errors.0 }}
-                        </div>
-                        {% else %}
-                        <div class="invalid-feedback">Please select a tanker capacity.</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Category -->
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        {{ tanker_form.category }}
-                        <label for="{{ tanker_form.category.id_for_label }}">Category</label>
-                        {% if tanker_form.category.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ tanker_form.category.errors.0 }}
-                        </div>
-                        {% else %}
-                        <div class="invalid-feedback">Please select a water category.</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Price Information -->
-                <div class="col-12 mt-3">
-                    <div class="alert alert-info">
-                        <strong>Price:</strong> 
-                        {% if request.method == "POST" and tanker_form.capacity.value %}
-                            ₹{{ pricing|get_item:tanker_form.capacity.value|floatformat:2 }} 
-                            for {{ tanker_form.capacity.value }} liters
-                        {% else %}
-                            Select a tanker capacity to see the price
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="col-12 d-grid mt-3">
-                    <button type="submit" class="btn btn-primary btn-lg rounded-pill">Book Now</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<div class="page-header">
+  <h1 class="page-title">Book Water Tanker</h1>
+  <p class="page-subtitle">Fill in the details below to schedule a delivery.</p>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.querySelector('.needs-validation');
-    if (!form) return;
+<!-- Pricing Info -->
+<div class="card mb-4" style="border-left:4px solid var(--primary)">
+  <div class="card-body py-3">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi bi-info-circle-fill" style="color:var(--primary)"></i>
+      <span style="font-weight:600;font-size:13.5px">Pricing</span>
+    </div>
+    <div class="row g-2">
+      {% for capacity, price in pricing.items %}
+        <div class="col-6 col-md-3">
+          <div style="background:var(--primary-50);border:1px solid var(--primary-100);border-radius:var(--r);padding:8px 12px;font-size:13px">
+            <div style="font-weight:600;color:var(--primary-dark)">{{ capacity }}L</div>
+            <div style="color:var(--text-muted)">₹{{ price }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
 
-    const repeatCharPattern = /(.)\1{2,}/;
+<form method="POST" action="{% url 'booking' %}">
+  {% csrf_token %}
 
-    const fields = {
-        first_name: {
-            el: document.getElementById('id_first_name'),
-            pattern: /^[A-Za-z\s]{2,30}$/,
-            error: 'First name must be 2–30 letters with no 3 repeating characters.'
-        },
-        last_name: {
-            el: document.getElementById('id_last_name'),
-            pattern: /^[A-Za-z\s]{2,30}$/,
-            error: 'Last name must be 2–30 letters with no 3 repeating characters.'
-        },
-        phone_number: {
-            el: document.getElementById('id_phone_number'),
-            pattern: /^[6-9]\d{9}$/,
-            error: 'Phone number must be 10 digits starting with 6–9.'
-        },
-        address_line: {
-            el: document.getElementById('id_address_line'),
-            pattern: /^[A-Za-z0-9\s,.-]{5,100}$/,
-            error: 'Address must be 5–100 characters.'
-        },
-        street: {
-            el: document.getElementById('id_street'),
-            pattern: /^[A-Za-z\s]{3,50}$/,
-            error: 'Street must be 3–50 letters.'
-        },
-        landmark: {
-            el: document.getElementById('id_landmark'),
-            pattern: /^[A-Za-z0-9\s,.-]{0,100}$/,
-            error: 'Landmark must be up to 100 characters.'
-        },
-        city: {
-            el: document.getElementById('id_city'),
-            pattern: /^[A-Za-z\s]{2,50}$/,
-            error: 'City must be 2–50 letters.'
-        },
-        state: {
-            el: document.getElementById('id_state'),
-            error: 'Please select a state.'
-        },
-        country: {
-            el: document.getElementById('id_country'),
-            error: 'Please select a country.'
-        },
-        pincode: {
-            el: document.getElementById('id_pincode'),
-            pattern: /^[0-9]{6}$/,
-            error: 'Pincode must be 6 digits and no digit should repeat more than 3 times.'
-        }
-    };
+  <div class="row g-4">
+    <!-- Personal Details -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <i class="bi bi-person me-2" style="color:var(--primary)"></i>Personal Details
+        </div>
+        <div class="card-body">
+          {% for field in user_form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="invalid-feedback d-block">{{ field.errors.0 }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
 
-    function validateField(field, checkEmpty = true) {
-        const el = field.el;
-        const value = el.value.trim();
-        let isValid = true;
+    <!-- Tanker & Location -->
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-truck me-2" style="color:var(--accent)"></i>Tanker Details
+        </div>
+        <div class="card-body">
+          {% for field in tanker_form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="invalid-feedback d-block">{{ field.errors.0 }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
 
-        if (el.tagName === 'SELECT') {
-            if (!value) {
-                el.setCustomValidity(field.error);
-                isValid = false;
-            } else {
-                el.setCustomValidity('');
-            }
-        } else if (value === '' && checkEmpty) {
-            el.setCustomValidity('This field is required.');
-            isValid = false;
-        } else if (field.pattern && !field.pattern.test(value)) {
-            el.setCustomValidity(field.error);
-            isValid = false;
-       } else if (el.id === 'id_pincode') {
-            const digitCounts = {};
-            for (let digit of value) {
-                digitCounts[digit] = (digitCounts[digit] || 0) + 1;
-                if (digitCounts[digit] > 4) {
-                    el.setCustomValidity('No digit should repeat more than 4 times.');
-                    isValid = false;
-                    break;
-                }
-            }
-            if (isValid) {
-                el.setCustomValidity('');
-            }
-        } else if (repeatCharPattern.test(value)) {
-            el.setCustomValidity('Too many repeating characters.');
-            isValid = false;
-        } else {
-            el.setCustomValidity('');
-        }
+      <div class="card">
+        <div class="card-header">
+          <i class="bi bi-geo-alt me-2" style="color:var(--success)"></i>Delivery Location
+        </div>
+        <div class="card-body">
+          {% for field in location_form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="invalid-feedback d-block">{{ field.errors.0 }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
 
-        el.reportValidity();
-        return isValid;
-    }
-
-    // Real-time validation
-    for (const key in fields) {
-        const field = fields[key];
-        if (!field.el) continue;
-
-        const eventType = field.el.tagName === 'SELECT' ? 'change' : 'input';
-        field.el.addEventListener(eventType, () => validateField(field));
-    }
-
-    // Final form validation on submit
-    form.addEventListener('submit', function (event) {
-        let allValid = true;
-
-        for (const key in fields) {
-            const field = fields[key];
-            if (!validateField(field)) {
-                allValid = false;
-            }
-        }
-
-        if (!form.checkValidity() || !allValid) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-
-        form.classList.add('was-validated');
-    });
-
-    // Auto-update price when capacity changes
-    const pricing = {
-        1000: 150,
-        2000: 240,
-        5000: 500,
-        10000: 800
-    };
-
-    const capacitySelect = document.getElementById('id_capacity');
-    const priceAlert = document.querySelector('.alert-info');
-
-    if (capacitySelect && priceAlert) {
-        capacitySelect.addEventListener('change', function () {
-            const selected = this.value;
-            if (pricing[selected]) {
-                priceAlert.innerHTML = `<strong>Price:</strong> ₹${pricing[selected].toFixed(2)} for ${selected} liters`;
-            } else {
-                priceAlert.innerHTML = `<strong>Price:</strong> Select a tanker capacity to see the price`;
-            }
-        });
-    }
-});
-</script>
+    <div class="col-12">
+      <div class="d-flex gap-3 justify-content-end">
+        <a href="{% url 'home' %}" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-primary" style="min-width:160px;padding:10px 20px">
+          <i class="bi bi-check2-circle me-2"></i>Confirm Booking
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
 {% endblock %}

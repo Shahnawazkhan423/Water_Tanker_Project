@@ -1,403 +1,196 @@
 {% extends "Home.html" %}
-{% block title %}Order Management{% endblock %}
+
+{% block title %}Orders{% endblock %}
+{% block page_title %}Orders{% endblock %}
+
 {% block sup-hero %}
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Font Awesome for icons -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-
-<div class="container-fluid py-4">
-    <!-- Header Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="page-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h2 class="mb-0"><i class="fas fa-truck me-2 text-primary"></i>Order Management</h2>
-                    <p class="text-muted mb-0">Manage all your water delivery orders in one place</p>
-                </div>
-                <div class="status-badges">
-                    <span class="badge bg-primary me-2">
-                        <i class="fas fa-clock me-1"></i> Pending: {{ pending_orders|length }}
-                    </span>
-                    <span class="badge bg-warning text-dark me-2">
-                        <i class="fas fa-truck-moving me-1"></i> On Way: {{ ontheway_orders|length }}
-                    </span>
-                    <span class="badge bg-success">
-                        <i class="fas fa-check-circle me-1"></i> Accepted: {{ accepted_orders|length }}
-                    </span>
-                </div>
-            </div>
-            <hr class="mt-3">
-        </div>
+<div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+  <div>
+    <h1 class="page-title">Order Management</h1>
+    <p class="page-subtitle">Review and manage incoming delivery requests.</p>
+  </div>
+  {% if not is_available %}
+    <div class="alert alert-warning d-flex align-items-center gap-2 mb-0" style="font-size:13px;padding:10px 14px">
+      <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+      You're offline. Go online to receive orders.
     </div>
-
-    <!-- Django Messages -->
-    {% if messages %}
-        <div class="row mb-4">
-            <div class="col-12">
-                {% for message in messages %}
-                    <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show" role="alert">
-                        <div class="d-flex align-items-center">
-                            <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} me-2"></i>
-                            <div>{{ message }}</div>
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
-
-    {% if view_type == 'list' %}
-    <!-- Pending Orders Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Pending Orders</h5>
-                    <span class="badge bg-white text-primary">{{ pending_orders|length }} orders</span>
-                </div>
-                <div class="card-body">
-                    {% if pending_orders %}
-                        <div class="row g-4">
-                            {% for order in pending_orders %}
-                                <div class="col-12 col-md-6 col-lg-4">
-                                    <div class="card h-100 order-card border-start border-primary border-3">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                                <div>
-                                                    <h6 class="card-title mb-1">
-                                                        <i class="fas fa-user me-2 text-secondary"></i>
-                                                        {{ order.user.first_name }} {{ order.user.last_name }}
-                                                    </h6>
-                                                    <small class="text-muted">Ordered: {{ order.created_at|timesince }} ago</small>
-                                                </div>
-                                                <span class="badge bg-primary">#{{ order.id }}</span>
-                                            </div>
-                                            
-                                            <div class="order-details mb-3 flex-grow-1">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-tint me-2 text-info"></i>
-                                                    <div>
-                                                        <span class="fw-bold">{{ order.tanker.capacity }}L</span>
-                                                        <span class="text-muted ms-2">{{ order.tanker.get_category_display }}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex align-items-start mb-2">
-                                                    <i class="fas fa-map-marker-alt me-2 text-danger mt-1"></i>
-                                                    <div>
-                                                        <span class="d-block">{% if order.location %}{{ order.location.address_line }}{% else %}N/A{% endif %}</span>
-                                                        <small class="text-muted">{% if order.location %}{{ order.location.city }}{% endif %}</small>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-info-circle me-2 text-warning"></i>
-                                                    <span class="badge bg-secondary">{{ order.order_status }}</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="order-actions mt-auto">
-                                                <form method="post" action="{% url 'update_order_status' %}" class="d-flex flex-wrap gap-2">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="order_id" value="{{ order.id }}">
-                                                    <button type="submit" name="action" value="accept" class="btn btn-success btn-sm flex-grow-1">
-                                                        <i class="fas fa-check-circle me-1"></i> Accept
-                                                    </button>
-                                                    <button type="submit" name="action" value="cancel" class="btn btn-danger btn-sm flex-grow-1">
-                                                        <i class="fas fa-times-circle me-1"></i> Reject
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="empty-state text-center py-5">
-                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No pending orders available</h5>
-                            <p class="text-muted">When new orders come in, they'll appear here</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- On The Way Orders Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-truck-moving me-2"></i>On The Way Orders</h5>
-                    <span class="badge bg-white text-warning">{{ ontheway_orders|length }} orders</span>
-                </div>
-                <div class="card-body">
-                    {% if ontheway_orders %}
-                        <div class="row g-4">
-                            {% for order in ontheway_orders %}
-                                <div class="col-12 col-md-6 col-lg-4">
-                                    <div class="card h-100 order-card border-start border-warning border-3">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                                <div>
-                                                    <h6 class="card-title mb-1">
-                                                        <i class="fas fa-user me-2 text-secondary"></i>
-                                                        {{ order.user.first_name }} {{ order.user.last_name }}
-                                                    </h6>
-                                                    <small class="text-muted">Accepted: {{ order.updated_at|timesince }} ago</small>
-                                                </div>
-                                                <span class="badge bg-warning text-dark">#{{ order.id }}</span>
-                                            </div>
-                                            
-                                            <div class="order-details mb-3 flex-grow-1">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-tint me-2 text-info"></i>
-                                                    <div>
-                                                        <span class="fw-bold">{{ order.tanker.capacity }}L</span>
-                                                        <span class="text-muted ms-2">{{ order.tanker.get_category_display }}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex align-items-start mb-2">
-                                                    <i class="fas fa-map-marker-alt me-2 text-danger mt-1"></i>
-                                                    <div>
-                                                        <span class="d-block">{% if order.location %}{{ order.location.address_line }}{% else %}N/A{% endif %}</span>
-                                                        <small class="text-muted">{% if order.location %}{{ order.location.city }}{% endif %}</small>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-info-circle me-2 text-warning"></i>
-                                                    <span class="badge bg-warning text-dark">{{ order.order_status }}</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="order-actions mt-auto">
-                                                <form method="post" action="{% url 'update_order_status' %}" class="d-grid">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="order_id" value="{{ order.id }}">
-                                                    <input type="hidden" name="action" value="update_status">
-                                                    <button type="submit" name="supplier_update_order_status" value="Delivered" class="btn btn-success btn-sm">
-                                                        <i class="fas fa-check-circle me-1"></i> Mark as Delivered
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="empty-state text-center py-5">
-                            <i class="fas fa-road fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No orders on the way</h5>
-                            <p class="text-muted">Accepted orders that are en route will appear here</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Accepted Orders Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Accepted Orders</h5>
-                    <span class="badge bg-white text-success">{{ accepted_orders|length }} orders</span>
-                </div>
-                <div class="card-body">
-                    {% if accepted_orders %}
-                        <div class="row g-4">
-                            {% for order in accepted_orders %}
-                                <div class="col-12 col-md-6 col-lg-4">
-                                    <div class="card h-100 order-card border-start border-success border-3">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                                <div>
-                                                    <h6 class="card-title mb-1">
-                                                        <i class="fas fa-user me-2 text-secondary"></i>
-                                                        {{ order.user.first_name }} {{ order.user.last_name }}
-                                                    </h6>
-                                                    <small class="text-muted">Accepted: {{ order.updated_at|timesince }} ago</small>
-                                                </div>
-                                                <span class="badge bg-success">#{{ order.id }}</span>
-                                            </div>
-                                            
-                                            <div class="order-details mb-3 flex-grow-1">
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <i class="fas fa-tint me-2 text-info"></i>
-                                                    <div>
-                                                        <span class="fw-bold">{{ order.tanker.capacity }}L</span>
-                                                        <span class="text-muted ms-2">{{ order.tanker.get_category_display }}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex align-items-start mb-2">
-                                                    <i class="fas fa-map-marker-alt me-2 text-danger mt-1"></i>
-                                                    <div>
-                                                        <span class="d-block">{% if order.location %}{{ order.location.address_line }}{% else %}N/A{% endif %}</span>
-                                                        <small class="text-muted">{% if order.location %}{{ order.location.city }}{% endif %}</small>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-info-circle me-2 text-success"></i>
-                                                    <span class="badge bg-success">{{ order.order_status }}</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="order-actions mt-auto">
-                                                <form method="post" action="{% url 'update_order_status' %}" class="d-flex flex-wrap gap-2">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="order_id" value="{{ order.id }}">
-                                                    <input type="hidden" name="action" value="update_status">
-                                                    <button type="submit" name="supplier_update_order_status" value="Canceled" class="btn btn-danger btn-sm flex-grow-1">
-                                                        <i class="fas fa-ban me-1"></i> Cancel
-                                                    </button>
-                                                    <button type="submit" name="supplier_update_order_status" value="On the Way" class="btn btn-warning btn-sm flex-grow-1">
-                                                        <i class="fas fa-truck me-1"></i> On Way
-                                                    </button>
-                                                    <button type="submit" name="supplier_update_order_status" value="Delivered" class="btn btn-success btn-sm flex-grow-1">
-                                                        <i class="fas fa-check me-1"></i> Complete
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="empty-state text-center py-5">
-                            <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No accepted orders</h5>
-                            <p class="text-muted">Orders you've accepted will appear here</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+  {% endif %}
 </div>
 
-<!-- Custom CSS -->
-<style>
-    :root {
-        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        --card-hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    }
-    
-    .order-card {
-        transition: all 0.3s ease;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: var(--card-shadow);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-    
-    .order-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--card-hover-shadow);
-    }
-    
-    .card-header {
-        border-radius: 10px 10px 0 0 !important;
-        padding: 1rem 1.5rem;
-    }
-    
-    .order-details {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 1rem;
-    }
-    
-    .empty-state {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 2rem;
-    }
-    
-    .page-header {
-        padding: 10px 0;
-    }
-    
-    .status-badges .badge {
-        font-size: 0.9rem;
-        padding: 8px 12px;
-        border-radius: 20px;
-        box-shadow: var(--card-shadow);
-    }
-    
-    .btn-sm {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-    }
-    
-    .btn-sm:hover {
-        transform: translateY(-2px);
-    }
-    
-    hr {
-        border-top: 2px solid rgba(0, 0, 0, 0.1);
-        margin: 1.5rem 0;
-    }
-    
-    .order-actions .btn {
-        white-space: nowrap;
-    }
-    
-    @media (max-width: 992px) {
-        .status-badges .badge {
-            font-size: 0.8rem;
-            padding: 6px 10px;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .status-badges {
-            margin-top: 1rem;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .status-badges .badge {
-            flex: 1;
-            margin: 0 0.25rem;
-            text-align: center;
-            font-size: 0.75rem;
-        }
-        
-        .card-header h5 {
-            font-size: 1.1rem;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .order-actions .btn {
-            width: 100%;
-            margin-bottom: 0.5rem;
-        }
-        
-        .order-actions form {
-            gap: 0.5rem !important;
-        }
-        
-        .empty-state {
-            padding: 1.5rem;
-        }
-    }
-</style>
+<!-- Pending Orders -->
+<div class="card mb-4">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <span><i class="bi bi-clock me-2" style="color:var(--warning)"></i>Pending Orders</span>
+    <span class="badge bg-warning text-dark">{{ pending_orders|length }}</span>
+  </div>
+  <div class="card-body p-0">
+    {% if pending_orders %}
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Location</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in pending_orders %}
+              <tr>
+                <td><span style="font-weight:700">#{{ order.id }}</span></td>
+                <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                <td>
+                  <div style="font-size:13px">{{ order.location.city|default:"—" }}</div>
+                  <div style="font-size:11.5px;color:var(--text-muted)">{{ order.location.pincode|default:"" }}</div>
+                </td>
+                <td><span style="font-weight:600">{{ order.quantity }}L</span></td>
+                <td><span style="font-weight:700;color:var(--success)">₹{{ order.price }}</span></td>
+                <td>
+                  <form method="POST" action="{% url 'update_order_status' %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                    <input type="hidden" name="action" value="accept">
+                    <button type="submit" class="btn btn-success btn-sm">
+                      <i class="bi bi-check2 me-1"></i>Accept
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding:32px">
+        <div class="empty-state-icon" style="font-size:36px"><i class="bi bi-inbox"></i></div>
+        <p style="color:var(--text-muted);font-size:13.5px">
+          {% if is_available %}No pending orders near you.{% else %}Go online to see pending orders.{% endif %}
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</div>
 
-<!-- Bootstrap JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Accepted Orders -->
+<div class="card mb-4">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <span><i class="bi bi-check2-circle me-2" style="color:var(--success)"></i>Accepted Orders</span>
+    <span class="badge bg-success">{{ accepted_orders|length }}</span>
+  </div>
+  <div class="card-body p-0">
+    {% if accepted_orders %}
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Location</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in accepted_orders %}
+              <tr>
+                <td><span style="font-weight:700">#{{ order.id }}</span></td>
+                <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                <td>
+                  <div style="font-size:13px">{{ order.location.city|default:"—" }}</div>
+                  <div style="font-size:11.5px;color:var(--text-muted)">{{ order.location.pincode|default:"" }}</div>
+                </td>
+                <td><span style="font-weight:600">{{ order.quantity }}L</span></td>
+                <td><span style="font-weight:700;color:var(--success)">₹{{ order.price }}</span></td>
+                <td class="d-flex gap-1 flex-wrap">
+                  <form method="POST" action="{% url 'update_order_status' %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                    <input type="hidden" name="action" value="on_the_way">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                      <i class="bi bi-truck me-1"></i>On Way
+                    </button>
+                  </form>
+                  <form method="POST" action="{% url 'update_order_status' %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                    <input type="hidden" name="action" value="cancel">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Cancel this order?')">
+                      <i class="bi bi-x-circle me-1"></i>Cancel
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding:32px">
+        <div class="empty-state-icon" style="font-size:36px"><i class="bi bi-clipboard2-minus"></i></div>
+        <p style="color:var(--text-muted);font-size:13.5px">No accepted orders.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- On The Way Orders -->
+<div class="card">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <span><i class="bi bi-truck me-2" style="color:var(--primary)"></i>In Transit</span>
+    <span class="badge bg-primary">{{ ontheway_orders|length }}</span>
+  </div>
+  <div class="card-body p-0">
+    {% if ontheway_orders %}
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Location</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in ontheway_orders %}
+              <tr>
+                <td><span style="font-weight:700">#{{ order.id }}</span></td>
+                <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                <td>
+                  <div style="font-size:13px">{{ order.location.city|default:"—" }}</div>
+                  <div style="font-size:11.5px;color:var(--text-muted)">{{ order.location.pincode|default:"" }}</div>
+                </td>
+                <td><span style="font-weight:600">{{ order.quantity }}L</span></td>
+                <td><span style="font-weight:700;color:var(--success)">₹{{ order.price }}</span></td>
+                <td>
+                  <form method="POST" action="{% url 'update_order_status' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                    <input type="hidden" name="action" value="deliver">
+                    <button type="submit" class="btn btn-success btn-sm"
+                            onclick="return confirm('Mark as delivered?')">
+                      <i class="bi bi-check-circle me-1"></i>Delivered
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding:32px">
+        <div class="empty-state-icon" style="font-size:36px"><i class="bi bi-truck"></i></div>
+        <p style="color:var(--text-muted);font-size:13.5px">No orders in transit.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
